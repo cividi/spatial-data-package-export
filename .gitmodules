@@ -1,0 +1,3 @@
+[submodule "GemeindescanExporter/qgis_plugin_tools"]
+	path = GemeindescanExporter/qgis_plugin_tools
+	url = https://github.com/GispoCoding/qgis_plugin_tools.git

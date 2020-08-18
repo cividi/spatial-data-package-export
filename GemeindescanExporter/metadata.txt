@@ -1,0 +1,16 @@
+[general]
+name=GemeindescanExporter
+description=Gemeindescan Exporter plugin
+about=Plugin to export data and styles to <a href="https://gemeindescan.ch/de/">gemeindescan</a>
+version=0.0.1
+qgisMinimumVersion=3.0
+author=Gispo Ltd.
+email=joona@gispo.fi
+changelog=
+tags=python, gemeindescan, export
+repository=https://github.com/GispoCoding/gemeindescan-exporter
+homepage=https://github.com/GispoCoding/gemeindescan-exporter
+tracker=https://github.com/GispoCoding/gemeindescan-exporter/issues
+category=Plugins
+experimental=True
+deprecated=False
