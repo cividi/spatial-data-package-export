@@ -1,0 +1,50 @@
+{
+  "0": {
+    "value": "1",
+    "label": "1",
+    "style": {
+      "fill": "#ec1182",
+      "fill-opacity": 1.0,
+      "stroke": "#232323",
+      "stroke-opacity": 1.0,
+      "stroke-width": "0.26",
+      "type": "rectangle"
+    }
+  },
+  "1": {
+    "value": "2",
+    "label": "2",
+    "style": {
+      "fill": "#3df091",
+      "fill-opacity": 1.0,
+      "stroke": "#232323",
+      "stroke-opacity": 1.0,
+      "stroke-width": "0.26",
+      "type": "rectangle"
+    }
+  },
+  "2": {
+    "value": "3",
+    "label": "3",
+    "style": {
+      "fill": "#4b50e2",
+      "fill-opacity": 1.0,
+      "stroke": "#232323",
+      "stroke-opacity": 1.0,
+      "stroke-width": "0.26",
+      "type": "rectangle"
+    }
+  },
+  "3": {
+    "value": "",
+    "label": "",
+    "style": {
+      "fill": "#cecd73",
+      "fill-opacity": 1.0,
+      "stroke": "#232323",
+      "stroke-opacity": 1.0,
+      "stroke-width": "0.26",
+      "type": "rectangle"
+    }
+  }
+}

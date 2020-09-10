@@ -1,0 +1,34 @@
+{
+  "1": {
+    "fillColor": "#ec1182",
+    "fillOpacity": 1.0,
+    "strokeColor": "#232323",
+    "strokeOpacity": 1.0,
+    "strokeWidth": "0.26",
+    "shape": "rectangle"
+  },
+  "2": {
+    "fillColor": "#3df091",
+    "fillOpacity": 1.0,
+    "strokeColor": "#232323",
+    "strokeOpacity": 1.0,
+    "strokeWidth": "0.26",
+    "shape": "rectangle"
+  },
+  "3": {
+    "fillColor": "#4b50e2",
+    "fillOpacity": 1.0,
+    "strokeColor": "#232323",
+    "strokeOpacity": 1.0,
+    "strokeWidth": "0.26",
+    "shape": "rectangle"
+  },
+  "": {
+    "fillColor": "#cecd73",
+    "fillOpacity": 1.0,
+    "strokeColor": "#232323",
+    "strokeOpacity": 1.0,
+    "strokeWidth": "0.26",
+    "shape": "rectangle"
+  }
+}
