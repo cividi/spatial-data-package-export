@@ -172,7 +172,7 @@ class Plugin:
             self.plugin_is_active = True
 
             if self.dock_widget is None:
-                self.dock_widget = ExporterDockWidget()
+                self.dock_widget = ExporterDockWidget(self.iface)
 
         self.dock_widget.closingPlugin.connect(self.onClosePlugin)
 

@@ -48,9 +48,9 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>0</y>
+         <y>-42</y>
          <width>658</width>
-         <height>455</height>
+         <height>351</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -111,9 +111,6 @@
            <item row="5" column="1">
             <widget class="QTextEdit" name="descriptionInput"/>
            </item>
-           <item row="6" column="1">
-            <widget class="QgsExtentGroupBox" name="extentInput"/>
-           </item>
            <item row="1" column="1">
             <widget class="QLineEdit" name="sourceInput"/>
            </item>
@@ -147,6 +144,30 @@
               <string>Snapshot title</string>
              </property>
             </widget>
+           </item>
+           <item row="6" column="1">
+            <layout class="QGridLayout" name="gridLayout_2">
+             <item row="1" column="1" colspan="2">
+              <widget class="QPushButton" name="btn_calculate_extent">
+               <property name="text">
+                <string>Calculate bounds</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QSpinBox" name="sb_extent_precision"/>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLineEdit" name="le_extent"/>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>Precision</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
@@ -234,12 +255,6 @@
    <class>QgsCollapsibleGroupBox</class>
    <extends>QGroupBox</extends>
    <header>qgscollapsiblegroupbox.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QgsExtentGroupBox</class>
-   <extends>QgsCollapsibleGroupBox</extends>
-   <header>qgsextentgroupbox.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

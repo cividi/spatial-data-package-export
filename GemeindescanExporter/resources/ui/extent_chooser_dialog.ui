@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>extent_chooser</class>
+    <widget class="QDialog" name="extent_chooser">
+        <property name="windowModality">
+            <enum>Qt::WindowModal</enum>
+        </property>
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>317</width>
+                <height>146</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>Dialog</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+                <widget class="QLabel" name="layerLabel">
+                    <property name="font">
+                        <font>
+                            <pointsize>9</pointsize>
+                            <weight>75</weight>
+                            <bold>true</bold>
+                        </font>
+                    </property>
+                    <property name="text">
+                        <string>Choose extent for the export</string>
+                    </property>
+                </widget>
+            </item>
+            <item>
+                <widget class="QgsExtentGroupBox" name="gb_extent">
+                    <property name="inputMethodHints">
+                        <set>Qt::ImhNone</set>
+                    </property>
+                    <property name="title">
+                        <string>Extent (current: none)</string>
+                    </property>
+                    <property name="flat">
+                        <bool>true</bool>
+                    </property>
+                    <property name="checkable">
+                        <bool>false</bool>
+                    </property>
+                    <property name="checked">
+                        <bool>false</bool>
+                    </property>
+                    <property name="collapsed">
+                        <bool>true</bool>
+                    </property>
+                    <property name="syncGroup">
+                        <string/>
+                    </property>
+                    <property name="scrollOnExpand">
+                        <bool>true</bool>
+                    </property>
+                    <property name="saveCheckedState">
+                        <bool>false</bool>
+                    </property>
+                    <property name="titleBase">
+                        <string>Extent</string>
+                    </property>
+                </widget>
+            </item>
+            <item>
+                <spacer name="verticalSpacer">
+                    <property name="orientation">
+                        <enum>Qt::Vertical</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                        <size>
+                            <width>20</width>
+                            <height>49</height>
+                        </size>
+                    </property>
+                </spacer>
+            </item>
+            <item>
+                <widget class="QDialogButtonBox" name="buttonBox">
+                    <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="standardButtons">
+                        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+                    </property>
+                </widget>
+            </item>
+        </layout>
+    </widget>
+    <customwidgets>
+        <customwidget>
+            <class>QgsCollapsibleGroupBox</class>
+            <extends>QGroupBox</extends>
+            <header>qgscollapsiblegroupbox.h</header>
+            <container>1</container>
+        </customwidget>
+        <customwidget>
+            <class>QgsExtentGroupBox</class>
+            <extends>QgsCollapsibleGroupBox</extends>
+            <header>qgsextentgroupbox.h</header>
+            <container>1</container>
+        </customwidget>
+    </customwidgets>
+    <resources/>
+    <connections>
+        <connection>
+            <sender>buttonBox</sender>
+            <signal>accepted()</signal>
+            <receiver>extent_chooser</receiver>
+            <slot>accept()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>248</x>
+                    <y>254</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>157</x>
+                    <y>274</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>buttonBox</sender>
+            <signal>rejected()</signal>
+            <receiver>extent_chooser</receiver>
+            <slot>reject()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>316</x>
+                    <y>260</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>286</x>
+                    <y>274</y>
+                </hint>
+            </hints>
+        </connection>
+    </connections>
+</ui>

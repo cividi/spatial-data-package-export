@@ -35,7 +35,7 @@ This is a temporary workaround until bug is fixed.
 """
 
 params = {
-    # 'EXTENT': '0.0,10.0,40,50 [EPSG:4326]',
+    'EXTENT': task_variables.EXTENT,
     'INPUT': task_variables.LAYER,
     'OUTPUT': task_variables.OUTPUT
 }

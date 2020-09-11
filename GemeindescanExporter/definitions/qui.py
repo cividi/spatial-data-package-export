@@ -16,14 +16,9 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with GemeindescanExporter.  If not, see <https://www.gnu.org/licenses/>.
+import enum
 
-# Variables
-FEEDBACK = None
-CONTEXT = None
-LAYER = None
-OUTPUT = None
-EXTENT = None
 
-# Signals
-EXECUTED = None
-COMPLETED = None
+@enum.unique
+class GuiS(enum.Enum):
+    extent_precision = 8

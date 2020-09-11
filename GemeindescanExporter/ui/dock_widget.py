@@ -27,12 +27,17 @@ from typing import Dict
 
 from PyQt5.QtCore import pyqtSignal
 from qgis.PyQt import QtWidgets
-from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsProject)
-from qgis.gui import QgsMapLayerComboBox
+from qgis.core import (QgsProcessingContext, QgsVectorLayer, QgsProject,
+                       QgsMapLayerProxyModel, QgsRectangle)
+from qgis.gui import QgsMapLayerComboBox, QgisInterface
 
+from .extent_dialog import ExtentChooserDialog
+from ..definitions.qui import GuiS
 from ..qgis_plugin_tools.tools.custom_logging import bar_msg
 from ..qgis_plugin_tools.tools.i18n import tr
+from ..qgis_plugin_tools.tools.logger_processing import LoggerProcessingFeedBack
 from ..qgis_plugin_tools.tools.resources import plugin_path, load_ui, plugin_name, resources_path
+from ..qgis_plugin_tools.tools.settings import get_setting, set_setting
 
 processing_path = plugin_path('core', 'processing')
 if processing_path not in sys.path:
@@ -46,21 +51,42 @@ LOGGER = logging.getLogger(plugin_name())
 class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     closingPlugin = pyqtSignal()
 
-    def __init__(self, parent=None):
+    def __init__(self, iface: QgisInterface, parent=None):
         super(ExporterDockWidget, self).__init__(parent)
-
         self.setupUi(self)
+        self.iface = iface
+        self.responsive_items = [self.pushButtonExport]
+        self.extent: QgsRectangle = self.iface.mapCanvas().extent()
+        self.sb_extent_precision.setValue(
+            get_setting(GuiS.extent_precision.name, GuiS.extent_precision.value, int))
+        self.le_extent.setText(self.extent.toString(self.sb_extent_precision.value()))
 
+        self.m_layer_cb.setFilters(QgsMapLayerProxyModel.Filters(QgsMapLayerProxyModel.Filter.PointLayer |
+                                                                 QgsMapLayerProxyModel.Filter.PolygonLayer |
+                                                                 QgsMapLayerProxyModel.Filter.LineLayer))
         self.pushButtonExport.clicked.connect(self.run)
-        self.items = [self.pushButtonExport]
+
+    def on_sb_extent_precision_valueChanged(self, new_val: int):
+        set_setting(GuiS.extent_precision.name, new_val)
+
+    def on_btn_calculate_extent_clicked(self):
+        curr_layer = self.m_layer_cb.currentLayer()
+        canvas = self.iface.mapCanvas()
+        crs = curr_layer.crs() if curr_layer is not None else canvas.mapSettings().destinationCrs()
+        extent_chooser = ExtentChooserDialog(canvas, crs)
+
+        result = extent_chooser.exec()
+        if result:
+            self.extent = extent_chooser.get_extent(self.sb_extent_precision.value())
+            self.le_extent.setText(self.extent.toString(self.sb_extent_precision.value()))
 
     def disable_ui(self):
-        for item in self.items:
+        for item in self.responsive_items:
             item.setEnabled(False)
 
     def completed(self, *args, **kwargs):
         print(1)
-        for item in self.items:
+        for item in self.responsive_items:
             item.setEnabled(True)
         LOGGER.info("Finished!!")
 
@@ -70,7 +96,8 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         LOGGER.info(f"Exporting {layer_name}")
 
         task_variables.CONTEXT = QgsProcessingContext()
-        task_variables.FEEDBACK = QgsProcessingFeedback()
+        task_variables.FEEDBACK = LoggerProcessingFeedBack(use_logger=True)
+        task_variables.EXTENT = self.extent
         task_variables.LAYER = cb.currentLayer()
         task_variables.OUTPUT = f'memory:{layer_name}-snapshot'
         task_variables.COMPLETED = lambda *args, **kwargs: self.completed()

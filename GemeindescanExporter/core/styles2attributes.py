@@ -17,17 +17,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with GemeindescanExporter.  If not, see <https://www.gnu.org/licenses/>.
 
-import logging
 from typing import Optional
 
 from PyQt5.QtCore import QVariant
 from qgis.core import (QgsVectorLayer, QgsFields, QgsField, QgsFeatureSink, QgsFillSymbol, QgsLineSymbol,
-                       QgsFeature, QgsProcessingFeedback)
+                       QgsFeature, QgsProcessingFeedback, QgsRectangle, QgsSpatialIndex, QgsFeatureRequest)
 
-from GemeindescanExporter.definitions.symbols import SymbolLayerType, SymbolType
-from GemeindescanExporter.qgis_plugin_tools.tools.resources import task_logger_name
-
-LOGGER = logging.getLogger(task_logger_name())
+from ..definitions.symbols import SymbolLayerType, SymbolType
 
 
 class StylesToAttributes:
@@ -42,10 +38,13 @@ class StylesToAttributes:
         "stroke-width": 1.0
     }
 
-    def __init__(self, layer: QgsVectorLayer, layer_name: str, field_template: Optional = None,
+    def __init__(self, layer: QgsVectorLayer, layer_name: str, feedback: QgsProcessingFeedback,
+                 field_template: Optional = None,
                  primary_layer: bool = False):
         self.layer = layer
         self.layer_name = layer_name
+        self.feedback = feedback
+
         self.renderer = self.layer.renderer()
         self.symbol_type: SymbolType = SymbolType[self.renderer.type()]
 
@@ -70,7 +69,7 @@ class StylesToAttributes:
         return _rgb, alpha
 
     def _get_style(self, symbol):
-        LOGGER.info(type(symbol))
+        self.feedback.pushDebugInfo(type(symbol))
         style = self.field_template.copy()
         sym_type = SymbolLayerType[symbol.symbolLayers()[0].layerType()]
         if isinstance(symbol, QgsFillSymbol):
@@ -96,7 +95,7 @@ class StylesToAttributes:
 
         elif isinstance(symbol, QgsLineSymbol):
             if sym_type == "SimpleLine":
-                LOGGER.info(symbol.symbolLayers()[0].properties())
+                self.feedback.pushDebugInfo(symbol.symbolLayers()[0].properties())
                 style["type"] = "line"
                 sym = symbol.symbolLayers()[0].properties()
                 style["fill"] = "transparent"
@@ -126,17 +125,24 @@ class StylesToAttributes:
             style = self._get_style(self.renderer.symbol())
             self.symbols[0] = {'range_lower': None, 'range_upper': None, 'label': self.layer_name, 'style': style}
 
-    def run(self, sink: QgsFeatureSink, feedback: QgsProcessingFeedback):
+    def run(self, sink: QgsFeatureSink, extent: Optional[QgsRectangle] = None):
         self._update_symbols()
         self._update_legend()
-        self._copy_fields(sink, feedback)
+        self._copy_fields(sink, extent)
 
-    def _copy_fields(self, sink: QgsFeatureSink, feedback: QgsProcessingFeedback):
+    def _copy_fields(self, sink: QgsFeatureSink, extent: Optional[QgsRectangle] = None):
         total = 100.0 / self.layer.featureCount()
-        features = self.layer.getFeatures()
+        if extent is not None:
+            self.feedback.pushDebugInfo(f'Extent: {extent.toString()}')
+            source_index = QgsSpatialIndex(self.layer, self.feedback)
+            ids = source_index.intersects(extent)
+            features = self.layer.getFeatures(QgsFeatureRequest().setFilterFids(ids))
+        else:
+            features = self.layer.getFeatures()
+
         f: QgsFeature
         for current, f in enumerate(features):
-            if feedback.isCanceled():
+            if self.feedback.isCanceled():
                 break
 
             if not f.hasGeometry():
@@ -150,7 +156,7 @@ class StylesToAttributes:
                 feat.setAttributes(attributes)
                 feat.setGeometry(f.geometry())
                 sink.addFeature(feat, QgsFeatureSink.FastInsert)
-            feedback.setProgress(int(current * total))
+            self.feedback.setProgress(int(current * total))
 
     def _generate_fields(self) -> QgsFields:
         fields: QgsFields = self.layer.fields()
