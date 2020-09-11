@@ -16,17 +16,21 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with GemeindescanExporter.  If not, see <https://www.gnu.org/licenses/>.
-
 from typing import Callable, Optional
 
-from PyQt5.QtCore import QTranslator, QCoreApplication
+from PyQt5.QtCore import QTranslator, QCoreApplication, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QWidget
+from qgis.PyQt import QtWidgets
+from qgis.core import QgsVectorLayer, QgsApplication
 from qgis.gui import QgisInterface
 
+from .core.orig import Exporter
+from .core.processing.provider import GemeindescanProcessingProvider
 from .qgis_plugin_tools.tools.custom_logging import setup_logger
 from .qgis_plugin_tools.tools.i18n import setup_translation, tr
 from .qgis_plugin_tools.tools.resources import plugin_name
+from .ui.dock_widget import ExporterDockWidget
 
 
 class Plugin:
@@ -37,6 +41,7 @@ class Plugin:
         self.iface = iface
 
         setup_logger(plugin_name(), iface)
+        # setup_task_logger(plugin_name())
 
         # initialize locale
         locale, file_path = setup_translation()
@@ -50,6 +55,13 @@ class Plugin:
 
         self.actions = []
         self.menu = tr(plugin_name())
+
+        # Check if plugin was started the first time in current QGIS session
+        # Must be set in initGui() to survive plugin reloads
+        self.dock_widget: Optional[QtWidgets.QDockWidget] = None
+        self.plugin_is_active = False
+
+        self.processing_provider = GemeindescanProcessingProvider()
 
     def add_action(
             self,
@@ -127,10 +139,21 @@ class Plugin:
             parent=self.iface.mainWindow(),
             add_to_toolbar=False
         )
+        self.add_action(
+            "",
+            text=tr("original script"),
+            callback=self.run_orig,
+            parent=self.iface.mainWindow(),
+            add_to_toolbar=False
+        )
+
+        QgsApplication.processingRegistry().addProvider(self.processing_provider)
 
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin dockwidget is closed"""
-        pass
+        if self.dock_widget is not None:
+            self.dock_widget.closingPlugin.disconnect(self.onClosePlugin)
+            self.plugin_is_active = False
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -140,6 +163,28 @@ class Plugin:
                 action)
             self.iface.removeToolBarIcon(action)
 
+        QgsApplication.processingRegistry().removeProvider(self.processing_provider)
+
+    # noinspection PyArgumentList
     def run(self):
         """Run method that performs all the real work"""
+        if not self.plugin_is_active:
+            self.plugin_is_active = True
+
+            if self.dock_widget is None:
+                self.dock_widget = ExporterDockWidget()
+
+        self.dock_widget.closingPlugin.connect(self.onClosePlugin)
+
+        self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dock_widget)
+        self.dock_widget.show()
+
+    # noinspection PyArgumentList
+    def run_orig(self):
+        """Run method that performs all the real work"""
         print("Hello QGIS plugin")
+        layer: QgsVectorLayer = self.iface.activeLayer()
+        if layer is not None:
+            exporter = Exporter()
+            exporter.write_layer(layer.name())
+            # QgsProject.instance().addMapLayer(f"{layer.name()}-snapshot")

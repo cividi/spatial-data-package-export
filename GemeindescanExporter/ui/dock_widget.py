@@ -17,6 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with GemeindescanExporter.  If not, see <https://www.gnu.org/licenses/>.
 
+# Have to do absolute import in order to modify module variables
 import logging
 import os
 import sys
@@ -24,33 +25,34 @@ import tempfile
 from importlib import reload
 from typing import Dict
 
-from PyQt5.QtWidgets import QDialog
-from qgis.core import QgsProcessingContext, QgsProject, QgsProcessingFeedback, QgsVectorLayer
-from qgis.gui import QgsMapLayerComboBox, QgisInterface
+from PyQt5.QtCore import pyqtSignal
+from qgis.PyQt import QtWidgets
+from qgis.core import (QgsProcessingContext, QgsProcessingFeedback, QgsVectorLayer, QgsProject)
+from qgis.gui import QgsMapLayerComboBox
 
 from ..qgis_plugin_tools.tools.custom_logging import bar_msg
 from ..qgis_plugin_tools.tools.i18n import tr
-from ..qgis_plugin_tools.tools.resources import load_ui, plugin_name, plugin_path, resources_path
+from ..qgis_plugin_tools.tools.resources import plugin_path, load_ui, plugin_name, resources_path
 
-# Have to do absolute import in order to modify module variables
 processing_path = plugin_path('core', 'processing')
 if processing_path not in sys.path:
     sys.path.append(processing_path)
 import task_variables
 
-FORM_CLASS = load_ui('main_dialog.ui')
+FORM_CLASS = load_ui('main_dialog_dock.ui')
 LOGGER = logging.getLogger(plugin_name())
 
 
-class Dialog(QDialog, FORM_CLASS):
+class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
+    closingPlugin = pyqtSignal()
 
-    def __init__(self, iface: QgisInterface, parent=None):
-        super(Dialog, self).__init__(parent)
-        # QDialog.__init__(self, parent)
-        self.iface = iface
+    def __init__(self, parent=None):
+        super(ExporterDockWidget, self).__init__(parent)
+
         self.setupUi(self)
-        self.b_export.clicked.connect(self.run)
-        self.items = [self.b_export, self.m_layer_cb]
+
+        self.pushButtonExport.clicked.connect(self.run)
+        self.items = [self.pushButtonExport]
 
     def disable_ui(self):
         for item in self.items:
@@ -78,6 +80,7 @@ class Dialog(QDialog, FORM_CLASS):
         modulename = 'GemeindescanExporter.core.processing.task_runner'
         if modulename in sys.modules:
             from ..core.processing import task_runner
+            # noinspection PyTypeChecker
             reload(task_runner)
         else:
             from ..core.processing import task_runner
