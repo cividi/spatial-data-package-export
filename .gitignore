@@ -127,3 +127,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+GemeindescanExporter/test/data/test_data.gpkg-shm
+GemeindescanExporter/test/data/test_data.gpkg-wal
