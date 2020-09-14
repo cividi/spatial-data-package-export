@@ -18,6 +18,7 @@
 #  along with GemeindescanExporter.  If not, see <https://www.gnu.org/licenses/>.
 
 # Have to do absolute import in order to modify module variables
+import json
 import logging
 import os
 import sys
@@ -29,10 +30,14 @@ from PyQt5.QtCore import pyqtSignal
 from qgis.PyQt import QtWidgets
 from qgis.core import (QgsProcessingContext, QgsVectorLayer, QgsProject,
                        QgsMapLayerProxyModel, QgsRectangle)
-from qgis.gui import QgsMapLayerComboBox, QgisInterface
+from qgis.gui import QgsMapLayerComboBox, QgisInterface, QgsFileWidget
 
 from .extent_dialog import ExtentChooserDialog
-from ..definitions.qui import GuiS
+from ..core.datapackage import DatapackageWriter
+from ..core.utils import load_config_from_template, extent_to_datapackage_bounds
+from ..definitions.configurable_settings import Settings
+from ..model.snapshot import Legend
+from ..model.styled_layer import StyledLayer
 from ..qgis_plugin_tools.tools.custom_logging import bar_msg
 from ..qgis_plugin_tools.tools.i18n import tr
 from ..qgis_plugin_tools.tools.logger_processing import LoggerProcessingFeedBack
@@ -55,19 +60,31 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         super(ExporterDockWidget, self).__init__(parent)
         self.setupUi(self)
         self.iface = iface
+        # Template can be configured via settings
+        self.config = load_config_from_template()
+        self.writer = DatapackageWriter(self.config)
         self.responsive_items = [self.pushButtonExport]
         self.extent: QgsRectangle = self.iface.mapCanvas().extent()
         self.sb_extent_precision.setValue(
-            get_setting(GuiS.extent_precision.name, GuiS.extent_precision.value, int))
+            get_setting(Settings.extent_precision.name, Settings.extent_precision.value, int))
         self.le_extent.setText(self.extent.toString(self.sb_extent_precision.value()))
 
         self.m_layer_cb.setFilters(QgsMapLayerProxyModel.Filters(QgsMapLayerProxyModel.Filter.PointLayer |
                                                                  QgsMapLayerProxyModel.Filter.PolygonLayer |
                                                                  QgsMapLayerProxyModel.Filter.LineLayer))
         self.pushButtonExport.clicked.connect(self.run)
+        self._set_initial_values()
+
+    def _set_initial_values(self):
+
+        snap = self.config.snapshots[0]
+        snapshot_config = list(snap.values())[0]
+
+        self.input_title.setText(snapshot_config.title)
+        self.input_description.setText(snapshot_config.description)
 
     def on_sb_extent_precision_valueChanged(self, new_val: int):
-        set_setting(GuiS.extent_precision.name, new_val)
+        set_setting(Settings.extent_precision.name, new_val)
 
     def on_btn_calculate_extent_clicked(self):
         curr_layer = self.m_layer_cb.currentLayer()
@@ -117,10 +134,11 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     def styles_to_attributes_finished(self, input_layer: QgsVectorLayer, context: QgsProcessingContext, succesful: bool,
                                       results: Dict[str, any]):
         if succesful:
+            legends = [Legend.from_dict(legend) for legend in results["OUTPUT_LEGEND"].values()]
             LOGGER.info('Task finished successfully',
-                        extra=bar_msg(f'Legend: {results["OUTPUT_LEGEND"]}'
-                                      ))
-            output_layer: QgsVectorLayer = context.getMapLayer(results['OUTPUT'])
+                        extra=bar_msg(f'Legend: {legends}'))
+            # output_layer: QgsVectorLayer = context.getMapLayer(results['OUTPUT'])
+            output_layer = context.takeResultLayer(results['OUTPUT'])
             # because getMapLayer doesn't transfer ownership, the layer will
             # be deleted when context goes out of scope and you'll get a
             # crash.
@@ -134,5 +152,18 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                         output_layer.loadNamedStyle(style_file)
                     else:
                         LOGGER.error(tr('Could not load style'), extra=bar_msg(msg))
-                QgsProject.instance().addMapLayer(
-                    context.takeResultLayer(output_layer.id()))
+
+                QgsProject.instance().addMapLayer(output_layer)
+
+                styled_layer = StyledLayer(task_variables.NAME, output_layer, legends)
+
+                snap = self.config.snapshots[0]
+                snap_name = list(snap.keys())[0]
+                snapshot_config = list(snap.values())[0]
+                snapshot_config.bounds = extent_to_datapackage_bounds(self.extent, self.sb_extent_precision.value())
+                snapshot = self.writer.create_snapshot(snap_name, snapshot_config, [styled_layer])
+                output: QgsFileWidget = self.f_output
+                path = output.filePath()
+
+                with open(path, 'w') as f:
+                    json.dump(snapshot.to_dict(), f)

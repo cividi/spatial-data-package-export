@@ -16,9 +16,31 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with GemeindescanExporter.  If not, see <https://www.gnu.org/licenses/>.
+import json
 from typing import List
 
 from qgis.core import QgsRectangle
+
+from ..definitions.configurable_settings import Settings
+from ..model.config import Config
+from ..model.snapshot import Snapshot
+from ..qgis_plugin_tools.tools.settings import get_setting
+
+
+def load_config_from_template() -> Config:
+    template_path = get_setting(Settings.export_config_template.name, Settings.export_config_template.value, str)
+    return Config.from_dict(load_json(template_path))
+
+
+def load_snapshot_template() -> Snapshot:
+    template_path = get_setting(Settings.snapshot_template.name, Settings.snapshot_template.value, str)
+    return Snapshot.from_dict(load_json(template_path))
+
+
+def load_json(template_path):
+    with open(template_path) as f:
+        template = json.load(f)
+    return template
 
 
 def extent_to_datapackage_bounds(extent: QgsRectangle, precision: int) -> List[str]:

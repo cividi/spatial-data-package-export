@@ -16,14 +16,16 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with GemeindescanExporter.  If not, see <https://www.gnu.org/licenses/>.
-import json
 import logging
 from typing import List, Optional, Tuple
 
+from .utils import load_json
+from ..definitions.configurable_settings import Settings
 from ..model.config import Config, SnapshotConfig
 from ..model.snapshot import Snapshot, Resource, Legend
 from ..model.styled_layer import StyledLayer
-from ..qgis_plugin_tools.tools.resources import plugin_name, resources_path
+from ..qgis_plugin_tools.tools.resources import plugin_name
+from ..qgis_plugin_tools.tools.settings import get_setting
 
 LOGGER = logging.getLogger(plugin_name())
 
@@ -40,8 +42,8 @@ class DatapackageWriter:
         self.legend_template: Legend = legend_template if legend_template is not None else leg_temp
 
     def _load_default_template(self) -> Tuple[Snapshot, Legend]:
-        with open(resources_path('templates', 'snapshot-template.json')) as f:
-            template = json.load(f)
+        template_path = get_setting(Settings.snapshot_template.name, Settings.snapshot_template.value, str)
+        template = load_json(template_path)
 
         return Snapshot.from_dict(template['snapshot']), Legend.from_dict(template['legend'])
 

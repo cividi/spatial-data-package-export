@@ -18,7 +18,11 @@
 #  along with GemeindescanExporter.  If not, see <https://www.gnu.org/licenses/>.
 import enum
 
+from ..qgis_plugin_tools.tools.resources import resources_path
+
 
 @enum.unique
-class GuiS(enum.Enum):
+class Settings(enum.Enum):
     extent_precision = 8
+    export_config_template = resources_path('templates', 'export-config.json')
+    snapshot_template = resources_path('templates', 'snapshot-template.json')
