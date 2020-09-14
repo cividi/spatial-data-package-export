@@ -34,10 +34,13 @@ def get_symbols_and_legend(name: str) -> Tuple[Dict, Dict]:
     return symbols, legend
 
 
-def get_snapshot_dict(name: str) -> Dict:
-    with open(plugin_test_data_path('snapshots', name)) as f:
-        snapshot_data = json.load(f)
-    return snapshot_data
+def get_test_json(*args: str) -> Dict:
+    f_path = plugin_test_data_path(*args)
+    if not (f_path.endswith('.json') or f_path.endswith('.geojson')):
+        raise ValueError('Invalid path')
+    with open(f_path) as f:
+        data = json.load(f)
+    return data
 
 
 def get_existing_layer_names():

@@ -1,0 +1,35 @@
+{
+  "project_name": "PROJECT-FOLDER-NAME",
+  "data_dir": "data",
+  "snapshots_dir": "snapshots",
+  "dp_template_file": "lib/template.json",
+  "snapshots": [
+    {
+      "DATAPACKAGE-FILENAME": {
+        "title": "TITLE",
+        "description": "",
+        "keywords": [
+          "KEYWORD 1",
+          "KEYWORD 2"
+        ],
+        "gemeindescan_meta": {
+          "topic": "GEMEINDESCAN TOPIC"
+        },
+        "bounds": [
+          "geo:8.35507485,47.06690836",
+          "geo:8.37991615,47.07424457"
+        ],
+        "sources": [
+          {
+            "url": "SOURCE URL",
+            "title": "SOURCE TITLE/DESCRIPTION"
+          }
+        ],
+        "resources": [
+          "LAYER-01 (as named in QGIS)",
+          "LAYER-02 (as named in QGIS)"
+        ]
+      }
+    }
+  ]
+}
