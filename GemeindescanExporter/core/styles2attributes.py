@@ -69,7 +69,7 @@ class StylesToAttributes:
         return _rgb, alpha
 
     def _get_style(self, symbol):
-        self.feedback.pushDebugInfo(type(symbol))
+        self.feedback.pushDebugInfo(str(type(symbol)))
         style = self.field_template.copy()
         sym_type = SymbolLayerType[symbol.symbolLayers()[0].layerType()]
         if isinstance(symbol, QgsFillSymbol):

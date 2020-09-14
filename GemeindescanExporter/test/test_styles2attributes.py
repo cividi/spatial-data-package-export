@@ -27,33 +27,33 @@ STYLE_FIELDS = {'fill', "fill-opacity", "stroke", "stroke-opacity", "stroke-widt
 
 
 def test_fields(new_project, layer_simple_poly):
-    converter = StylesToAttributes(layer_simple_poly, layer_simple_poly.name())
+    converter = StylesToAttributes(layer_simple_poly, layer_simple_poly.name(), QgsProcessingFeedback())
     fields = [f.name() for f in converter.fields.toList()]
     assert len(fields) == len(layer_simple_poly.fields().toList()) + 5
     assert STYLE_FIELDS.difference(fields) == set()
 
 
 def test_simple_poly(new_project, categorized_poly, layer_empty_poly):
-    converter = StylesToAttributes(categorized_poly, categorized_poly.name())
+    converter = StylesToAttributes(categorized_poly, categorized_poly.name(), QgsProcessingFeedback())
     assert converter.symbol_type == SymbolType.categorizedSymbol
 
     update_fields(converter, layer_empty_poly)
     layer_empty_poly.startEditing()
-    converter.run(layer_empty_poly, QgsProcessingFeedback())
+    converter.run(layer_empty_poly)
     layer_empty_poly.commitChanges()
 
     expected_symbols, expected_legend = get_symbols_and_legend('categorized_poly')
-
-    assert layer_empty_poly.featureCount() == categorized_poly.featureCount()
-    common_asserts(converter, expected_legend, expected_symbols, layer_empty_poly)
+    common_asserts(converter, expected_legend, expected_symbols, categorized_poly, layer_empty_poly)
 
 
-def common_asserts(converter, expected_legend, expected_symbols, layer):
+def common_asserts(converter, expected_legend, expected_symbols, src_layer, converted_layer):
+    assert converted_layer.featureCount() == src_layer.featureCount()
+
     assert converter.legend == expected_legend
     assert converter.symbols == expected_symbols
-    for i in range(layer.featureCount()):
+    for i in range(converted_layer.featureCount()):
         # Memory layer indexing starts with 1 instead of 0 (possibly a BUG)
-        f = layer.getFeature(i + 1)
+        f = converted_layer.getFeature(i + 1)
         symbol = expected_symbols[i]
         for key in STYLE_FIELDS:
             assert f[key] == symbol['style'][key]
