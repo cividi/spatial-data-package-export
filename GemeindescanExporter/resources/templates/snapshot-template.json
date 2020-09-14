@@ -1,0 +1,79 @@
+{
+  "snapshot": {
+    "name": "",
+    "title": "",
+    "description": "",
+    "version": "1.0.0",
+    "datapackage_version": "1.0.0",
+    "gemeindescan_version": "0.3.1",
+    "gemeindescan_meta": {
+      "topic": "",
+      "permission": "NOT_LISTED",
+      "is_showcase": false,
+      "bfs_number": 1051
+    },
+    "format": "geojson",
+    "license": "ODC-By-1.0",
+    "licenses": [
+      {
+        "url": "https://opendatacommons.org/licenses/by/1.0/",
+        "type": "ODC-By-1.0"
+      }
+    ],
+    "keywords": [
+      "europe",
+      "switzerland",
+      "gemeindescan",
+      "geodata"
+    ],
+    "views": [
+      {
+        "name": "mapview",
+        "specType": "gemeindescanSnapshot",
+        "spec": {
+          "title": "",
+          "description": "",
+          "attribution": ""
+        }
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://www.openstreetmap.org/copyright",
+        "title": "Karte: Mapbox, \u00a9 OpenStreetMap"
+      }
+    ],
+    "resources": [
+      {
+        "name": "mapbox-background",
+        "path": "mapbox://styles/gemeindescan/ck6rp249516tg1iqkmt48o4pz",
+        "mediatype": "application/vnd.mapbox-vector-tile"
+      }
+    ],
+    "maintainers": [
+      {
+        "web": "https://github.com/n0rdlicht/",
+        "name": "Thorben Westerhuys"
+      }
+    ],
+    "contributors": [
+      {
+        "web": "https://cividi.ch",
+        "role": "publisher",
+        "email": "info@cividi.ch",
+        "title": "cividi"
+      }
+    ]
+  },
+  "legend": {
+    "label": "",
+    "size": 1,
+    "shape": "circle",
+    "primary": false,
+    "fillColor": "#cccccc",
+    "fillOpacity": 1,
+    "strokeColor": "#cccccc",
+    "strokeWidth": 1,
+    "strokeOpacity": 0.8
+  }
+}

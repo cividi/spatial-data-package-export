@@ -42,6 +42,14 @@ def from_dict(x: Any) -> Dict:
     return x
 
 
+def from_list_dict(f: Callable[[Any], T], x: Any) -> List[Dict[any, T]]:
+    assert isinstance(x, list)
+    if len(x):
+        assert isinstance(x[0], dict)
+        return [{key: f(val) for key, val in y.items()} for y in x]
+    return []
+
+
 def from_float(x: Any) -> float:
     assert isinstance(x, (float, int)) and not isinstance(x, bool)
     return float(x)

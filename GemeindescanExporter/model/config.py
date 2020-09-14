@@ -24,41 +24,7 @@ from dataclasses import dataclass
 from typing import Optional, Any, List, Dict
 
 from .model_utils import (from_str, to_class, from_list, from_union, from_none, from_list_dict)
-
-
-@dataclass
-class GemeindescanMeta:
-    topic: Optional[str] = None
-
-    @staticmethod
-    def from_dict(obj: Any) -> 'GemeindescanMeta':
-        assert isinstance(obj, dict)
-        topic = from_union([from_str, from_none], obj.get("topic"))
-        return GemeindescanMeta(topic)
-
-    def to_dict(self) -> dict:
-        result: dict = {}
-        result["topic"] = from_union([from_str, from_none], self.topic)
-        return result
-
-
-@dataclass
-class Source:
-    url: Optional[str] = None
-    title: Optional[str] = None
-
-    @staticmethod
-    def from_dict(obj: Any) -> 'Source':
-        assert isinstance(obj, dict)
-        url = from_union([from_str, from_none], obj.get("url"))
-        title = from_union([from_str, from_none], obj.get("title"))
-        return Source(url, title)
-
-    def to_dict(self) -> dict:
-        result: dict = {}
-        result["url"] = from_union([from_str, from_none], self.url)
-        result["title"] = from_union([from_str, from_none], self.title)
-        return result
+from .snapshot import Source, GemeindescanMeta
 
 
 @dataclass
