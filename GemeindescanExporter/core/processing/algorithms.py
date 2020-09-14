@@ -23,7 +23,7 @@ from qgis.core import (
     QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterFeatureSink,
     QgsProcessingException,
     QgsFeatureSink, QgsProcessingParameterVectorLayer,
-    QgsVectorLayer, QgsRectangle, QgsProcessingParameterExtent)
+    QgsVectorLayer, QgsRectangle, QgsProcessingParameterExtent, QgsProcessingParameterString)
 
 from ..styles2attributes import StylesToAttributes
 from ...qgis_plugin_tools.tools.algorithm_processing import BaseProcessingAlgorithm
@@ -36,6 +36,7 @@ class StyleToAttributesAlg(BaseProcessingAlgorithm):
     """
     ID = 'styletoattributes'
     INPUT = 'INPUT'
+    NAME = 'NAME'
     OUTPUT = 'OUTPUT'
     OUTPUT_SYMBOLS = 'OUTPUT_SYMBOLS'
     OUTPUT_LEGEND = 'OUTPUT_LEGEND'
@@ -44,19 +45,23 @@ class StyleToAttributesAlg(BaseProcessingAlgorithm):
     def name(self) -> str:
         return StyleToAttributesAlg.ID
 
+    def shortHelpString(self):
+        return tr('Extracts styles of the vector layer as attributes for the features')
+
     def displayName(self) -> str:
         return tr('Style to attributes')
 
     def group(self):
-        return tr('Vector general')
+        return tr('Vector')
 
     def groupId(self):
-        return 'vectorgeneral'
+        return 'vector'
 
     # noinspection PyMethodOverriding
     def initAlgorithm(self, config: Dict[str, Any]):
         self.addParameter(QgsProcessingParameterVectorLayer(self.INPUT, tr('Input layer')))
-        self.addParameter(QgsProcessingParameterExtent(self.EXTENT, tr('Input extent')))
+        self.addParameter(QgsProcessingParameterString(self.NAME, tr('Output Layer name')))
+        self.addParameter(QgsProcessingParameterExtent(self.EXTENT, tr('Input extent'), defaultValue=None))
 
         self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT, tr('Layer with attributes')))
 
@@ -67,7 +72,11 @@ class StyleToAttributesAlg(BaseProcessingAlgorithm):
         if source is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.INPUT))
 
-        wrkr = StylesToAttributes(source, 'asd', feedback)
+        output_name = self.parameterAsString(parameters, self.NAME, context)
+        if output_name is None:
+            output_name = f'{source.name()}-snapshot'
+
+        wrkr = StylesToAttributes(source, output_name, feedback)
 
         extent: QgsRectangle = self.parameterAsExtent(parameters, self.EXTENT, context, crs=source.sourceCrs())
 
@@ -77,7 +86,7 @@ class StyleToAttributesAlg(BaseProcessingAlgorithm):
         if sink is None:
             raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
 
-        wrkr.run(sink, extent)
+        wrkr.extract_styles_to_layer(sink, extent)
 
         ret_val = {self.OUTPUT: dest_id,
                    self.OUTPUT_SYMBOLS: wrkr.symbols,

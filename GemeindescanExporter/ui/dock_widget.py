@@ -99,7 +99,8 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         task_variables.FEEDBACK = LoggerProcessingFeedBack(use_logger=True)
         task_variables.EXTENT = self.extent
         task_variables.LAYER = cb.currentLayer()
-        task_variables.OUTPUT = f'memory:{layer_name}-snapshot'
+        task_variables.NAME = f'{layer_name}-snapshot'
+        task_variables.OUTPUT = f'memory:{task_variables.NAME}'
         task_variables.COMPLETED = lambda *args, **kwargs: self.completed()
         task_variables.EXECUTED = self.styles_to_attributes_finished
 

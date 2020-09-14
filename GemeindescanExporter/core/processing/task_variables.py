@@ -21,6 +21,7 @@
 FEEDBACK = None
 CONTEXT = None
 LAYER = None
+NAME = None
 OUTPUT = None
 EXTENT = None
 

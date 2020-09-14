@@ -39,7 +39,7 @@ def test_simple_poly(new_project, categorized_poly, layer_empty_poly):
 
     update_fields(converter, layer_empty_poly)
     layer_empty_poly.startEditing()
-    converter.run(layer_empty_poly)
+    converter.extract_styles_to_layer(layer_empty_poly)
     layer_empty_poly.commitChanges()
 
     expected_symbols, expected_legend = get_symbols_and_legend('categorized_poly')

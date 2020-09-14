@@ -37,6 +37,7 @@ This is a temporary workaround until bug is fixed.
 params = {
     'EXTENT': task_variables.EXTENT,
     'INPUT': task_variables.LAYER,
+    'NAME': task_variables.NAME,
     'OUTPUT': task_variables.OUTPUT
 }
 

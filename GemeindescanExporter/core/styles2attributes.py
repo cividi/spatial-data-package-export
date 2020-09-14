@@ -68,6 +68,11 @@ class StylesToAttributes:
         alpha = round(_prop[-1] / 255, 2)
         return _rgb, alpha
 
+    def extract_styles_to_layer(self, sink: QgsFeatureSink, extent: Optional[QgsRectangle] = None):
+        self._update_symbols()
+        self._update_legend()
+        self._copy_fields(sink, extent)
+
     def _get_style(self, symbol):
         self.feedback.pushDebugInfo(str(type(symbol)))
         style = self.field_template.copy()
@@ -124,11 +129,6 @@ class StylesToAttributes:
         elif self.symbol_type == SymbolType.singleSymbol:
             style = self._get_style(self.renderer.symbol())
             self.symbols[0] = {'range_lower': None, 'range_upper': None, 'label': self.layer_name, 'style': style}
-
-    def run(self, sink: QgsFeatureSink, extent: Optional[QgsRectangle] = None):
-        self._update_symbols()
-        self._update_legend()
-        self._copy_fields(sink, extent)
 
     def _copy_fields(self, sink: QgsFeatureSink, extent: Optional[QgsRectangle] = None):
         total = 100.0 / self.layer.featureCount()
