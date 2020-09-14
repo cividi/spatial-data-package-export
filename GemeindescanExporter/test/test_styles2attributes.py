@@ -49,7 +49,7 @@ def test_simple_poly(new_project, categorized_poly, layer_empty_poly):
 def common_asserts(converter, expected_legend, expected_symbols, src_layer, converted_layer):
     assert converted_layer.featureCount() == src_layer.featureCount()
 
-    assert converter.legend == expected_legend
+    assert converter.get_legend() == expected_legend
     assert converter.symbols == expected_symbols
     for i in range(converted_layer.featureCount()):
         # Memory layer indexing starts with 1 instead of 0 (possibly a BUG)

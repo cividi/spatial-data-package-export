@@ -38,7 +38,6 @@ class StyleToAttributesAlg(BaseProcessingAlgorithm):
     INPUT = 'INPUT'
     NAME = 'NAME'
     OUTPUT = 'OUTPUT'
-    OUTPUT_SYMBOLS = 'OUTPUT_SYMBOLS'
     OUTPUT_LEGEND = 'OUTPUT_LEGEND'
     EXTENT = 'EXTENT'
 
@@ -89,7 +88,6 @@ class StyleToAttributesAlg(BaseProcessingAlgorithm):
         wrkr.extract_styles_to_layer(sink, extent)
 
         ret_val = {self.OUTPUT: dest_id,
-                   self.OUTPUT_SYMBOLS: wrkr.symbols,
-                   self.OUTPUT_LEGEND: wrkr.legend,
+                   self.OUTPUT_LEGEND: wrkr.get_legend(),
                    }
         return ret_val

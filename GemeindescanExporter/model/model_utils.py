@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with GemeindescanExporter.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import TypeVar, Any, Type, cast, Callable, List
+from typing import TypeVar, Any, Type, cast, Callable, List, Dict
 
 T = TypeVar("T")
 
@@ -35,6 +35,11 @@ def to_class(c: Type[T], x: Any) -> dict:
 def from_list(f: Callable[[Any], T], x: Any) -> List[T]:
     assert isinstance(x, list)
     return [f(y) for y in x]
+
+
+def from_dict(x: Any) -> Dict:
+    assert isinstance(x, dict)
+    return x
 
 
 def from_float(x: Any) -> float:

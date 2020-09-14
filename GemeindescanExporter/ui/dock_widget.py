@@ -119,7 +119,6 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         if succesful:
             LOGGER.info('Task finished successfully',
                         extra=bar_msg(f'Legend: {results["OUTPUT_LEGEND"]}'
-                                      f'Symbols: {results["OUTPUT_SYMBOLS"]}'
                                       ))
             output_layer: QgsVectorLayer = context.getMapLayer(results['OUTPUT'])
             # because getMapLayer doesn't transfer ownership, the layer will

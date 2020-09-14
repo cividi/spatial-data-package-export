@@ -17,13 +17,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with GemeindescanExporter.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Optional
+from typing import Optional, Dict
 
 from PyQt5.QtCore import QVariant
 from qgis.core import (QgsVectorLayer, QgsFields, QgsField, QgsFeatureSink, QgsFillSymbol, QgsLineSymbol,
                        QgsFeature, QgsProcessingFeedback, QgsRectangle, QgsSpatialIndex, QgsFeatureRequest)
 
 from ..definitions.symbols import SymbolLayerType, SymbolType
+from ..model.snapshot import Legend
 
 
 class StylesToAttributes:
@@ -60,6 +61,7 @@ class StylesToAttributes:
         self.field_template = field_template.copy()
 
         self.fields: QgsFields = self._generate_fields()
+        self.legend = {}
 
     @staticmethod
     def _rgb_extract(prop):
@@ -67,6 +69,9 @@ class StylesToAttributes:
         _rgb = '#' + ('%02x%02x%02x' % tuple(_prop[0:-1]))
         alpha = round(_prop[-1] / 255, 2)
         return _rgb, alpha
+
+    def get_legend(self) -> Dict:
+        return {label: legend.to_dict() for label, legend in self.legend.items()}
 
     def extract_styles_to_layer(self, sink: QgsFeatureSink, extent: Optional[QgsRectangle] = None):
         self._update_symbols()
@@ -210,9 +215,10 @@ class StylesToAttributes:
         for index, item in self.symbols.items():
             legend_style = item["style"].copy()
             legend_style = {self.field_mapper[key]: value for key, value in legend_style.items()}
-            if self.primary_layer and (i == 0 or i == (len(self.symbols.items()) - 1)):
-                legend_style["primary"] = True
-            legend[item["label"]] = legend_style
+            legend_style['size'] = 1
+            legend_style["primary"] = self.primary_layer and (i == 0 or i == (len(self.symbols.items()) - 1))
+            legend_style["label"] = item["label"]
+            legend[item["label"]] = Legend.from_dict(legend_style)
             i = i + 1
 
         self.legend = legend

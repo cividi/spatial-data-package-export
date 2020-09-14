@@ -21,9 +21,9 @@ Generated using https://app.quicktype.io/ from json file
 """
 
 from dataclasses import dataclass
-from typing import Optional, Any, List
+from typing import Optional, Any, List, Dict
 
-from .model_utils import (from_str, to_class, from_list, from_union, from_none)
+from .model_utils import (from_str, to_class, from_list, from_union, from_none, from_list_dict)
 
 
 @dataclass
@@ -62,7 +62,7 @@ class Source:
 
 
 @dataclass
-class DatapackageFilename:
+class SnapshotConfig:
     title: Optional[str] = None
     description: Optional[str] = None
     keywords: Optional[List[str]] = None
@@ -72,7 +72,7 @@ class DatapackageFilename:
     resources: Optional[List[str]] = None
 
     @staticmethod
-    def from_dict(obj: Any) -> 'DatapackageFilename':
+    def from_dict(obj: Any) -> 'SnapshotConfig':
         assert isinstance(obj, dict)
         title = from_union([from_str, from_none], obj.get("title"))
         description = from_union([from_str, from_none], obj.get("description"))
@@ -81,7 +81,7 @@ class DatapackageFilename:
         bounds = from_union([lambda x: from_list(from_str, x), from_none], obj.get("bounds"))
         sources = from_union([lambda x: from_list(Source.from_dict, x), from_none], obj.get("sources"))
         resources = from_union([lambda x: from_list(from_str, x), from_none], obj.get("resources"))
-        return DatapackageFilename(title, description, keywords, gemeindescan_meta, bounds, sources, resources)
+        return SnapshotConfig(title, description, keywords, gemeindescan_meta, bounds, sources, resources)
 
     def to_dict(self) -> dict:
         result: dict = {}
@@ -97,29 +97,12 @@ class DatapackageFilename:
 
 
 @dataclass
-class SnapshotConfig:
-    datapackage_filename: Optional[DatapackageFilename] = None
-
-    @staticmethod
-    def from_dict(obj: Any) -> 'SnapshotConfig':
-        assert isinstance(obj, dict)
-        datapackage_filename = from_union([DatapackageFilename.from_dict, from_none], obj.get("DATAPACKAGE-FILENAME"))
-        return SnapshotConfig(datapackage_filename)
-
-    def to_dict(self) -> dict:
-        result: dict = {}
-        result["DATAPACKAGE-FILENAME"] = from_union([lambda x: to_class(DatapackageFilename, x), from_none],
-                                                    self.datapackage_filename)
-        return result
-
-
-@dataclass
 class Config:
     project_name: Optional[str] = None
     data_dir: Optional[str] = None
     snapshots_dir: Optional[str] = None
     dp_template_file: Optional[str] = None
-    snapshots: Optional[List[SnapshotConfig]] = None
+    snapshots: Optional[List[Dict[str, SnapshotConfig]]] = None
 
     @staticmethod
     def from_dict(obj: Any) -> 'Config':
@@ -128,7 +111,7 @@ class Config:
         data_dir = from_union([from_str, from_none], obj.get("data_dir"))
         snapshots_dir = from_union([from_str, from_none], obj.get("snapshots_dir"))
         dp_template_file = from_union([from_str, from_none], obj.get("dp_template_file"))
-        snapshots = from_union([lambda x: from_list(SnapshotConfig.from_dict, x), from_none], obj.get("snapshots"))
+        snapshots = from_union([lambda x: from_list_dict(SnapshotConfig.from_dict, x), from_none], obj.get("snapshots"))
         return Config(project_name, data_dir, snapshots_dir, dp_template_file, snapshots)
 
     def to_dict(self) -> dict:
@@ -137,6 +120,7 @@ class Config:
         result["data_dir"] = from_union([from_str, from_none], self.data_dir)
         result["snapshots_dir"] = from_union([from_str, from_none], self.snapshots_dir)
         result["dp_template_file"] = from_union([from_str, from_none], self.dp_template_file)
-        result["snapshots"] = from_union([lambda x: from_list(lambda x: to_class(SnapshotConfig, x), x), from_none],
-                                         self.snapshots)
+        result["snapshots"] = from_union(
+            [lambda x: from_list_dict(lambda x: to_class(SnapshotConfig, x), x), from_none],
+            self.snapshots)
         return result

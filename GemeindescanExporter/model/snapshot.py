@@ -21,10 +21,10 @@ Generated using https://app.quicktype.io/ from json file
 """
 
 from dataclasses import dataclass
-from typing import Any, List, Optional, Dict
+from typing import Any, List, Optional, Dict, Union
 
 from .model_utils import (from_str, to_class, from_list, from_float, from_union, from_none,
-                          from_int, from_bool)
+                          from_int, from_bool, from_dict)
 
 
 @dataclass
@@ -118,7 +118,7 @@ class Resource:
         assert isinstance(obj, dict)
         name = from_str(obj.get("name"))
         mediatype = from_str(obj.get("mediatype"))
-        data = obj.get("data")
+        data = from_union([from_dict, from_none], obj.get("data"))
         path = from_union([from_str, from_none], obj.get("path"))
         return Resource(name, mediatype, data, path)
 
@@ -128,7 +128,8 @@ class Resource:
         result["mediatype"] = from_str(self.mediatype)
         if self.data is not None:
             result["data"] = self.data
-        result["path"] = from_union([from_str, from_none], self.path)
+        if self.path is not None:
+            result["path"] = from_union([from_str, from_none], self.path)
         return result
 
 
@@ -153,41 +154,41 @@ class Source:
 
 @dataclass
 class Legend:
-    label: str
+    label: Union[str, int]
     size: int
     shape: str
     primary: bool
     fill_color: str
     fill_opacity: float
     stroke_color: str
-    stroke_width: str
+    stroke_width: Union[str, int]
     stroke_opacity: float
 
     @staticmethod
     def from_dict(obj: Any) -> 'Legend':
         assert isinstance(obj, dict)
-        label = from_str(obj.get("label"))
+        label = from_union([from_str, from_int], obj.get("label"))
         size = from_int(obj.get("size"))
         shape = from_str(obj.get("shape"))
         primary = from_bool(obj.get("primary"))
         fill_color = from_str(obj.get("fillColor"))
         fill_opacity = from_float(obj.get("fillOpacity"))
         stroke_color = from_str(obj.get("strokeColor"))
-        stroke_width = from_str(obj.get("strokeWidth"))
+        stroke_width = from_union([from_str, from_int], obj.get("strokeWidth"))
         stroke_opacity = from_float(obj.get("strokeOpacity"))
         return Legend(label, size, shape, primary, fill_color, fill_opacity, stroke_color, stroke_width, stroke_opacity)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["label"] = from_str(self.label)
+        result["label"] = from_union([from_str, from_int], self.label)
         result["size"] = from_int(self.size)
         result["shape"] = from_str(self.shape)
         result["primary"] = from_bool(self.primary)
         result["fillColor"] = from_str(self.fill_color)
-        result["fillOpacity"] = from_int(self.fill_opacity)
+        result["fillOpacity"] = from_float(self.fill_opacity)
         result["strokeColor"] = from_str(self.stroke_color)
-        result["strokeWidth"] = from_str(self.stroke_width)
-        result["strokeOpacity"] = from_int(self.stroke_opacity)
+        result["strokeWidth"] = from_union([from_str, from_int], self.stroke_width)
+        result["strokeOpacity"] = from_float(self.stroke_opacity)
         return result
 
 
@@ -205,8 +206,8 @@ class Spec:
         title = from_str(obj.get("title"))
         description = from_str(obj.get("description"))
         attribution = from_str(obj.get("attribution"))
-        bounds = from_list(from_str, obj.get("bounds"))
-        legend = from_list(Legend.from_dict, obj.get("legend"))
+        bounds = from_list(from_str, obj.get("bounds", []))
+        legend = from_list(Legend.from_dict, obj.get("legend", []))
         return Spec(title, description, attribution, bounds, legend)
 
     def to_dict(self) -> dict:
@@ -232,7 +233,7 @@ class View:
         name = from_str(obj.get("name"))
         spec_type = from_str(obj.get("specType"))
         spec = Spec.from_dict(obj.get("spec"))
-        resources = from_list(from_str, obj.get("resources"))
+        resources = from_list(from_str, obj.get("resources", []))
         return View(name, spec_type, spec, resources)
 
     def to_dict(self) -> dict:
@@ -277,7 +278,7 @@ class Snapshot:
         license = from_str(obj.get("license"))
         licenses = from_list(License.from_dict, obj.get("licenses"))
         keywords = from_list(from_str, obj.get("keywords"))
-        views = from_list(View.from_dict, obj.get("views"))
+        views = from_list(View.from_dict, obj.get("views", []))
         sources = from_list(Source.from_dict, obj.get("sources"))
         resources = from_list(Resource.from_dict, obj.get("resources"))
         maintainers = from_list(Maintainer.from_dict, obj.get("maintainers"))
