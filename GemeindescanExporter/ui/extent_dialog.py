@@ -45,12 +45,5 @@ class ExtentChooserDialog(QDialog, FORM_CLASS):
     def get_extent(self, precision: int) -> QgsRectangle:
         extent_gb: QgsExtentGroupBox = self.gb_extent
         extent: QgsRectangle = extent_gb.outputExtent()
-
-        rnd = lambda c: round(c, precision)
-        rounded_extent = QgsRectangle(
-            rnd(extent.xMinimum()),
-            rnd(extent.yMinimum()),
-            rnd(extent.xMaximum()),
-            rnd(extent.yMaximum()))
-        LOGGER.debug(f'Extent is {rounded_extent.toString(precision)}')
-        return rounded_extent
+        LOGGER.debug(f'Extent is {extent.toString(precision)}')
+        return extent

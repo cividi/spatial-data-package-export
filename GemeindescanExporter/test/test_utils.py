@@ -16,29 +16,33 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with GemeindescanExporter.  If not, see <https://www.gnu.org/licenses/>.
-import json
-from typing import Dict, Tuple
+import pytest
+from qgis.core import QgsRectangle
 
-from .conftest import IFACE, CANVAS
-from ..qgis_plugin_tools.tools.resources import plugin_test_data_path
-
-
-def get_symbols_and_legend(name: str) -> Tuple[Dict, Dict]:
-    f_name = f'{name}.json'
-    with open(plugin_test_data_path('symbols', f_name)) as f:
-        symbols = json.load(f)
-    symbols = {int(key): val for key, val in symbols.items()}
-
-    with open(plugin_test_data_path('legend', f_name)) as f:
-        legend = json.load(f)
-    return symbols, legend
+from ..core.utils import extent_to_datapackage_bounds, datapackage_bounds_to_extent
 
 
-def get_snapshot_dict(name: str) -> Dict:
-    with open(plugin_test_data_path('snapshots', name)) as f:
-        snapshot_data = json.load(f)
-    return snapshot_data
+@pytest.fixture
+def bounds():
+    return ["geo:59.599242,21.540037", "geo:61.029195,31.618383"]
 
 
-def get_existing_layer_names():
-    return {layer.name() for layer in IFACE.getMockLayers() + CANVAS.layers()}
+@pytest.fixture
+def extent():
+    return QgsRectangle(21.54003660, 59.59924232, 31.61838268, 61.02919460)
+
+
+@pytest.fixture
+def rounded_extent():
+    return QgsRectangle(21.540037, 59.59924, 31.618383, 61.029195)
+
+
+def test_extent_to_datapackage_bounds(extent, bounds):
+    got_bounds = extent_to_datapackage_bounds(extent, 6)
+    assert got_bounds == bounds
+
+
+@pytest.mark.skip('Rounding issues...')
+def test_datapackage_bounds_to_extent(bounds, rounded_extent):
+    extent = datapackage_bounds_to_extent(bounds)
+    assert extent == rounded_extent
