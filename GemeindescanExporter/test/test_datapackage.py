@@ -35,14 +35,15 @@ def test_simple_poly(new_project, categorized_poly, layer_empty_poly):
     converter.extract_styles_to_layer(layer_empty_poly)
     layer_empty_poly.commitChanges()
 
-    legend = list(converter.legend.values())
-
-    styled_layer = StyledLayer('asd', layer_empty_poly, legend)
-    with open(plugin_test_data_path('config', 'config_categorized_poly.json')) as f:
+    styled_layer = StyledLayer('asd', layer_empty_poly, list(converter.legend.values()))
+    with open(plugin_test_data_path('config', 'config_simple_poly.json')) as f:
         config = Config.from_dict(json.load(f))
 
     writer = DatapackageWriter(config)
-    snapshot = writer.create_snapshot([styled_layer])
+    snapshot_config = config.snapshots[0]
+    name = list(snapshot_config.keys())[0]
+    snapshot_config = list(snapshot_config.values())[0]
+    snapshot = writer.create_snapshot(name, snapshot_config, [styled_layer])
     expected_snapshot_dict = get_test_json('snapshots', 'categorized_poly.json')
     assert snapshot.to_dict() == expected_snapshot_dict
 

@@ -20,7 +20,7 @@ import json
 import logging
 from typing import List, Optional, Tuple
 
-from ..model.config import Config
+from ..model.config import Config, SnapshotConfig
 from ..model.snapshot import Snapshot, Resource, Legend
 from ..model.styled_layer import StyledLayer
 from ..qgis_plugin_tools.tools.resources import plugin_name, resources_path
@@ -36,6 +36,7 @@ class DatapackageWriter:
 
         snap_temp, leg_temp = self._load_default_template()
         self.snapshot_template: Snapshot = snapshot_template if snapshot_template is not None else snap_temp
+        self.snapshot_template.name = config.project_name
         self.legend_template: Legend = legend_template if legend_template is not None else leg_temp
 
     def _load_default_template(self) -> Tuple[Snapshot, Legend]:
@@ -44,8 +45,15 @@ class DatapackageWriter:
 
         return Snapshot.from_dict(template['snapshot']), Legend.from_dict(template['legend'])
 
-    def create_snapshot(self, styled_layers: List[StyledLayer]):
+    def create_snapshot(self, snapshot_name: str, snapshot_config: SnapshotConfig, styled_layers: List[StyledLayer]):
         snapshot = Snapshot.from_dict(self.snapshot_template.to_dict())
+        snapshot.name = snapshot_name
+        snapshot.title = snapshot_config.title
+        snapshot.views[0].spec.bounds = snapshot_config.bounds
+        snapshot.description = snapshot_config.description
+        snapshot.keywords = snapshot_config.keywords
+        snapshot.sources += snapshot_config.sources
+        snapshot.gemeindescan_meta = snapshot_config.gemeindescan_meta
 
         LOGGER.debug('Updating resources')
         initial_resources = snapshot.resources

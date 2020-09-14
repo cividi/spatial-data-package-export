@@ -1,12 +1,12 @@
 {
-  "name": "",
-  "title": "",
+  "name": "simple-poly",
+  "title": "TITLE",
   "description": "",
   "version": "1.0.0",
   "datapackage_version": "1.0.0",
   "gemeindescan_version": "0.3.1",
   "gemeindescan_meta": {
-    "topic": ""
+    "topic": "GEMEINDESCAN TOPIC"
   },
   "format": "geojson",
   "license": "ODC-By-1.0",
@@ -17,10 +17,8 @@
     }
   ],
   "keywords": [
-    "europe",
-    "switzerland",
-    "gemeindescan",
-    "geodata"
+    "KEYWORD 1",
+    "KEYWORD 2"
   ],
   "views": [
     {
@@ -30,7 +28,10 @@
         "title": "",
         "description": "",
         "attribution": "",
-        "bounds": [],
+        "bounds": [
+          "geo:8.35507485,47.06690836",
+          "geo:8.37991615,47.07424457"
+        ],
         "legend": [
           {
             "label": "1",
@@ -88,6 +89,10 @@
     {
       "url": "https://www.openstreetmap.org/copyright",
       "title": "Karte: Mapbox, \u00a9 OpenStreetMap"
+    },
+    {
+      "url": "SOURCE URL",
+      "title": "SOURCE TITLE/DESCRIPTION"
     }
   ],
   "resources": [

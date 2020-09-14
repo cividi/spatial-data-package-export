@@ -5,7 +5,7 @@
   "dp_template_file": "lib/template.json",
   "snapshots": [
     {
-      "DATAPACKAGE-FILENAME": {
+      "simple-poly": {
         "title": "TITLE",
         "description": "",
         "keywords": [
