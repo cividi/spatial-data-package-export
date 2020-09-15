@@ -5,6 +5,18 @@
 QGIS plugin to export data and styles to [Gemeindescan](https://gemeindescan.ch/de/).
 
 
+### Installation instructions
+
+The plugin can be installed by downloading a release from this 
+repository:
+
+1. Download the latest release zip from GitHub releases (above).
+
+2. Launch QGIS and the plugins menu by selecting Plugins - Manage and Install Plugins from the top menu.
+
+3. Select the Install from ZIP tab, browse to the zip file you just downloaded, and click Install Plugin!
+
+
 ### Development
 
 Refer to [development](docs/development.md) to instructions for developing the plugin.

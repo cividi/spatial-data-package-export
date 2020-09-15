@@ -22,10 +22,9 @@ from PyQt5.QtCore import QTranslator, QCoreApplication, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QWidget
 from qgis.PyQt import QtWidgets
-from qgis.core import QgsVectorLayer, QgsApplication
+from qgis.core import QgsApplication
 from qgis.gui import QgisInterface
 
-from .core.orig import Exporter
 from .core.processing.provider import GemeindescanProcessingProvider
 from .qgis_plugin_tools.tools.custom_logging import setup_logger
 from .qgis_plugin_tools.tools.i18n import setup_translation, tr
@@ -139,13 +138,6 @@ class Plugin:
             parent=self.iface.mainWindow(),
             add_to_toolbar=False
         )
-        self.add_action(
-            "",
-            text=tr("original script"),
-            callback=self.run_orig,
-            parent=self.iface.mainWindow(),
-            add_to_toolbar=False
-        )
 
         QgsApplication.processingRegistry().addProvider(self.processing_provider)
 
@@ -178,13 +170,3 @@ class Plugin:
 
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dock_widget)
         self.dock_widget.show()
-
-    # noinspection PyArgumentList
-    def run_orig(self):
-        """Run method that performs all the real work"""
-        print("Hello QGIS plugin")
-        layer: QgsVectorLayer = self.iface.activeLayer()
-        if layer is not None:
-            exporter = Exporter()
-            exporter.write_layer(layer.name())
-            # QgsProject.instance().addMapLayer(f"{layer.name()}-snapshot")
