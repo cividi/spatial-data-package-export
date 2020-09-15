@@ -66,6 +66,7 @@ def create_styles_to_attributes_tasks(task_wrappers: List[TaskWrapper], complete
         alg = QgsApplication.processingRegistry().algorithmById(
             f'{GemeindescanProcessingProvider.ID}:{StyleToAttributesAlg.ID}')
         task = QgsProcessingAlgRunnerTask(alg, task_wrapper.params, task_wrapper.context, task_wrapper.feedback)
+        task.setDependentLayers([task_wrapper.layer])
         # noinspection PyUnresolvedReferences
         task.executed.connect(partial(task_wrapper.executed, task_wrapper.layer, task_wrapper.context, task_wrapper.id))
         # noinspection PyUnresolvedReferences

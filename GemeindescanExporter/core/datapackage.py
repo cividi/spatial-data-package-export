@@ -54,7 +54,7 @@ class DatapackageWriter:
         snapshot.views[0].spec.bounds = snapshot_config.bounds
         snapshot.description = snapshot_config.description
         snapshot.keywords = snapshot_config.keywords
-        snapshot.sources += snapshot_config.sources
+        snapshot.sources = snapshot_config.sources
         snapshot.gemeindescan_meta = snapshot_config.gemeindescan_meta
 
         LOGGER.debug('Updating resources')
