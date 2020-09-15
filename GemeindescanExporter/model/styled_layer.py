@@ -22,7 +22,7 @@ import tempfile
 from dataclasses import dataclass
 from typing import List, Dict
 
-from qgis.core import QgsVectorLayer, QgsVectorFileWriter, QgsCoordinateReferenceSystem
+from qgis.core import QgsVectorFileWriter, QgsCoordinateReferenceSystem, QgsProject
 
 from .snapshot import Legend
 from ..qgis_plugin_tools.tools.resources import resources_path
@@ -31,11 +31,14 @@ from ..qgis_plugin_tools.tools.resources import resources_path
 @dataclass
 class StyledLayer:
     resource_name: str
-    layer: QgsVectorLayer
+    layer_id: str
     legend: List[Legend]
 
+    @property
+    def layer(self):
+        return QgsProject.instance().mapLayer(self.layer_id)
+
     def get_geojson_data(self) -> Dict:
-        data = {}
         source = self.layer.source()
         if source.lower().endswith('.geojson') or source.lower().endswith('.json'):
             with open(source) as f:

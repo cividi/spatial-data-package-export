@@ -16,38 +16,62 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with GemeindescanExporter.  If not, see <https://www.gnu.org/licenses/>.
-
-
+import uuid
+from dataclasses import dataclass
 from functools import partial
+from typing import List, Dict, Callable
 
-# task_variables has been added to path by importing code
-import task_variables
-from qgis.core import (QgsApplication, QgsProcessingAlgRunnerTask)
+from qgis.core import (QgsApplication, QgsProcessingAlgRunnerTask, QgsRectangle, QgsVectorLayer, QgsProcessingFeedback,
+                       QgsProcessingContext)
 
 from .algorithms import StyleToAttributesAlg
 from .provider import GemeindescanProcessingProvider
 
-"""
-There is a bug in QGIS https://github.com/qgis/QGIS/issues/38583 that prevents starting tasks
-using processing algorithms
 
-This is a temporary workaround until bug is fixed.
-"""
+@dataclass
+class TaskWrapper:
+    """
+    Helper class for task parameters. Could be replaced with TypedDict, but support for Python 3.8 is not that wide yet
+    """
+    id: uuid.UUID
+    layer: QgsVectorLayer
+    name: str
+    extent: QgsRectangle
+    output: str
+    feedback: QgsProcessingFeedback
+    context: QgsProcessingContext
+    executed: Callable
 
-params = {
-    'EXTENT': task_variables.EXTENT,
-    'INPUT': task_variables.LAYER,
-    'NAME': task_variables.NAME,
-    'OUTPUT': task_variables.OUTPUT
-}
+    @property
+    def params(self) -> Dict[str, any]:
+        return {
+            'EXTENT': self.extent,
+            'INPUT': self.layer,
+            'NAME': self.name,
+            'OUTPUT': self.output
+        }
 
-alg = QgsApplication.processingRegistry().algorithmById(
-    f'{GemeindescanProcessingProvider.ID}:{StyleToAttributesAlg.ID}')
-feedback = task_variables.FEEDBACK
-context = task_variables.CONTEXT
-task = QgsProcessingAlgRunnerTask(alg, params, context, feedback)
-# noinspection PyUnresolvedReferences
-task.executed.connect(partial(task_variables.EXECUTED, task_variables.LAYER, context))
-# noinspection PyUnresolvedReferences
-task.taskCompleted.connect(task_variables.COMPLETED)
-QgsApplication.taskManager().addTask(task)
+    def __str__(self) -> str:
+        return str(self.params)
+
+
+def create_styles_to_attributes_tasks(task_wrappers: List[TaskWrapper], completed: Callable):
+    tasks = []
+    if len(task_wrappers) == 0:
+        # TODO: custom execption
+        raise ValueError()
+    for task_wrapper in task_wrappers:
+        alg = QgsApplication.processingRegistry().algorithmById(
+            f'{GemeindescanProcessingProvider.ID}:{StyleToAttributesAlg.ID}')
+        task = QgsProcessingAlgRunnerTask(alg, task_wrapper.params, task_wrapper.context, task_wrapper.feedback)
+        # noinspection PyUnresolvedReferences
+        task.executed.connect(partial(task_wrapper.executed, task_wrapper.layer, task_wrapper.context, task_wrapper.id))
+        # noinspection PyUnresolvedReferences
+        task.taskCompleted.connect(completed)
+        tasks.append(task)
+
+    main_task = tasks[0]
+    for i in range(1, len(tasks)):
+        main_task.addSubTask(tasks[i])
+
+    QgsApplication.taskManager().addTask(main_task)

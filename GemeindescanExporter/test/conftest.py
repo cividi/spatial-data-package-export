@@ -37,7 +37,7 @@ def new_project() -> None:
 
 @pytest.fixture(scope='session')
 def test_gpkg():
-    return plugin_test_data_path('test_data.gpkg')
+    return plugin_test_data_path('test_data_4326.gpkg')
 
 
 @pytest.fixture

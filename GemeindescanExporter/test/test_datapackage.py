@@ -20,6 +20,7 @@ import json
 
 from qgis.core import QgsProcessingFeedback, QgsVectorLayer, QgsVectorDataProvider
 
+from .conftest import add_layer
 from .utils import get_test_json
 from ..core.datapackage import DatapackageWriter
 from ..core.styles2attributes import StylesToAttributes
@@ -34,8 +35,9 @@ def test_simple_poly(new_project, categorized_poly, layer_empty_poly):
     layer_empty_poly.startEditing()
     converter.extract_styles_to_layer(layer_empty_poly)
     layer_empty_poly.commitChanges()
+    add_layer(layer_empty_poly)
 
-    styled_layer = StyledLayer('asd', layer_empty_poly, list(converter.legend.values()))
+    styled_layer: StyledLayer = StyledLayer('asd', layer_empty_poly.id(), list(converter.legend.values()))
     with open(plugin_test_data_path('config', 'config_simple_poly.json')) as f:
         config = Config.from_dict(json.load(f))
 

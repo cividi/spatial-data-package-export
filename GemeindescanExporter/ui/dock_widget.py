@@ -21,33 +21,30 @@
 import json
 import logging
 import os
-import sys
 import tempfile
-from importlib import reload
+import uuid
 from typing import Dict
 
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QCheckBox, QGridLayout, QPushButton, QWidget
 from qgis.PyQt import QtWidgets
 from qgis.core import (QgsProcessingContext, QgsVectorLayer, QgsProject,
-                       QgsMapLayerProxyModel, QgsRectangle)
+                       QgsMapLayerProxyModel, QgsRectangle, QgsApplication)
 from qgis.gui import QgsMapLayerComboBox, QgisInterface, QgsFileWidget
 
 from .extent_dialog import ExtentChooserDialog
 from ..core.datapackage import DatapackageWriter
+from ..core.processing.task_runner import TaskWrapper, create_styles_to_attributes_tasks
 from ..core.utils import load_config_from_template, extent_to_datapackage_bounds
 from ..definitions.configurable_settings import Settings
 from ..model.snapshot import Legend
 from ..model.styled_layer import StyledLayer
 from ..qgis_plugin_tools.tools.custom_logging import bar_msg
+from ..qgis_plugin_tools.tools.decorations import log_if_fails
 from ..qgis_plugin_tools.tools.i18n import tr
 from ..qgis_plugin_tools.tools.logger_processing import LoggerProcessingFeedBack
-from ..qgis_plugin_tools.tools.resources import plugin_path, load_ui, plugin_name, resources_path
+from ..qgis_plugin_tools.tools.resources import load_ui, plugin_name, resources_path
 from ..qgis_plugin_tools.tools.settings import get_setting, set_setting
-
-processing_path = plugin_path('core', 'processing')
-if processing_path not in sys.path:
-    sys.path.append(processing_path)
-import task_variables
 
 FORM_CLASS = load_ui('main_dialog_dock.ui')
 LOGGER = logging.getLogger(plugin_name())
@@ -63,16 +60,20 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         # Template can be configured via settings
         self.config = load_config_from_template()
         self.writer = DatapackageWriter(self.config)
-        self.responsive_items = [self.pushButtonExport]
         self.extent: QgsRectangle = self.iface.mapCanvas().extent()
+        self.layer_grid: QGridLayout = self.layer_grid
+        self.layer_rows: Dict = {}
+        # TODO: add items here
+        self.responsive_items = [self.btn_export]
+
         self.sb_extent_precision.setValue(
             get_setting(Settings.extent_precision.name, Settings.extent_precision.value, int))
         self.le_extent.setText(self.extent.toString(self.sb_extent_precision.value()))
 
-        self.m_layer_cb.setFilters(QgsMapLayerProxyModel.Filters(QgsMapLayerProxyModel.Filter.PointLayer |
-                                                                 QgsMapLayerProxyModel.Filter.PolygonLayer |
-                                                                 QgsMapLayerProxyModel.Filter.LineLayer))
-        self.pushButtonExport.clicked.connect(self.run)
+        self.btn_add_layer_row.setIcon(QgsApplication.getThemeIcon('/mActionAdd.svg'))
+        self.btn_add_layer_row.clicked.connect(lambda _: self._add_row(len(self.layer_rows) + 1))
+
+        self.btn_export.clicked.connect(self.run)
         self._set_initial_values()
 
     def _set_initial_values(self):
@@ -83,15 +84,56 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.input_title.setText(snapshot_config.title)
         self.input_description.setText(snapshot_config.description)
 
+    # noinspection PyUnresolvedReferences
+    @log_if_fails
+    def _add_row(self, row_index: int):
+        b_rm = QPushButton(text='', icon=QgsApplication.getThemeIcon('/mActionRemove.svg'))
+        b_rm.setToolTip(tr('Remove row'))
+        b_rm.clicked.connect(lambda _: self._remove_row(row_uuid))
+
+        bx_layer = QgsMapLayerComboBox()
+        bx_layer.setFilters(QgsMapLayerProxyModel.Filters(QgsMapLayerProxyModel.Filter.PointLayer |
+                                                          QgsMapLayerProxyModel.Filter.PolygonLayer |
+                                                          QgsMapLayerProxyModel.Filter.LineLayer))
+        cb_primary = QCheckBox(text='')
+
+        row_uuid = str(uuid.uuid4())
+        row = {
+            'layer': bx_layer,
+            'primary': cb_primary,
+            'rm': b_rm,
+            'feedback': LoggerProcessingFeedBack(use_logger=True),
+            'context': QgsProcessingContext()
+        }
+        self.layer_rows[row_uuid] = row
+        self.layer_grid.addWidget(b_rm, row_index, 0)
+        self.layer_grid.addWidget(bx_layer, row_index, 1)
+        self.layer_grid.addWidget(cb_primary, row_index, 2)
+
+    def _remove_row(self, row_uuid: str):
+        row = self.layer_rows.pop(row_uuid)
+        for widget in row.values():
+            if isinstance(widget, QWidget):
+                self.layer_grid.removeWidget(widget)
+                widget.hide()
+                widget.setParent(None)
+            # noinspection PyUnusedLocal
+            widget = None
+
     def on_sb_extent_precision_valueChanged(self, new_val: int):
         set_setting(Settings.extent_precision.name, new_val)
 
     def on_btn_calculate_extent_clicked(self):
-        curr_layer = self.m_layer_cb.currentLayer()
         canvas = self.iface.mapCanvas()
-        crs = curr_layer.crs() if curr_layer is not None else canvas.mapSettings().destinationCrs()
-        extent_chooser = ExtentChooserDialog(canvas, crs)
+        rows = list(self.layer_rows.values())
 
+        crs = canvas.mapSettings().destinationCrs()
+        if len(rows):
+            layer = rows[0]['layer'].currentLayer()
+            if layer is not None:
+                crs = layer.crs()
+
+        extent_chooser = ExtentChooserDialog(canvas, crs)
         result = extent_chooser.exec()
         if result:
             self.extent = extent_chooser.get_extent(self.sb_extent_precision.value())
@@ -101,49 +143,64 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         for item in self.responsive_items:
             item.setEnabled(False)
 
+    def run(self):
+        task_wrappers = []
+        for id, row in self.layer_rows.items():
+            cb: QgsMapLayerComboBox = row['layer']
+            layer_name = cb.currentText()
+            row['layer_name'] = layer_name
+            new_layer_name = f'{layer_name}-snapshot'
+            row['new_layer_name'] = new_layer_name
+            row['finished'] = False
+            task_wrapper = TaskWrapper(id=id, layer=cb.currentLayer(), name=new_layer_name, extent=self.extent,
+                                       output=f'memory:{new_layer_name}', feedback=row['feedback'],
+                                       context=row['context'], executed=self.styles_to_attributes_finished
+                                       )
+            LOGGER.info(f"Exporting {layer_name}")
+            task_wrappers.append(task_wrapper)
+
+        LOGGER.info(f'Tasks are: {[str(w) for w in task_wrappers]}')
+
+        if len(task_wrappers) == 0:
+            LOGGER.warning(tr('No layers selected'),
+                           extra=bar_msg(tr('Select at least one layer to create snapshot')))
+        else:
+            create_styles_to_attributes_tasks(task_wrappers, completed=lambda *args, **kwargs: self.completed())
+            self.disable_ui()
+
     def completed(self, *args, **kwargs):
-        print(1)
+        all_finished = all(map(lambda x: x['finished'], self.layer_rows.values()))
+        if not all_finished:
+            return
+
         for item in self.responsive_items:
             item.setEnabled(True)
-        LOGGER.info("Finished!!")
+        LOGGER.info(tr('Finished exporting style to attributes'))
 
-    def run(self):
-        cb: QgsMapLayerComboBox = self.m_layer_cb
-        layer_name = cb.currentText()
-        LOGGER.info(f"Exporting {layer_name}")
+        snap = self.config.snapshots[0]
+        snap_name = list(snap.keys())[0]
+        snapshot_config = list(snap.values())[0]
+        snapshot_config.bounds = extent_to_datapackage_bounds(self.extent, self.sb_extent_precision.value())
+        snapshot = self.writer.create_snapshot(snap_name, snapshot_config,
+                                               [row['styled_layer'] for row in self.layer_rows.values()])
 
-        task_variables.CONTEXT = QgsProcessingContext()
-        task_variables.FEEDBACK = LoggerProcessingFeedBack(use_logger=True)
-        task_variables.EXTENT = self.extent
-        task_variables.LAYER = cb.currentLayer()
-        task_variables.NAME = f'{layer_name}-snapshot'
-        task_variables.OUTPUT = f'memory:{task_variables.NAME}'
-        task_variables.COMPLETED = lambda *args, **kwargs: self.completed()
-        task_variables.EXECUTED = self.styles_to_attributes_finished
+        output: QgsFileWidget = self.f_output
+        path = os.path.join(output.filePath(), 'testi.json')
 
-        # Start the task in a weird way, check task_runner for more info
-        modulename = 'GemeindescanExporter.core.processing.task_runner'
-        if modulename in sys.modules:
-            from ..core.processing import task_runner
-            # noinspection PyTypeChecker
-            reload(task_runner)
-        else:
-            from ..core.processing import task_runner
-        self.disable_ui()
+        with open(path, 'w') as f:
+            json.dump(snapshot.to_dict(), f)
 
-    def styles_to_attributes_finished(self, input_layer: QgsVectorLayer, context: QgsProcessingContext, succesful: bool,
-                                      results: Dict[str, any]):
+        LOGGER.info(tr('Snapshot succesfully exported'),
+                    extra=bar_msg(tr('Snapshot can be found in {}', path), success=True))
+
+    def styles_to_attributes_finished(self, input_layer: QgsVectorLayer, context: QgsProcessingContext, id: uuid.UUID,
+                                      succesful: bool, results: Dict[str, any]) -> None:
         if succesful:
+            row = self.layer_rows[id]
             legends = [Legend.from_dict(legend) for legend in results["OUTPUT_LEGEND"].values()]
-            LOGGER.info('Task finished successfully',
-                        extra=bar_msg(f'Legend: {legends}'))
-            # output_layer: QgsVectorLayer = context.getMapLayer(results['OUTPUT'])
-            output_layer = context.takeResultLayer(results['OUTPUT'])
-            # because getMapLayer doesn't transfer ownership, the layer will
-            # be deleted when context goes out of scope and you'll get a
-            # crash.
-            # takeMapLayer transfers ownership so it's then safe to add it
-            # to the project and give the project ownership.
+            LOGGER.info(tr('Task {} finished successfully', id))
+
+            output_layer: QgsVectorLayer = context.takeResultLayer(results['OUTPUT'])
             if output_layer and output_layer.isValid():
                 with tempfile.TemporaryDirectory(dir=resources_path()) as tmpdirname:
                     style_file = os.path.join(tmpdirname, 'style.qml')
@@ -154,16 +211,6 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                         LOGGER.error(tr('Could not load style'), extra=bar_msg(msg))
 
                 QgsProject.instance().addMapLayer(output_layer)
+                row['styled_layer'] = StyledLayer(row['layer_name'], output_layer.id(), legends)
 
-                styled_layer = StyledLayer(task_variables.NAME, output_layer, legends)
-
-                snap = self.config.snapshots[0]
-                snap_name = list(snap.keys())[0]
-                snapshot_config = list(snap.values())[0]
-                snapshot_config.bounds = extent_to_datapackage_bounds(self.extent, self.sb_extent_precision.value())
-                snapshot = self.writer.create_snapshot(snap_name, snapshot_config, [styled_layer])
-                output: QgsFileWidget = self.f_output
-                path = output.filePath()
-
-                with open(path, 'w') as f:
-                    json.dump(snapshot.to_dict(), f)
+            row['finished'] = True
