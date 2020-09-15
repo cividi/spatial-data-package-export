@@ -21,7 +21,8 @@ from typing import Optional, Dict
 
 from PyQt5.QtCore import QVariant
 from qgis.core import (QgsVectorLayer, QgsFields, QgsField, QgsFeatureSink, QgsFillSymbol, QgsLineSymbol,
-                       QgsFeature, QgsProcessingFeedback, QgsRectangle, QgsSpatialIndex, QgsFeatureRequest)
+                       QgsFeature, QgsProcessingFeedback, QgsRectangle, QgsSpatialIndex, QgsFeatureRequest,
+                       QgsMarkerSymbol)
 
 from ..definitions.symbols import SymbolLayerType, SymbolType
 from ..model.snapshot import Legend
@@ -87,10 +88,9 @@ class StylesToAttributes:
         self.feedback.pushDebugInfo(str(type(symbol)))
         style = self.field_template.copy()
         sym_type = SymbolLayerType[symbol.symbolLayers()[0].layerType()]
+        sym = symbol.symbolLayers()[0].properties()
         if isinstance(symbol, QgsFillSymbol):
-            sym = symbol.symbolLayers()[0].properties()
             if sym_type == SymbolLayerType.SimpleLine:
-                sym = symbol.symbolLayers()[0].properties()
                 style["type"] = "line"
                 style["fill"] = "#000000"
                 style["fill-opacity"] = 0
@@ -109,15 +109,22 @@ class StylesToAttributes:
                 style["stroke-width"] = sym['outline_width']
 
         elif isinstance(symbol, QgsLineSymbol):
-            if sym_type == "SimpleLine":
+            if sym_type == SymbolLayerType.SimpleLine:
                 self.feedback.pushDebugInfo(symbol.symbolLayers()[0].properties())
                 style["type"] = "line"
-                sym = symbol.symbolLayers()[0].properties()
                 style["fill"] = "transparent"
                 style["fill-opacity"] = 0
                 style["stroke"] = self._rgb_extract(sym['line_color'])[0]
                 style["stroke-opacity"] = self._rgb_extract(sym['line_color'])[1]
                 style["stroke-width"] = sym['line_width']
+        elif isinstance(symbol, QgsMarkerSymbol):
+            if sym_type == SymbolLayerType.SimpleMarker:
+                style["type"] = "circle"
+                style["fill"] = self._rgb_extract(sym['color'])[0]
+                style["fill-opacity"] = self._rgb_extract(sym['color'])[1]
+                style["stroke"] = self._rgb_extract(sym['outline_color'])[0]
+                style["stroke-opacity"] = self._rgb_extract(sym['outline_color'])[1]
+                style["stroke-width"] = sym['outline_width']
         else:
             raise ValueError(f"Unkown symbol type: {symbol.symbolLayers()[0].layerType()}")
         return style
@@ -141,7 +148,7 @@ class StylesToAttributes:
             self.symbols[0] = {'range_lower': None, 'range_upper': None, 'label': self.layer_name, 'style': style}
 
     def _copy_fields(self, sink: QgsFeatureSink, extent: Optional[QgsRectangle] = None):
-        total = 100.0 / self.layer.featureCount()
+        total = 100.0 / self.layer.featureCount() if self.layer.featureCount() > 0 else 100
         if extent is not None:
             self.feedback.pushDebugInfo(f'Extent: {extent.toString()}')
             source_index = QgsSpatialIndex(self.layer, self.feedback)

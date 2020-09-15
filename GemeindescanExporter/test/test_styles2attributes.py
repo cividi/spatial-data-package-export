@@ -22,6 +22,7 @@ from qgis.core import QgsVectorDataProvider, QgsProcessingFeedback, QgsVectorLay
 from .utils import get_symbols_and_legend
 from ..core.styles2attributes import StylesToAttributes
 from ..definitions.symbols import SymbolType
+from ..qgis_plugin_tools.tools.logger_processing import LoggerProcessingFeedBack
 
 STYLE_FIELDS = {'fill', "fill-opacity", "stroke", "stroke-opacity", "stroke-width"}
 
@@ -33,17 +34,43 @@ def test_fields(new_project, layer_simple_poly):
     assert STYLE_FIELDS.difference(fields) == set()
 
 
-def test_simple_poly(new_project, categorized_poly, layer_empty_poly):
-    converter = StylesToAttributes(categorized_poly, categorized_poly.name(), QgsProcessingFeedback())
+def test_simple_poly(new_project, layer_simple_poly, layer_empty_poly):
+    simple_asserts(layer_empty_poly, layer_simple_poly)
+
+
+def test_simple_lines(new_project, layer_lines, layer_empty_lines):
+    simple_asserts(layer_lines, layer_empty_lines)
+
+
+def test_simple_points(new_project, layer_points, layer_empty_points):
+    simple_asserts(layer_points, layer_empty_points)
+
+
+def test_categorized_poly(new_project, categorized_poly, layer_empty_poly):
+    feedback = LoggerProcessingFeedBack()
+    converter = StylesToAttributes(categorized_poly, categorized_poly.name(), feedback)
     assert converter.symbol_type == SymbolType.categorizedSymbol
 
     update_fields(converter, layer_empty_poly)
     layer_empty_poly.startEditing()
     converter.extract_styles_to_layer(layer_empty_poly)
     layer_empty_poly.commitChanges()
+    assert not feedback.isCanceled(), feedback.last_report_error
 
     expected_symbols, expected_legend = get_symbols_and_legend('categorized_poly')
     common_asserts(converter, expected_legend, expected_symbols, categorized_poly, layer_empty_poly)
+
+
+def simple_asserts(src_layer, dst_layer):
+    feedback = LoggerProcessingFeedBack()
+    converter = StylesToAttributes(dst_layer, src_layer.name(), feedback)
+    assert converter.symbol_type == SymbolType.singleSymbol
+    update_fields(converter, dst_layer)
+    src_layer.startEditing()
+    converter.extract_styles_to_layer(dst_layer)
+    src_layer.commitChanges()
+    assert not feedback.isCanceled(), feedback.last_report_error
+    return converter
 
 
 def common_asserts(converter, expected_legend, expected_symbols, src_layer, converted_layer):

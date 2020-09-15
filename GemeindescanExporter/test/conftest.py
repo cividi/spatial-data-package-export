@@ -48,6 +48,20 @@ def layer_simple_poly(test_gpkg):
 
 
 @pytest.fixture
+def layer_points(test_gpkg):
+    name = 'school_point'
+    layer = get_layer(name, test_gpkg)
+    return layer
+
+
+@pytest.fixture
+def layer_lines(test_gpkg):
+    name = 'roads_line'
+    layer = get_layer(name, test_gpkg)
+    return layer
+
+
+@pytest.fixture
 def categorized_poly(layer_simple_poly):
     add_layer(layer_simple_poly)
     style_file = plugin_test_data_path('style', 'categorized_poly.qml')
@@ -66,6 +80,24 @@ def tmp_dir():
 def layer_empty_poly(tmp_dir, layer_simple_poly):
     dp: QgsVectorDataProvider = layer_simple_poly.dataProvider()
     layer = QgsVectorLayer('Polygon', 'test_poly', 'memory')
+    layer.setCrs(dp.crs())
+    assert layer.isValid()
+    return layer
+
+
+@pytest.fixture
+def layer_empty_points(tmp_dir, layer_points):
+    dp: QgsVectorDataProvider = layer_points.dataProvider()
+    layer = QgsVectorLayer('Point', 'test_point', 'memory')
+    layer.setCrs(dp.crs())
+    assert layer.isValid()
+    return layer
+
+
+@pytest.fixture
+def layer_empty_lines(tmp_dir, layer_lines):
+    dp: QgsVectorDataProvider = layer_lines.dataProvider()
+    layer = QgsVectorLayer('LineString', 'test_lines', 'memory')
     layer.setCrs(dp.crs())
     assert layer.isValid()
     return layer

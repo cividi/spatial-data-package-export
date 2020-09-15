@@ -28,6 +28,7 @@ class SymbolType(enum.Enum):
 
 @enum.unique
 class SymbolLayerType(enum.Enum):
+    SimpleMarker = 'SimpleMarker'
     SimpleLine = 'SimpleLine'
     CentroidFill = 'CentroidFill'
     SimpleFill = 'SimpleFill'
