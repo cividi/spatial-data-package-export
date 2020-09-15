@@ -145,15 +145,14 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                            extra=bar_msg(tr('Select at least one layer to create snapshot')))
         else:
             create_styles_to_attributes_tasks(task_wrappers, completed=lambda *args, **kwargs: self.completed())
-            self.disable_ui()
+            self._disable_ui()
 
     def completed(self, *args, **kwargs):
         all_finished = all(map(lambda x: x['finished'], self.layer_rows.values()))
         if not all_finished:
             return
 
-        for item in self.responsive_items:
-            item.setEnabled(True)
+        self._enable_ui()
         LOGGER.info(tr('Finished exporting style to attributes'))
 
         snapshot_config = self._create_snapshot_config()
@@ -173,10 +172,10 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
     def styles_to_attributes_finished(self, input_layer: QgsVectorLayer, context: QgsProcessingContext, id: uuid.UUID,
                                       succesful: bool, results: Dict[str, any]) -> None:
+        row = self.layer_rows[id]
         if succesful:
-            row = self.layer_rows[id]
             legends = [Legend.from_dict(legend) for legend in results["OUTPUT_LEGEND"].values()]
-            LOGGER.info(tr('Task {} finished successfully', id))
+            LOGGER.info(tr('Exporting styles for {} finished successfully', input_layer.name()))
 
             output_layer: QgsVectorLayer = context.takeResultLayer(results['OUTPUT'])
             if output_layer and output_layer.isValid():
@@ -192,6 +191,12 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                 row['styled_layer'] = StyledLayer(row['layer_name'], output_layer.id(), legends)
 
             row['finished'] = True
+        else:
+            feedback: LoggerProcessingFeedBack = row['feedback']
+            error_msg = feedback.last_report_error
+            LOGGER.error(tr('Exporting styles for {} finished with errors', input_layer.name()),
+                         extra=bar_msg(details=tr(f'Details: {error_msg}. Check log file for more details')))
+            self._enable_ui()
 
     # noinspection PyUnresolvedReferences
     @log_if_fails
@@ -270,6 +275,10 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             self.extent = extent_chooser.get_extent(self.sb_extent_precision.value())
             self.le_extent.setText(self.extent.toString(self.sb_extent_precision.value()))
 
-    def disable_ui(self):
+    def _disable_ui(self):
         for item in self.responsive_items:
             item.setEnabled(False)
+
+    def _enable_ui(self):
+        for item in self.responsive_items:
+            item.setEnabled(True)

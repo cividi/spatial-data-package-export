@@ -25,6 +25,7 @@ from qgis.core import (QgsVectorLayer, QgsFields, QgsField, QgsFeatureSink, QgsF
 
 from ..definitions.symbols import SymbolLayerType, SymbolType
 from ..model.snapshot import Legend
+from ..qgis_plugin_tools.tools.i18n import tr
 
 
 class StylesToAttributes:
@@ -74,9 +75,13 @@ class StylesToAttributes:
         return {label: legend.to_dict() for label, legend in self.legend.items()}
 
     def extract_styles_to_layer(self, sink: QgsFeatureSink, extent: Optional[QgsRectangle] = None):
-        self._update_symbols()
-        self._update_legend()
-        self._copy_fields(sink, extent)
+        try:
+            self._update_symbols()
+            self._update_legend()
+            self._copy_fields(sink, extent)
+        except Exception as e:
+            self.feedback.reportError(tr('Error occurred: {}', e), True)
+            self.feedback.cancel()
 
     def _get_style(self, symbol):
         self.feedback.pushDebugInfo(str(type(symbol)))
