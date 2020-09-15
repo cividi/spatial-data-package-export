@@ -46,25 +46,21 @@ def test_simple_points(new_project, layer_points, layer_empty_points):
     simple_asserts(layer_points, layer_empty_points)
 
 
-def test_categorized_poly(new_project, categorized_poly, layer_empty_poly):
-    feedback = LoggerProcessingFeedBack()
-    converter = StylesToAttributes(categorized_poly, categorized_poly.name(), feedback)
-    assert converter.symbol_type == SymbolType.categorizedSymbol
+def test_centroid_poly(new_project, centroid_poly, layer_empty_points):
+    simple_asserts(centroid_poly, layer_empty_points)
 
-    update_fields(converter, layer_empty_poly)
-    layer_empty_poly.startEditing()
-    converter.extract_styles_to_layer(layer_empty_poly)
-    layer_empty_poly.commitChanges()
-    assert not feedback.isCanceled(), feedback.last_report_error
+
+def test_categorized_poly(new_project, categorized_poly, layer_empty_poly):
+    converter = simple_asserts(categorized_poly, layer_empty_poly, SymbolType.categorizedSymbol)
 
     expected_symbols, expected_legend = get_symbols_and_legend('categorized_poly')
     common_asserts(converter, expected_legend, expected_symbols, categorized_poly, layer_empty_poly)
 
 
-def simple_asserts(src_layer, dst_layer):
+def simple_asserts(src_layer, dst_layer, symbol=SymbolType.singleSymbol):
     feedback = LoggerProcessingFeedBack()
     converter = StylesToAttributes(dst_layer, src_layer.name(), feedback)
-    assert converter.symbol_type == SymbolType.singleSymbol
+    assert converter.symbol_type == symbol
     update_fields(converter, dst_layer)
     src_layer.startEditing()
     converter.extract_styles_to_layer(dst_layer)

@@ -71,6 +71,15 @@ def categorized_poly(layer_simple_poly):
 
 
 @pytest.fixture
+def centroid_poly(layer_simple_poly):
+    add_layer(layer_simple_poly)
+    style_file = plugin_test_data_path('style', 'centroid_poly.qml')
+    msg, succeeded = layer_simple_poly.loadNamedStyle(style_file)
+    assert succeeded, msg
+    return layer_simple_poly
+
+
+@pytest.fixture
 def tmp_dir():
     with tempfile.TemporaryDirectory(dir=plugin_test_data_path()) as tmpdirname:
         yield tmpdirname
