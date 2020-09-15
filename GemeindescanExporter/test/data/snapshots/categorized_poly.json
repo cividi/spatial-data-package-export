@@ -87,10 +87,6 @@
   ],
   "sources": [
     {
-      "url": "https://www.openstreetmap.org/copyright",
-      "title": "Karte: Mapbox, \u00a9 OpenStreetMap"
-    },
-    {
       "url": "SOURCE URL",
       "title": "SOURCE TITLE/DESCRIPTION"
     }

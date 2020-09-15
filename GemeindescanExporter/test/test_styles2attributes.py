@@ -35,7 +35,7 @@ def test_fields(new_project, layer_simple_poly):
 
 
 def test_simple_poly(new_project, layer_simple_poly, layer_empty_poly):
-    simple_asserts(layer_empty_poly, layer_simple_poly)
+    simple_asserts(layer_simple_poly, layer_empty_poly)
 
 
 def test_simple_lines(new_project, layer_lines, layer_empty_lines):
@@ -59,19 +59,18 @@ def test_categorized_poly(new_project, categorized_poly, layer_empty_poly):
 
 def simple_asserts(src_layer, dst_layer, symbol=SymbolType.singleSymbol):
     feedback = LoggerProcessingFeedBack()
-    converter = StylesToAttributes(dst_layer, src_layer.name(), feedback)
+    converter = StylesToAttributes(src_layer, src_layer.name(), feedback)
     assert converter.symbol_type == symbol
     update_fields(converter, dst_layer)
-    src_layer.startEditing()
+    dst_layer.startEditing()
     converter.extract_styles_to_layer(dst_layer)
-    src_layer.commitChanges()
+    dst_layer.commitChanges()
     assert not feedback.isCanceled(), feedback.last_report_error
+    assert dst_layer.featureCount() == src_layer.featureCount(), 'feature count is not the same'
     return converter
 
 
 def common_asserts(converter, expected_legend, expected_symbols, src_layer, converted_layer):
-    assert converted_layer.featureCount() == src_layer.featureCount()
-
     assert converter.get_legend() == expected_legend
     assert converter.symbols == expected_symbols
     for i in range(converted_layer.featureCount()):
