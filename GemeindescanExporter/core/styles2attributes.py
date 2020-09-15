@@ -22,7 +22,7 @@ from typing import Optional, Dict
 from PyQt5.QtCore import QVariant
 from qgis.core import (QgsVectorLayer, QgsFields, QgsField, QgsFeatureSink, QgsFillSymbol, QgsLineSymbol,
                        QgsFeature, QgsProcessingFeedback, QgsRectangle, QgsSpatialIndex, QgsFeatureRequest,
-                       QgsMarkerSymbol)
+                       QgsMarkerSymbol, QgsSymbol, QgsSymbolLayer)
 
 from ..definitions.symbols import SymbolLayerType, SymbolType
 from ..model.snapshot import Legend
@@ -84,11 +84,16 @@ class StylesToAttributes:
             self.feedback.reportError(tr('Error occurred: {}', e), True)
             self.feedback.cancel()
 
-    def _get_style(self, symbol):
+    def _get_style(self, symbol: QgsSymbol):
         self.feedback.pushDebugInfo(str(type(symbol)))
+
         style = self.field_template.copy()
-        sym_type = SymbolLayerType[symbol.symbolLayers()[0].layerType()]
-        sym = symbol.symbolLayers()[0].properties()
+        symbol_layer: QgsSymbolLayer = symbol.symbolLayers()[0]
+        if symbol_layer.subSymbol() is not None:
+            return self._get_style(symbol_layer.subSymbol())
+
+        sym_type = SymbolLayerType[symbol_layer.layerType()]
+        sym = symbol_layer.properties()
         if isinstance(symbol, QgsFillSymbol):
             if sym_type == SymbolLayerType.SimpleLine:
                 style["type"] = "line"
@@ -110,7 +115,7 @@ class StylesToAttributes:
 
         elif isinstance(symbol, QgsLineSymbol):
             if sym_type == SymbolLayerType.SimpleLine:
-                self.feedback.pushDebugInfo(symbol.symbolLayers()[0].properties())
+                self.feedback.pushDebugInfo(symbol_layer.properties())
                 style["type"] = "line"
                 style["fill"] = "transparent"
                 style["fill-opacity"] = 0
@@ -126,7 +131,7 @@ class StylesToAttributes:
                 style["stroke-opacity"] = self._rgb_extract(sym['outline_color'])[1]
                 style["stroke-width"] = sym['outline_width']
         else:
-            raise ValueError(f"Unkown symbol type: {symbol.symbolLayers()[0].layerType()}")
+            raise ValueError(f"Unkown symbol type: {symbol_layer.layerType()}")
         return style
 
     def _update_symbols(self):
