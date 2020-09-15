@@ -152,8 +152,9 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             new_layer_name = f'{layer_name}-snapshot'
             row['new_layer_name'] = new_layer_name
             row['finished'] = False
+            is_primary = row['primary'].isChecked()
             task_wrapper = TaskWrapper(id=id, layer=cb.currentLayer(), name=new_layer_name, extent=self.extent,
-                                       output=f'memory:{new_layer_name}', feedback=row['feedback'],
+                                       primary=is_primary, output=f'memory:{new_layer_name}', feedback=row['feedback'],
                                        context=row['context'], executed=self.styles_to_attributes_finished
                                        )
             LOGGER.info(f"Exporting {layer_name}")

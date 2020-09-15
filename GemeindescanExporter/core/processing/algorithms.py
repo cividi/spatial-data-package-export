@@ -23,7 +23,8 @@ from qgis.core import (
     QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterFeatureSink,
     QgsProcessingException,
     QgsFeatureSink, QgsProcessingParameterVectorLayer,
-    QgsVectorLayer, QgsRectangle, QgsProcessingParameterExtent, QgsProcessingParameterString)
+    QgsVectorLayer, QgsRectangle, QgsProcessingParameterExtent, QgsProcessingParameterString,
+    QgsProcessingParameterBoolean)
 
 from ..styles2attributes import StylesToAttributes
 from ...qgis_plugin_tools.tools.algorithm_processing import BaseProcessingAlgorithm
@@ -37,6 +38,7 @@ class StyleToAttributesAlg(BaseProcessingAlgorithm):
     ID = 'styletoattributes'
     INPUT = 'INPUT'
     NAME = 'NAME'
+    PRIMARY = 'PRIMARY'
     OUTPUT = 'OUTPUT'
     OUTPUT_LEGEND = 'OUTPUT_LEGEND'
     EXTENT = 'EXTENT'
@@ -61,6 +63,8 @@ class StyleToAttributesAlg(BaseProcessingAlgorithm):
         self.addParameter(QgsProcessingParameterVectorLayer(self.INPUT, tr('Input layer')))
         self.addParameter(QgsProcessingParameterString(self.NAME, tr('Output Layer name')))
         self.addParameter(QgsProcessingParameterExtent(self.EXTENT, tr('Input extent'), defaultValue=None))
+        self.addParameter(
+            QgsProcessingParameterBoolean(self.PRIMARY, tr('Is layer a primary layer'), defaultValue=False))
 
         self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT, tr('Layer with attributes')))
 
@@ -75,7 +79,9 @@ class StyleToAttributesAlg(BaseProcessingAlgorithm):
         if output_name is None:
             output_name = f'{source.name()}-snapshot'
 
-        wrkr = StylesToAttributes(source, output_name, feedback)
+        primary_layer: bool = self.parameterAsBool(parameters, self.PRIMARY, context)
+
+        wrkr = StylesToAttributes(source, output_name, feedback, primary_layer=primary_layer)
 
         extent: QgsRectangle = self.parameterAsExtent(parameters, self.EXTENT, context, crs=source.sourceCrs())
 

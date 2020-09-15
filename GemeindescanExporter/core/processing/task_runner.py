@@ -37,6 +37,7 @@ class TaskWrapper:
     layer: QgsVectorLayer
     name: str
     extent: QgsRectangle
+    primary: bool
     output: str
     feedback: QgsProcessingFeedback
     context: QgsProcessingContext
@@ -48,6 +49,7 @@ class TaskWrapper:
             'EXTENT': self.extent,
             'INPUT': self.layer,
             'NAME': self.name,
+            'PRIMARY': self.primary,
             'OUTPUT': self.output
         }
 
