@@ -34,7 +34,7 @@ def load_config_from_template() -> Config:
 
 def load_snapshot_template() -> Snapshot:
     template_path = get_setting(Settings.snapshot_template.name, Settings.snapshot_template.value, str)
-    return Snapshot.from_dict(load_json(template_path))
+    return Snapshot.from_dict(load_json(template_path)['snapshot'])
 
 
 def load_json(template_path):

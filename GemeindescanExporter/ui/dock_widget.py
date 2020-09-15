@@ -26,18 +26,19 @@ import uuid
 from typing import Dict
 
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QCheckBox, QGridLayout, QPushButton, QWidget
+from PyQt5.QtWidgets import QCheckBox, QGridLayout, QPushButton, QWidget, QLineEdit
 from qgis.PyQt import QtWidgets
 from qgis.core import (QgsProcessingContext, QgsVectorLayer, QgsProject,
                        QgsMapLayerProxyModel, QgsRectangle, QgsApplication)
-from qgis.gui import QgsMapLayerComboBox, QgisInterface, QgsFileWidget
+from qgis.gui import QgsMapLayerComboBox, QgisInterface
 
 from .extent_dialog import ExtentChooserDialog
 from ..core.datapackage import DatapackageWriter
 from ..core.processing.task_runner import TaskWrapper, create_styles_to_attributes_tasks
-from ..core.utils import load_config_from_template, extent_to_datapackage_bounds
+from ..core.utils import load_config_from_template, extent_to_datapackage_bounds, load_snapshot_template
 from ..definitions.configurable_settings import Settings
-from ..model.snapshot import Legend
+from ..model.config import SnapshotConfig
+from ..model.snapshot import Legend, Source
 from ..model.styled_layer import StyledLayer
 from ..qgis_plugin_tools.tools.custom_logging import bar_msg
 from ..qgis_plugin_tools.tools.decorations import log_if_fails
@@ -59,10 +60,13 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.iface = iface
         # Template can be configured via settings
         self.config = load_config_from_template()
+        self.snapshot_template = load_snapshot_template()
         self.writer = DatapackageWriter(self.config)
         self.extent: QgsRectangle = self.iface.mapCanvas().extent()
         self.layer_grid: QGridLayout = self.layer_grid
+        self.source_grid: QGridLayout = self.source_grid
         self.layer_rows: Dict = {}
+        self.source_rows: Dict = {}
         # TODO: add items here
         self.responsive_items = [self.btn_export]
 
@@ -71,79 +75,53 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.le_extent.setText(self.extent.toString(self.sb_extent_precision.value()))
 
         self.btn_add_layer_row.setIcon(QgsApplication.getThemeIcon('/mActionAdd.svg'))
-        self.btn_add_layer_row.clicked.connect(lambda _: self._add_row(len(self.layer_rows) + 1))
+        self.btn_add_layer_row.clicked.connect(lambda _: self._add_layer_row(len(self.layer_rows) + 1))
+
+        self.btn_add_source_row.setIcon(QgsApplication.getThemeIcon('/mActionAdd.svg'))
+        self.btn_add_source_row.clicked.connect(lambda _: self._add_source_row(len(self.source_rows) + 1))
 
         self.btn_export.clicked.connect(self.run)
+        self.btn_reset_settings.clicked.connect(self._set_initial_values)
         self._set_initial_values()
 
     def _set_initial_values(self):
+        for name, snapshot_config in self.config.snapshots[0].items():
+            self.input_name.setText(name)
+            self.input_title.setText(snapshot_config.title)
+            self.input_description.setText(snapshot_config.description)
+            break
 
-        snap = self.config.snapshots[0]
-        snapshot_config = list(snap.values())[0]
+        for i, source in enumerate(self.snapshot_template.sources, start=1):
+            self._add_source_row(1, source.url, source.title)
+        self._add_layer_row(1)
 
-        self.input_title.setText(snapshot_config.title)
-        self.input_description.setText(snapshot_config.description)
+    def _create_snapshot_config(self):
+        snapshot_config_template = None
+        for snapshot_config_template in self.config.snapshots[0].values():
+            break
 
-    # noinspection PyUnresolvedReferences
-    @log_if_fails
-    def _add_row(self, row_index: int):
-        b_rm = QPushButton(text='', icon=QgsApplication.getThemeIcon('/mActionRemove.svg'))
-        b_rm.setToolTip(tr('Remove row'))
-        b_rm.clicked.connect(lambda _: self._remove_row(row_uuid))
+        if snapshot_config_template is None:
+            LOGGER.warning(tr('Check your snapshot configuration'),
+                           extra=bar_msg(tr('Configuration does not contain snapshot configuration template')))
+            # TODO: custom exception
+            raise ValueError()
 
-        bx_layer = QgsMapLayerComboBox()
-        bx_layer.setFilters(QgsMapLayerProxyModel.Filters(QgsMapLayerProxyModel.Filter.PointLayer |
-                                                          QgsMapLayerProxyModel.Filter.PolygonLayer |
-                                                          QgsMapLayerProxyModel.Filter.LineLayer))
-        cb_primary = QCheckBox(text='')
+        # noinspection PyUnboundLocalVariable
+        snapshot_config = SnapshotConfig.from_dict(snapshot_config_template.to_dict())
 
-        row_uuid = str(uuid.uuid4())
-        row = {
-            'layer': bx_layer,
-            'primary': cb_primary,
-            'rm': b_rm,
-            'feedback': LoggerProcessingFeedBack(use_logger=True),
-            'context': QgsProcessingContext()
-        }
-        self.layer_rows[row_uuid] = row
-        self.layer_grid.addWidget(b_rm, row_index, 0)
-        self.layer_grid.addWidget(bx_layer, row_index, 1)
-        self.layer_grid.addWidget(cb_primary, row_index, 2)
-
-    def _remove_row(self, row_uuid: str):
-        row = self.layer_rows.pop(row_uuid)
-        for widget in row.values():
-            if isinstance(widget, QWidget):
-                self.layer_grid.removeWidget(widget)
-                widget.hide()
-                widget.setParent(None)
-            # noinspection PyUnusedLocal
-            widget = None
-
-    def on_sb_extent_precision_valueChanged(self, new_val: int):
-        set_setting(Settings.extent_precision.name, new_val)
-
-    def on_btn_calculate_extent_clicked(self):
-        canvas = self.iface.mapCanvas()
-        rows = list(self.layer_rows.values())
-
-        crs = canvas.mapSettings().destinationCrs()
-        if len(rows):
-            layer = rows[0]['layer'].currentLayer()
-            if layer is not None:
-                crs = layer.crs()
-
-        extent_chooser = ExtentChooserDialog(canvas, crs)
-        result = extent_chooser.exec()
-        if result:
-            self.extent = extent_chooser.get_extent(self.sb_extent_precision.value())
-            self.le_extent.setText(self.extent.toString(self.sb_extent_precision.value()))
-
-    def disable_ui(self):
-        for item in self.responsive_items:
-            item.setEnabled(False)
+        snapshot_config.title = self.input_title.text()
+        snapshot_config.description = self.input_description.toPlainText()
+        snapshot_config.bounds = extent_to_datapackage_bounds(self.extent, self.sb_extent_precision.value())
+        snapshot_config.sources = [Source(row['url'].text(), row['title'].text()) for row in self.source_rows.values()]
+        return snapshot_config
 
     def run(self):
+        output_path: str = self.f_output.filePath()
+        if len(output_path) == 0 or len(self.input_name.text()) == 0:
+            LOGGER.warning(tr('No output path filled'),
+                           extra=bar_msg(tr('Fill output path and snapshot name')))
+            return
+
         task_wrappers = []
         for id, row in self.layer_rows.items():
             cb: QgsMapLayerComboBox = row['layer']
@@ -178,21 +156,20 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             item.setEnabled(True)
         LOGGER.info(tr('Finished exporting style to attributes'))
 
-        snap = self.config.snapshots[0]
-        snap_name = list(snap.keys())[0]
-        snapshot_config = list(snap.values())[0]
-        snapshot_config.bounds = extent_to_datapackage_bounds(self.extent, self.sb_extent_precision.value())
-        snapshot = self.writer.create_snapshot(snap_name, snapshot_config,
+        snapshot_config = self._create_snapshot_config()
+
+        snapshot_name = self.input_name.text()
+        snapshot = self.writer.create_snapshot(snapshot_name, snapshot_config,
                                                [row['styled_layer'] for row in self.layer_rows.values()])
 
-        output: QgsFileWidget = self.f_output
-        path = os.path.join(output.filePath(), 'testi.json')
+        output_path = self.f_output.filePath()
+        output_file = os.path.join(output_path, f'{snapshot_name}.json')
 
-        with open(path, 'w') as f:
+        with open(output_file, 'w') as f:
             json.dump(snapshot.to_dict(), f)
 
         LOGGER.info(tr('Snapshot succesfully exported'),
-                    extra=bar_msg(tr('Snapshot can be found in {}', path), success=True))
+                    extra=bar_msg(tr('Snapshot can be found in {}', output_file), success=True))
 
     def styles_to_attributes_finished(self, input_layer: QgsVectorLayer, context: QgsProcessingContext, id: uuid.UUID,
                                       succesful: bool, results: Dict[str, any]) -> None:
@@ -215,3 +192,84 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                 row['styled_layer'] = StyledLayer(row['layer_name'], output_layer.id(), legends)
 
             row['finished'] = True
+
+    # noinspection PyUnresolvedReferences
+    @log_if_fails
+    def _add_layer_row(self, row_index: int):
+        row_uuid = str(uuid.uuid4())
+        b_rm = QPushButton(text='', icon=QgsApplication.getThemeIcon('/mActionRemove.svg'))
+        b_rm.setToolTip(tr('Remove row'))
+        b_rm.clicked.connect(lambda _: self._remove_row(row_uuid, self.layer_rows, self.layer_grid))
+
+        bx_layer = QgsMapLayerComboBox()
+        bx_layer.setFilters(QgsMapLayerProxyModel.Filters(QgsMapLayerProxyModel.Filter.PointLayer |
+                                                          QgsMapLayerProxyModel.Filter.PolygonLayer |
+                                                          QgsMapLayerProxyModel.Filter.LineLayer))
+        cb_primary = QCheckBox(text='')
+
+        row = {
+            'layer': bx_layer,
+            'primary': cb_primary,
+            'rm': b_rm,
+            'feedback': LoggerProcessingFeedBack(use_logger=True),
+            'context': QgsProcessingContext()
+        }
+        self.layer_rows[row_uuid] = row
+        self.layer_grid.addWidget(b_rm, row_index, 0)
+        self.layer_grid.addWidget(bx_layer, row_index, 1)
+        self.layer_grid.addWidget(cb_primary, row_index, 2)
+
+    # noinspection PyUnresolvedReferences
+    @log_if_fails
+    def _add_source_row(self, row_index: int, url: str = '', title: str = ''):
+        row_uuid = str(uuid.uuid4())
+        b_rm = QPushButton(text='', icon=QgsApplication.getThemeIcon('/mActionRemove.svg'))
+        b_rm.setToolTip(tr('Remove row'))
+        b_rm.clicked.connect(lambda _: self._remove_row(row_uuid, self.source_rows, self.source_grid))
+
+        le_url = QLineEdit(url)
+        le_title = QLineEdit(title)
+        row = {
+            'rm': b_rm,
+            'url': le_url,
+            'title': le_title
+        }
+
+        self.source_rows[row_uuid] = row
+        self.source_grid.addWidget(b_rm, row_index, 0)
+        self.source_grid.addWidget(le_url, row_index, 1)
+        self.source_grid.addWidget(le_title, row_index, 2)
+
+    @log_if_fails
+    def _remove_row(self, row_uuid: str, row_dict: Dict, grid: QGridLayout):
+        row = row_dict.pop(row_uuid)
+        for widget in row.values():
+            if isinstance(widget, QWidget):
+                grid.removeWidget(widget)
+                widget.hide()
+                widget.setParent(None)
+            # noinspection PyUnusedLocal
+            widget = None
+
+    def on_sb_extent_precision_valueChanged(self, new_val: int):
+        set_setting(Settings.extent_precision.name, new_val)
+
+    def on_btn_calculate_extent_clicked(self):
+        canvas = self.iface.mapCanvas()
+        rows = list(self.layer_rows.values())
+
+        crs = canvas.mapSettings().destinationCrs()
+        if len(rows):
+            layer = rows[0]['layer'].currentLayer()
+            if layer is not None:
+                crs = layer.crs()
+
+        extent_chooser = ExtentChooserDialog(canvas, crs)
+        result = extent_chooser.exec()
+        if result:
+            self.extent = extent_chooser.get_extent(self.sb_extent_precision.value())
+            self.le_extent.setText(self.extent.toString(self.sb_extent_precision.value()))
+
+    def disable_ui(self):
+        for item in self.responsive_items:
+            item.setEnabled(False)
