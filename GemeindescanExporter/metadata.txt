@@ -3,7 +3,7 @@ name=GemeindescanExporter
 description=Gemeindescan Exporter plugin
 about=Plugin to export data and styles to <a href="https://gemeindescan.ch/de/">gemeindescan</a>
 version=0.0.1
-qgisMinimumVersion=3.0
+qgisMinimumVersion=3.10
 author=Gispo Ltd.
 email=joona@gispo.fi
 changelog=
