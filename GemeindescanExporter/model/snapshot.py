@@ -20,19 +20,19 @@
 Generated using https://app.quicktype.io/ from json file
 """
 
-from dataclasses import dataclass
 from typing import Any, List, Optional, Dict, Union
 
 from .model_utils import (from_str, to_class, from_list, from_float, from_union, from_none,
                           from_int, from_bool, from_dict)
 
 
-@dataclass
 class Contributor:
-    web: str
-    role: str
-    email: str
-    title: str
+
+    def __init__(self, web: str, role: str, email: str, title: str) -> None:
+        self.web = web
+        self.role = role
+        self.email = email
+        self.title = title
 
     @staticmethod
     def from_dict(obj: Any) -> 'Contributor':
@@ -52,9 +52,10 @@ class Contributor:
         return result
 
 
-@dataclass
 class GemeindescanMeta:
-    topic: str
+
+    def __init__(self, topic: str) -> None:
+        self.topic = topic
 
     @staticmethod
     def from_dict(obj: Any) -> 'GemeindescanMeta':
@@ -68,10 +69,11 @@ class GemeindescanMeta:
         return result
 
 
-@dataclass
 class License:
-    url: str
-    type: str
+
+    def __init__(self, url: str, type: str) -> None:
+        self.url = url
+        self.type = type
 
     @staticmethod
     def from_dict(obj: Any) -> 'License':
@@ -87,10 +89,11 @@ class License:
         return result
 
 
-@dataclass
 class Maintainer:
-    web: str
-    name: str
+
+    def __init__(self, web: str, name: str) -> None:
+        self.web = web
+        self.name = name
 
     @staticmethod
     def from_dict(obj: Any) -> 'Maintainer':
@@ -106,12 +109,13 @@ class Maintainer:
         return result
 
 
-@dataclass
 class Resource:
-    name: str
-    mediatype: str
-    data: Optional[Dict] = None
-    path: Optional[str] = None
+
+    def __init__(self, name: str, mediatype: str, data: Optional[Dict] = None, path: Optional[str] = None) -> None:
+        self.name = name
+        self.mediatype = mediatype
+        self.data = data
+        self.path = path
 
     @staticmethod
     def from_dict(obj: Any) -> 'Resource':
@@ -133,10 +137,11 @@ class Resource:
         return result
 
 
-@dataclass
 class Source:
-    url: str
-    title: str
+
+    def __init__(self, url: str, title: str) -> None:
+        self.url = url
+        self.title = title
 
     @staticmethod
     def from_dict(obj: Any) -> 'Source':
@@ -152,17 +157,19 @@ class Source:
         return result
 
 
-@dataclass
 class Legend:
-    label: Union[str, int]
-    size: int
-    shape: str
-    primary: bool
-    fill_color: str
-    fill_opacity: float
-    stroke_color: str
-    stroke_width: Union[str, int]
-    stroke_opacity: float
+
+    def __init__(self, label: Union[str, int], size: int, shape: str, primary: bool, fill_color: str,
+                 fill_opacity: float, stroke_color: str, stroke_width: Union[str, int], stroke_opacity: float) -> None:
+        self.label = label
+        self.size = size
+        self.shape = shape
+        self.primary = primary
+        self.fill_color = fill_color
+        self.fill_opacity = fill_opacity
+        self.stroke_color = stroke_color
+        self.stroke_width = stroke_width
+        self.stroke_opacity = stroke_opacity
 
     @staticmethod
     def from_dict(obj: Any) -> 'Legend':
@@ -192,13 +199,14 @@ class Legend:
         return result
 
 
-@dataclass
 class Spec:
-    title: str
-    description: str
-    attribution: str
-    bounds: List[str]
-    legend: List[Legend]
+
+    def __init__(self, title: str, description: str, attribution: str, bounds: List[str], legend: List[Legend]) -> None:
+        self.title = title
+        self.description = description
+        self.attribution = attribution
+        self.bounds = bounds
+        self.legend = legend
 
     @staticmethod
     def from_dict(obj: Any) -> 'Spec':
@@ -220,12 +228,13 @@ class Spec:
         return result
 
 
-@dataclass
 class View:
-    name: str
-    spec_type: str
-    spec: Spec
-    resources: List[str]
+
+    def __init__(self, name: str, spec_type: str, spec: Spec, resources: List[str]) -> None:
+        self.name = name
+        self.spec_type = spec_type
+        self.spec = spec
+        self.resources = resources
 
     @staticmethod
     def from_dict(obj: Any) -> 'View':
@@ -245,24 +254,28 @@ class View:
         return result
 
 
-@dataclass
 class Snapshot:
-    name: str
-    title: str
-    description: str
-    version: str
-    datapackage_version: str
-    gemeindescan_version: str
-    gemeindescan_meta: GemeindescanMeta
-    format: str
-    license: str
-    licenses: List[License]
-    keywords: List[str]
-    views: List[View]
-    sources: List[Source]
-    resources: List[Resource]
-    maintainers: List[Maintainer]
-    contributors: List[Contributor]
+
+    def __init__(self, name: str, title: str, description: str, version: str, datapackage_version: str,
+                 gemeindescan_version: str, gemeindescan_meta: GemeindescanMeta, format: str, license: str,
+                 licenses: List[License], keywords: List[str], views: List[View], sources: List[Source],
+                 resources: List[Resource], maintainers: List[Maintainer], contributors: List[Contributor]) -> None:
+        self.name = name
+        self.title = title
+        self.description = description
+        self.version = version
+        self.datapackage_version = datapackage_version
+        self.gemeindescan_version = gemeindescan_version
+        self.gemeindescan_meta = gemeindescan_meta
+        self.format = format
+        self.license = license
+        self.licenses = licenses
+        self.keywords = keywords
+        self.views = views
+        self.sources = sources
+        self.resources = resources
+        self.maintainers = maintainers
+        self.contributors = contributors
 
     @staticmethod
     def from_dict(obj: Any) -> 'Snapshot':

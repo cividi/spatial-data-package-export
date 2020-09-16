@@ -20,22 +20,25 @@
 Generated using https://app.quicktype.io/ from json file
 """
 
-from dataclasses import dataclass
 from typing import Optional, Any, List, Dict
 
 from .model_utils import (from_str, to_class, from_list, from_union, from_none, from_list_dict)
 from .snapshot import Source, GemeindescanMeta
 
 
-@dataclass
 class SnapshotConfig:
-    title: Optional[str] = None
-    description: Optional[str] = None
-    keywords: Optional[List[str]] = None
-    gemeindescan_meta: Optional[GemeindescanMeta] = None
-    bounds: Optional[List[str]] = None
-    sources: Optional[List[Source]] = None
-    resources: Optional[List[str]] = None
+
+    def __init__(self, title: Optional[str] = None, description: Optional[str] = None,
+                 keywords: Optional[List[str]] = None, gemeindescan_meta: Optional[GemeindescanMeta] = None,
+                 bounds: Optional[List[str]] = None, sources: Optional[List[Source]] = None,
+                 resources: Optional[List[str]] = None) -> None:
+        self.title = title
+        self.description = description
+        self.keywords = keywords
+        self.gemeindescan_meta = gemeindescan_meta
+        self.bounds = bounds
+        self.sources = sources
+        self.resources = resources
 
     @staticmethod
     def from_dict(obj: Any) -> 'SnapshotConfig':
@@ -62,13 +65,16 @@ class SnapshotConfig:
         return result
 
 
-@dataclass
 class Config:
-    project_name: Optional[str] = None
-    data_dir: Optional[str] = None
-    snapshots_dir: Optional[str] = None
-    dp_template_file: Optional[str] = None
-    snapshots: Optional[List[Dict[str, SnapshotConfig]]] = None
+
+    def __init__(self, project_name: Optional[str] = None, data_dir: Optional[str] = None,
+                 snapshots_dir: Optional[str] = None, dp_template_file: Optional[str] = None,
+                 snapshots: Optional[List[Dict[str, SnapshotConfig]]] = None) -> None:
+        self.project_name = project_name
+        self.data_dir = data_dir
+        self.snapshots_dir = snapshots_dir
+        self.dp_template_file = dp_template_file
+        self.snapshots = snapshots
 
     @staticmethod
     def from_dict(obj: Any) -> 'Config':

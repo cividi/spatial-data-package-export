@@ -19,7 +19,6 @@
 import json
 import os
 import tempfile
-from dataclasses import dataclass
 from typing import List, Dict
 
 from qgis.core import QgsVectorFileWriter, QgsCoordinateReferenceSystem, QgsProject
@@ -28,11 +27,12 @@ from .snapshot import Legend
 from ..qgis_plugin_tools.tools.resources import resources_path
 
 
-@dataclass
 class StyledLayer:
-    resource_name: str
-    layer_id: str
-    legend: List[Legend]
+
+    def __init__(self, resource_name: str, layer_id: str, legend: List[Legend]):
+        self.resource_name = resource_name
+        self.layer_id = layer_id
+        self.legend = legend
 
     @property
     def layer(self):

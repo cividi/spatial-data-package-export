@@ -17,7 +17,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with GemeindescanExporter.  If not, see <https://www.gnu.org/licenses/>.
 import uuid
-from dataclasses import dataclass
 from functools import partial
 from typing import List, Dict, Callable
 
@@ -28,20 +27,23 @@ from .algorithms import StyleToAttributesAlg
 from .provider import GemeindescanProcessingProvider
 
 
-@dataclass
 class TaskWrapper:
     """
     Helper class for task parameters. Could be replaced with TypedDict, but support for Python 3.8 is not that wide yet
     """
-    id: uuid.UUID
-    layer: QgsVectorLayer
-    name: str
-    extent: QgsRectangle
-    primary: bool
-    output: str
-    feedback: QgsProcessingFeedback
-    context: QgsProcessingContext
-    executed: Callable
+
+    def __init__(self, id: uuid.UUID, layer: QgsVectorLayer, name: str, extent: QgsRectangle, primary: bool,
+                 output: str, feedback: QgsProcessingFeedback, context: QgsProcessingContext,
+                 executed: Callable) -> None:
+        self.id = id
+        self.layer = layer
+        self.name = name
+        self.extent = extent
+        self.primary = primary
+        self.output = output
+        self.feedback = feedback
+        self.context = context
+        self.executed = executed
 
     @property
     def params(self) -> Dict[str, any]:
