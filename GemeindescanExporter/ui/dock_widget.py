@@ -23,9 +23,9 @@ import logging
 import os
 import tempfile
 import uuid
-from typing import Dict
+from typing import Dict, Optional
 
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QCheckBox, QGridLayout, QPushButton, QWidget, QLineEdit
 from qgis.PyQt import QtWidgets
 from qgis.core import (QgsProcessingContext, QgsVectorLayer, QgsProject,
@@ -62,7 +62,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.config = load_config_from_template()
         self.snapshot_template = load_snapshot_template()
         self.writer = DatapackageWriter(self.config)
-        self.extent: QgsRectangle = self.iface.mapCanvas().extent()
+        self.extent: Optional[QgsRectangle] = None
         self.layer_grid: QGridLayout = self.layer_grid
         self.source_grid: QGridLayout = self.source_grid
         self.layer_rows: Dict = {}
@@ -72,7 +72,8 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
         self.sb_extent_precision.setValue(
             get_setting(Settings.extent_precision.name, Settings.extent_precision.value, int))
-        self.le_extent.setText(self.extent.toString(self.sb_extent_precision.value()))
+        self.le_extent.setText(
+            self.extent.toString(self.sb_extent_precision.value()) if self.extent is not None else '')
 
         self.btn_add_layer_row.setIcon(QgsApplication.getThemeIcon('/mActionAdd.svg'))
         self.btn_add_layer_row.clicked.connect(lambda _: self._add_layer_row(len(self.layer_rows) + 1))
@@ -259,6 +260,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     def on_sb_extent_precision_valueChanged(self, new_val: int):
         set_setting(Settings.extent_precision.name, new_val)
 
+    @pyqtSlot()
     def on_btn_calculate_extent_clicked(self):
         canvas = self.iface.mapCanvas()
         rows = list(self.layer_rows.values())

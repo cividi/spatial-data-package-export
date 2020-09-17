@@ -38,7 +38,7 @@ class ExtentChooserDialog(QDialog, FORM_CLASS):
         extent_gb: QgsExtentGroupBox = self.gb_extent
         extent_gb.setOriginalExtent(canvas.extent(), crs)
         extent_gb.setCurrentExtent(canvas.extent(), crs)
-        extent_gb.setOutputCrs(crs)
+        extent_gb.setOutputCrs(QgsCoordinateReferenceSystem('EPSG:4326'))
         # TODO: fix bug - QGIS crashes when drawing from canvas
         # extent_gb.setMapCanvas(canvas)
 

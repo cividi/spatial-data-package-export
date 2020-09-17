@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with GemeindescanExporter.  If not, see <https://www.gnu.org/licenses/>.
 import pytest
-from qgis.core import QgsRectangle
+from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 
 from ..core.utils import extent_to_datapackage_bounds, datapackage_bounds_to_extent
 
@@ -30,6 +30,11 @@ def bounds():
 @pytest.fixture
 def extent():
     return QgsRectangle(21.54003660, 59.59924232, 31.61838268, 61.02919460)
+
+
+@pytest.fixture
+def extent2():
+    return QgsRectangle(21.55787082699999857, 59.40132140899999769, 27.46496583600000108, 62.1826135000000022)
 
 
 @pytest.fixture
@@ -46,3 +51,11 @@ def test_extent_to_datapackage_bounds(extent, bounds):
 def test_datapackage_bounds_to_extent(bounds, rounded_extent):
     extent = datapackage_bounds_to_extent(bounds)
     assert extent == rounded_extent
+
+
+def test_transformations(extent):
+    extent_crs = QgsCoordinateReferenceSystem('EPSG:4326')
+    source_crs = QgsCoordinateReferenceSystem('EPSG:3067')
+    transform = QgsCoordinateTransform(extent_crs, source_crs, QgsProject.instance())
+    extent_transformed = transform.transformBoundingBox(extent)
+    assert not extent_transformed == extent

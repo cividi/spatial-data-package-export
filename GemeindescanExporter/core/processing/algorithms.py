@@ -24,7 +24,7 @@ from qgis.core import (
     QgsProcessingException,
     QgsFeatureSink, QgsProcessingParameterVectorLayer,
     QgsVectorLayer, QgsRectangle, QgsProcessingParameterExtent, QgsProcessingParameterString,
-    QgsProcessingParameterBoolean)
+    QgsProcessingParameterBoolean, QgsCoordinateReferenceSystem, QgsCoordinateTransform)
 
 from ..styles2attributes import StylesToAttributes
 from ...qgis_plugin_tools.tools.algorithm_processing import BaseProcessingAlgorithm
@@ -83,7 +83,15 @@ class StyleToAttributesAlg(BaseProcessingAlgorithm):
 
         wrkr = StylesToAttributes(source, output_name, feedback, primary_layer=primary_layer)
 
-        extent: QgsRectangle = self.parameterAsExtent(parameters, self.EXTENT, context, crs=source.sourceCrs())
+        extent_crs = QgsCoordinateReferenceSystem('EPSG:4326')
+        extent: QgsRectangle = self.parameterAsExtent(parameters, self.EXTENT, context,
+                                                      crs=extent_crs)
+
+        if extent_crs != source.crs() and extent is not None:
+            transform = QgsCoordinateTransform(extent_crs, source.crs(), context.project())
+            extent_transformed = transform.transformBoundingBox(extent)
+        else:
+            extent_transformed = extent
 
         sink: QgsFeatureSink
         (sink, dest_id) = self.parameterAsSink(parameters, self.OUTPUT, context,
@@ -91,7 +99,7 @@ class StyleToAttributesAlg(BaseProcessingAlgorithm):
         if sink is None:
             raise QgsProcessingException(self.invalidSinkError(parameters, self.OUTPUT))
 
-        wrkr.extract_styles_to_layer(sink, extent)
+        wrkr.extract_styles_to_layer(sink, extent_transformed)
 
         ret_val = {self.OUTPUT: dest_id,
                    self.OUTPUT_LEGEND: wrkr.get_legend(),
