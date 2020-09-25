@@ -176,7 +176,8 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         row = self.layer_rows[id]
         if succesful:
             legends = [Legend.from_dict(legend) for legend in results["OUTPUT_LEGEND"].values()]
-            LOGGER.info(tr('Exporting styles for {} finished successfully', input_layer.name()))
+            style_type = results['OUTPUT_STYLE_TYPE']
+            LOGGER.info(tr('Exporting styles for {} ({}) finished successfully', input_layer.name(), style_type))
 
             output_layer: QgsVectorLayer = context.takeResultLayer(results['OUTPUT'])
             if output_layer and output_layer.isValid():
@@ -189,7 +190,8 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                         LOGGER.error(tr('Could not load style'), extra=bar_msg(msg))
 
                 QgsProject.instance().addMapLayer(output_layer)
-                row['styled_layer'] = StyledLayer(row['layer_name'], output_layer.id(), legends)
+
+                row['styled_layer'] = StyledLayer(row['layer_name'], output_layer.id(), legends, style_type)
 
             row['finished'] = True
         else:
@@ -263,13 +265,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     @pyqtSlot()
     def on_btn_calculate_extent_clicked(self):
         canvas = self.iface.mapCanvas()
-        rows = list(self.layer_rows.values())
-
         crs = canvas.mapSettings().destinationCrs()
-        if len(rows):
-            layer = rows[0]['layer'].currentLayer()
-            if layer is not None:
-                crs = layer.crs()
 
         extent_chooser = ExtentChooserDialog(canvas, crs)
         result = extent_chooser.exec()

@@ -62,7 +62,7 @@ class DatapackageWriter:
         snapshot.resources = []
 
         for styled_layer in styled_layers:
-            resource = Resource(styled_layer.resource_name, mediatype='application/geo+json',
+            resource = Resource(styled_layer.resource_name, mediatype=styled_layer.style_type.media_type,
                                 data=styled_layer.get_geojson_data())
             snapshot.resources.append(resource)
 

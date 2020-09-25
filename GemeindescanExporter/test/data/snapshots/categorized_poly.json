@@ -41,7 +41,7 @@
             "fillColor": "#ec1182",
             "fillOpacity": 1.0,
             "strokeColor": "#232323",
-            "strokeWidth": "0.26",
+            "strokeWidth": 0.26,
             "strokeOpacity": 1.0
           },
           {
@@ -52,7 +52,7 @@
             "fillColor": "#3df091",
             "fillOpacity": 1.0,
             "strokeColor": "#232323",
-            "strokeWidth": "0.26",
+            "strokeWidth": 0.26,
             "strokeOpacity": 1.0
           },
           {
@@ -63,7 +63,7 @@
             "fillColor": "#4b50e2",
             "fillOpacity": 1.0,
             "strokeColor": "#232323",
-            "strokeWidth": "0.26",
+            "strokeWidth": 0.26,
             "strokeOpacity": 1.0
           },
           {
@@ -74,7 +74,7 @@
             "fillColor": "#cecd73",
             "fillOpacity": 1.0,
             "strokeColor": "#232323",
-            "strokeWidth": "0.26",
+            "strokeWidth": 0.26,
             "strokeOpacity": 1.0
           }
         ]

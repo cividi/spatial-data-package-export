@@ -17,32 +17,24 @@
 #  You should have received a copy of the GNU General Public License
 #  along with GemeindescanExporter.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 
 from PyQt5.QtCore import QVariant
 from qgis.core import (QgsVectorLayer, QgsFields, QgsField, QgsFeatureSink, QgsFillSymbol, QgsLineSymbol,
                        QgsFeature, QgsProcessingFeedback, QgsRectangle, QgsSpatialIndex, QgsFeatureRequest,
-                       QgsMarkerSymbol, QgsSymbol, QgsSymbolLayer)
+                       QgsMarkerSymbol, QgsSymbol, QgsSymbolLayer, QgsPropertyCollection, QgsProperty)
 
+from ..definitions.style import Style, PointStyle
 from ..definitions.symbols import SymbolLayerType, SymbolType
+from ..definitions.types import StyleType
 from ..model.snapshot import Legend
+from ..qgis_plugin_tools.tools.exceptions import QgsPluginNotImplementedException
 from ..qgis_plugin_tools.tools.i18n import tr
 
 
 class StylesToAttributes:
-    field_mapper = {"fill": "fillColor", "fill-opacity": "fillOpacity", "stroke": "strokeColor",
-                    "stroke-opacity": "strokeOpacity", "stroke-width": "strokeWidth", "type": "shape"}
-
-    DEFAULT_TEMPLATE = {
-        "fill": "#000000",
-        "fill-opacity": 1.0,
-        "stroke": "#ffffff",
-        "stroke-opacity": 1.0,
-        "stroke-width": 1.0
-    }
 
     def __init__(self, layer: QgsVectorLayer, layer_name: str, feedback: QgsProcessingFeedback,
-                 field_template: Optional = None,
                  primary_layer: bool = False):
         self.layer = layer
         self.layer_name = layer_name
@@ -51,6 +43,9 @@ class StylesToAttributes:
         self.renderer = self.layer.renderer()
         self.symbol_type: SymbolType = SymbolType[self.renderer.type()]
 
+        self.style_type: StyleType = StyleType.from_layer(layer)
+        self.field_template = self.style_type.get_style().to_dict()
+
         if self.symbol_type in [SymbolType.categorizedSymbol, SymbolType.graduatedSymbol]:
             self.mapped_col = self.renderer.classAttribute()
         else:
@@ -58,9 +53,6 @@ class StylesToAttributes:
 
         self.symbols = {}
         self.primary_layer = primary_layer
-
-        field_template = field_template if field_template is not None else StylesToAttributes.DEFAULT_TEMPLATE
-        self.field_template = field_template.copy()
 
         self.fields: QgsFields = self._generate_fields()
         self.legend = {}
@@ -75,61 +67,80 @@ class StylesToAttributes:
     def get_legend(self) -> Dict:
         return {label: legend.to_dict() for label, legend in self.legend.items()}
 
+    def get_symbols(self) -> Dict:
+        return {key: {**val, 'style': val['style'].to_dict()} for key, val in self.symbols.items()}
+
     def extract_styles_to_layer(self, sink: QgsFeatureSink, extent: Optional[QgsRectangle] = None):
         try:
             self._update_symbols()
-            self._update_legend()
             self._copy_fields(sink, extent)
+            self._update_legend()
         except Exception as e:
             self.feedback.reportError(tr('Error occurred: {}', e), True)
             self.feedback.cancel()
 
-    def _get_style(self, symbol: QgsSymbol):
+    def _get_style(self, symbol: QgsSymbol) -> Style:
         self.feedback.pushDebugInfo(str(type(symbol)))
 
-        style = self.field_template.copy()
+        symbol_opacity: float = symbol.opacity()
+
         symbol_layer: QgsSymbolLayer = symbol.symbolLayers()[0]
         if symbol_layer.subSymbol() is not None:
             return self._get_style(symbol_layer.subSymbol())
 
+        style: Style = self.style_type.get_style()
         sym_type = SymbolLayerType[symbol_layer.layerType()]
         sym = symbol_layer.properties()
+
+        # Add data defined properties for the style
+        if symbol_layer.hasDataDefinedProperties():
+            data_defined_props: QgsPropertyCollection = symbol_layer.dataDefinedProperties()
+            for key in data_defined_props.propertyKeys():
+                prop: QgsProperty = data_defined_props.property(key)
+                if prop.field() != '':
+                    style.add_data_defined_expression(prop.field(), prop.asExpression())
+
         if isinstance(symbol, QgsFillSymbol):
             if sym_type == SymbolLayerType.SimpleLine:
-                style["type"] = "line"
-                style["fill"] = "#000000"
-                style["fill-opacity"] = 0
-                style["stroke"] = self._rgb_extract(sym['outline_color'])[0]
-                style["stroke-opacity"] = self._rgb_extract(sym['outline_color'])[1]
-                style["stroke-width"] = sym['outline_width']
+                style.type = "line"
+                style.fill = "#000000"
+                style.fill_opacity = 0
+                style.stroke = self._rgb_extract(sym['outline_color'])[0]
+                style.stroke_opacity = symbol_opacity * self._rgb_extract(sym['outline_color'])[1]
+                style.stroke_width = float(sym['outline_width'])
             if sym_type in [SymbolLayerType.CentroidFill, SymbolLayerType.SimpleFill]:
                 if sym_type == SymbolLayerType.CentroidFill:
-                    style["type"] = "circle"
+                    style.type = "circle"
                 else:
-                    style["type"] = "rectangle"
-                style["fill"] = self._rgb_extract(sym['color'])[0]
-                style["fill-opacity"] = self._rgb_extract(sym['color'])[1]
-                style["stroke"] = self._rgb_extract(sym['outline_color'])[0]
-                style["stroke-opacity"] = self._rgb_extract(sym['outline_color'])[1]
-                style["stroke-width"] = sym['outline_width']
+                    style.type = "rectangle"
+                style.fill = self._rgb_extract(sym['color'])[0]
+                style.fill_opacity = symbol_opacity * self._rgb_extract(sym['color'])[1]
+                style.stroke = self._rgb_extract(sym['outline_color'])[0]
+                style.stroke_opacity = symbol_opacity * self._rgb_extract(sym['outline_color'])[1]
+                style.stroke_width = float(sym['outline_width'])
 
         elif isinstance(symbol, QgsLineSymbol):
             if sym_type == SymbolLayerType.SimpleLine:
                 self.feedback.pushDebugInfo(symbol_layer.properties())
-                style["type"] = "line"
-                style["fill"] = "transparent"
-                style["fill-opacity"] = 0
-                style["stroke"] = self._rgb_extract(sym['line_color'])[0]
-                style["stroke-opacity"] = self._rgb_extract(sym['line_color'])[1]
-                style["stroke-width"] = sym['line_width']
+                style.type = "line"
+                style.fill = "transparent"
+                style.fill_opacity = 0
+                style.stroke = self._rgb_extract(sym['line_color'])[0]
+                style.stroke_opacity = symbol_opacity * self._rgb_extract(sym['line_color'])[1]
+                style.stroke_width = float(sym['line_width'])
         elif isinstance(symbol, QgsMarkerSymbol):
             if sym_type == SymbolLayerType.SimpleMarker:
-                style["type"] = "circle"
-                style["fill"] = self._rgb_extract(sym['color'])[0]
-                style["fill-opacity"] = self._rgb_extract(sym['color'])[1]
-                style["stroke"] = self._rgb_extract(sym['outline_color'])[0]
-                style["stroke-opacity"] = self._rgb_extract(sym['outline_color'])[1]
-                style["stroke-width"] = sym['outline_width']
+                style: PointStyle
+                style.type = "circle"
+                style.fill = self._rgb_extract(sym['color'])[0]
+                style.fill_opacity = symbol_opacity * self._rgb_extract(sym['color'])[1]
+                style.has_fill = style.fill_opacity > 0.0
+                style.stroke = self._rgb_extract(sym['outline_color'])[0]
+                style.stroke_opacity = symbol_opacity * self._rgb_extract(sym['outline_color'])[1]
+                style.stroke_width = float(sym['outline_width'])
+                style.has_stroke = style.stroke_opacity > 0.0
+                style.radius = sym['size']
+
         else:
             raise ValueError(f"Unkown symbol type: {symbol_layer.layerType()}")
         return style
@@ -171,13 +182,12 @@ class StylesToAttributes:
                 sink.addFeature(f, QgsFeatureSink.FastInsert)
             else:
                 feat = QgsFeature()
-                style_attributes = self._get_style_for_feature(f)
-
-                attributes = f.attributes() + [style_attributes[key] for key in
-                                               sorted(style_attributes.keys())]
+                attributes = self._get_attributes_for_feature(f)
                 feat.setAttributes(attributes)
                 feat.setGeometry(f.geometry())
-                sink.addFeature(feat, QgsFeatureSink.FastInsert)
+                succeeded = sink.addFeature(feat, QgsFeatureSink.FastInsert)
+                if not succeeded:
+                    raise ValueError(tr('Could not add feature to target layer. Attributes: {}', attributes))
             self.feedback.setProgress(int(current * total))
 
     def _generate_fields(self) -> QgsFields:
@@ -186,15 +196,19 @@ class StylesToAttributes:
             if field_template_name not in self.layer.fields().names():
                 if isinstance(field_template_value, str):
                     field = QgsField(field_template_name, QVariant.String)
-                    fields.append(field)
                 elif isinstance(field_template_value, float):
                     field = QgsField(field_template_name, QVariant.Double)
-                    fields.append(field)
+                elif isinstance(field_template_value, bool):
+                    field = QgsField(field_template_name, QVariant.Bool)
+                else:
+                    raise QgsPluginNotImplementedException(
+                        tr('Field type not implemented: {}', type(field_template_value)))
+                fields.append(field)
 
         return fields
 
-    def _get_style_for_feature(self, feature: QgsFeature):
-        ret_val = {}
+    def _get_attributes_for_feature(self, feature: QgsFeature) -> List[any]:
+        attributes = {i: feature[field.name()] for i, field in enumerate(feature.fields().toList())}
         if self.symbol_type == SymbolType.graduatedSymbol:
             feature_value = feature[self.mapped_col]
             matched = None
@@ -205,7 +219,10 @@ class StylesToAttributes:
                         break
                 if matched is not None:
                     for field_name in self.field_template.keys():
-                        ret_val[self.fields.names().index(field_name)] = self.symbols[matched]['style'][field_name]
+                        style: Style = self.symbols[matched]['style']
+                        style.evaluate_data_defined_expressions(feature)
+                        attributes[self.fields.names().index(field_name)] = style.to_dict()[
+                            field_name]
 
         elif self.symbol_type == SymbolType.categorizedSymbol:
             feature_value = feature[self.mapped_col]
@@ -216,22 +233,26 @@ class StylesToAttributes:
                         matched = index
                 if matched is not None:
                     for field_name in self.field_template.keys():
-                        ret_val[self.fields.names().index(field_name)] = self.symbols[matched]['style'][field_name]
+                        style = self.symbols[matched]['style']
+                        style.evaluate_data_defined_expressions(feature)
+                        attributes[self.fields.names().index(field_name)] = style.to_dict()[
+                            field_name]
 
         elif self.symbol_type == SymbolType.singleSymbol:
             for field_name in self.field_template.keys():
-                ret_val[self.fields.names().index(field_name)] = self.symbols[0]['style'][field_name]
+                style = self.symbols[0]['style']
+                style.evaluate_data_defined_expressions(feature)
+                attributes[self.fields.names().index(field_name)] = style.to_dict()[field_name]
 
         # TODO: Add more
 
-        return ret_val
+        return [attributes[key] for key in sorted(attributes.keys())]
 
     def _update_legend(self):
         legend = {}
         i = 0
         for index, item in self.symbols.items():
-            legend_style = item["style"].copy()
-            legend_style = {self.field_mapper[key]: value for key, value in legend_style.items()}
+            legend_style = item["style"].legend_style
             legend_style['size'] = 1
             legend_style["primary"] = self.primary_layer and (i == 0 or i == (len(self.symbols.items()) - 1))
             legend_style["label"] = item["label"]

@@ -41,6 +41,7 @@ class StyleToAttributesAlg(BaseProcessingAlgorithm):
     PRIMARY = 'PRIMARY'
     OUTPUT = 'OUTPUT'
     OUTPUT_LEGEND = 'OUTPUT_LEGEND'
+    OUTPUT_STYLE_TYPE = 'OUTPUT_STYLE_TYPE'
     EXTENT = 'EXTENT'
 
     def name(self) -> str:
@@ -103,5 +104,6 @@ class StyleToAttributesAlg(BaseProcessingAlgorithm):
 
         ret_val = {self.OUTPUT: dest_id,
                    self.OUTPUT_LEGEND: wrkr.get_legend(),
+                   self.OUTPUT_STYLE_TYPE: wrkr.style_type.name
                    }
         return ret_val

@@ -1,0 +1,30 @@
+{
+  "0": {
+    "value": "one",
+    "label": "one",
+    "style": {
+      "fillColor": "#76a8c8",
+      "fillOpacity": 0.8,
+      "color": "#ffffff",
+      "opacity": 0.8,
+      "weight": 3.0,
+      "radius": 45.22258970898781,
+      "fill": true,
+      "stroke": true
+    }
+  },
+  "1": {
+    "value": "two",
+    "label": "two",
+    "style": {
+      "fillColor": "#a6cd6a",
+      "fillOpacity": 0.8,
+      "color": "#ffffff",
+      "opacity": 0.8,
+      "weight": 3.0,
+      "radius": 25.982587430391774,
+      "fill": true,
+      "stroke": true
+    }
+  }
+}

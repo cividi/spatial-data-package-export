@@ -17,8 +17,29 @@
 #  You should have received a copy of the GNU General Public License
 #  along with GemeindescanExporter.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import TypedDict
+import enum
+
+from qgis.core import QgsVectorLayer
+
+from .style import PointStyle, SimpleStyle, Style
+from ..qgis_plugin_tools.tools.layers import LayerType
 
 
-class StyleValue(TypedDict):
-    pass
+@enum.unique
+class StyleType(enum.Enum):
+    SimpleStyle = {'mediatype': 'application/geo+json', 'style_cls': SimpleStyle}
+    PointStyle = {'mediatype': 'application/vnd.simplestyle-extended', 'style_cls': PointStyle}
+
+    @staticmethod
+    def from_layer(layer: QgsVectorLayer):
+        if LayerType.from_layer(layer) == LayerType.Point:
+            return StyleType.PointStyle
+        else:
+            return StyleType.SimpleStyle
+
+    @property
+    def media_type(self) -> str:
+        return self.value['mediatype']
+
+    def get_style(self) -> Style:
+        return self.value['style_cls']()

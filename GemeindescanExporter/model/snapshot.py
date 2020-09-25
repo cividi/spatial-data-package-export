@@ -160,7 +160,8 @@ class Source:
 class Legend:
 
     def __init__(self, label: Union[str, int], size: int, shape: str, primary: bool, fill_color: str,
-                 fill_opacity: float, stroke_color: str, stroke_width: Union[str, int], stroke_opacity: float) -> None:
+                 fill_opacity: float, stroke_color: str, stroke_width: Union[str, int, float],
+                 stroke_opacity: float) -> None:
         self.label = label
         self.size = size
         self.shape = shape
@@ -181,7 +182,7 @@ class Legend:
         fill_color = from_str(obj.get("fillColor"))
         fill_opacity = from_float(obj.get("fillOpacity"))
         stroke_color = from_str(obj.get("strokeColor"))
-        stroke_width = from_union([from_str, from_int], obj.get("strokeWidth"))
+        stroke_width = from_union([from_str, from_int, from_float], obj.get("strokeWidth"))
         stroke_opacity = from_float(obj.get("strokeOpacity"))
         return Legend(label, size, shape, primary, fill_color, fill_opacity, stroke_color, stroke_width, stroke_opacity)
 
@@ -194,7 +195,7 @@ class Legend:
         result["fillColor"] = from_str(self.fill_color)
         result["fillOpacity"] = from_float(self.fill_opacity)
         result["strokeColor"] = from_str(self.stroke_color)
-        result["strokeWidth"] = from_union([from_str, from_int], self.stroke_width)
+        result["strokeWidth"] = from_union([from_str, from_int, from_float], self.stroke_width)
         result["strokeOpacity"] = from_float(self.stroke_opacity)
         return result
 
