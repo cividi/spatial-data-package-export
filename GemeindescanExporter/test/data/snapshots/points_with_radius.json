@@ -44,7 +44,7 @@
             "fillOpacity": 0.8,
             "strokeColor": "#ffffff",
             "strokeWidth": 3,
-            "strokeOpacity": 1
+            "strokeOpacity": 0.8
           },
           {
             "label": "two",
@@ -55,7 +55,7 @@
             "fillOpacity": 0.8,
             "strokeColor": "#ffffff",
             "strokeWidth": 3,
-            "strokeOpacity": 1
+            "strokeOpacity": 0.8
           }
         ]
       },
@@ -94,7 +94,7 @@
               "fillColor": "#76a8c8",
               "fillOpacity": 0.8,
               "color": "#ffffff",
-              "opacity": 1.0,
+              "opacity": 0.8,
               "weight": 3.0
             },
             "geometry": {
@@ -115,7 +115,7 @@
               "fillColor": "#a6cd6a",
               "fillOpacity": 0.8,
               "color": "#ffffff",
-              "opacity": 1.0,
+              "opacity": 0.8,
               "weight": 3.0
             },
             "geometry": {
@@ -136,7 +136,7 @@
               "fillColor": "#76a8c8",
               "fillOpacity": 0.8,
               "color": "#ffffff",
-              "opacity": 1.0,
+              "opacity": 0.8,
               "weight": 3.0
             },
             "geometry": {

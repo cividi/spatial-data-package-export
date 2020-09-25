@@ -82,6 +82,8 @@ class StylesToAttributes:
     def _get_style(self, symbol: QgsSymbol) -> Style:
         self.feedback.pushDebugInfo(str(type(symbol)))
 
+        symbol_opacity: float = symbol.opacity()
+
         symbol_layer: QgsSymbolLayer = symbol.symbolLayers()[0]
         if symbol_layer.subSymbol() is not None:
             return self._get_style(symbol_layer.subSymbol())
@@ -104,18 +106,18 @@ class StylesToAttributes:
                 style.fill = "#000000"
                 style.fill_opacity = 0
                 style.stroke = self._rgb_extract(sym['outline_color'])[0]
-                style.stroke_opacity = self._rgb_extract(sym['outline_color'])[1]
-                style.stroke_width = sym['outline_width']
+                style.stroke_opacity = symbol_opacity * self._rgb_extract(sym['outline_color'])[1]
+                style.stroke_width = float(sym['outline_width'])
             if sym_type in [SymbolLayerType.CentroidFill, SymbolLayerType.SimpleFill]:
                 if sym_type == SymbolLayerType.CentroidFill:
                     style.type = "circle"
                 else:
                     style.type = "rectangle"
                 style.fill = self._rgb_extract(sym['color'])[0]
-                style.fill_opacity = self._rgb_extract(sym['color'])[1]
+                style.fill_opacity = symbol_opacity * self._rgb_extract(sym['color'])[1]
                 style.stroke = self._rgb_extract(sym['outline_color'])[0]
-                style.stroke_opacity = self._rgb_extract(sym['outline_color'])[1]
-                style.stroke_width = sym['outline_width']
+                style.stroke_opacity = symbol_opacity * self._rgb_extract(sym['outline_color'])[1]
+                style.stroke_width = float(sym['outline_width'])
 
         elif isinstance(symbol, QgsLineSymbol):
             if sym_type == SymbolLayerType.SimpleLine:
@@ -124,20 +126,18 @@ class StylesToAttributes:
                 style.fill = "transparent"
                 style.fill_opacity = 0
                 style.stroke = self._rgb_extract(sym['line_color'])[0]
-                style.stroke_opacity = self._rgb_extract(sym['line_color'])[1]
-                style.stroke_width = sym['line_width']
+                style.stroke_opacity = symbol_opacity * self._rgb_extract(sym['line_color'])[1]
+                style.stroke_width = float(sym['line_width'])
         elif isinstance(symbol, QgsMarkerSymbol):
             if sym_type == SymbolLayerType.SimpleMarker:
                 style: PointStyle
                 style.type = "circle"
                 style.fill = self._rgb_extract(sym['color'])[0]
-                style.fill_opacity = self._rgb_extract(sym['color'])[1]
+                style.fill_opacity = symbol_opacity * self._rgb_extract(sym['color'])[1]
                 style.stroke = self._rgb_extract(sym['outline_color'])[0]
-                style.stroke_opacity = self._rgb_extract(sym['outline_color'])[1]
-                style.stroke_width = sym['outline_width']
+                style.stroke_opacity = symbol_opacity * self._rgb_extract(sym['outline_color'])[1]
+                style.stroke_width = float(sym['outline_width'])
                 style.radius = sym['size']
-
-
 
         else:
             raise ValueError(f"Unkown symbol type: {symbol_layer.layerType()}")

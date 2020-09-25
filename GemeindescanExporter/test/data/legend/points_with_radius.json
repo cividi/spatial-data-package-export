@@ -5,10 +5,10 @@
     "shape": "circle",
     "primary": false,
     "fillColor": "#76a8c8",
-    "fillOpacity": 1.0,
+    "fillOpacity": 0.8,
     "strokeColor": "#ffffff",
-    "strokeWidth": "3",
-    "strokeOpacity": 1.0
+    "strokeWidth": 3.0,
+    "strokeOpacity": 0.8
   },
   {
     "label": "two",
@@ -16,9 +16,9 @@
     "shape": "circle",
     "primary": false,
     "fillColor": "#a6cd6a",
-    "fillOpacity": 1.0,
+    "fillOpacity": 0.8,
     "strokeColor": "#ffffff",
-    "strokeWidth": "3",
-    "strokeOpacity": 1.0
+    "strokeWidth": 3.0,
+    "strokeOpacity": 0.8
   }
 ]

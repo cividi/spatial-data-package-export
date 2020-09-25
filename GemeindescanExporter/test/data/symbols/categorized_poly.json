@@ -7,7 +7,7 @@
       "fill-opacity": 1.0,
       "stroke": "#232323",
       "stroke-opacity": 1.0,
-      "stroke-width": "0.26"
+      "stroke-width": 0.26
     }
   },
   "1": {
@@ -18,7 +18,7 @@
       "fill-opacity": 1.0,
       "stroke": "#232323",
       "stroke-opacity": 1.0,
-      "stroke-width": "0.26"
+      "stroke-width": 0.26
     }
   },
   "2": {
@@ -29,7 +29,7 @@
       "fill-opacity": 1.0,
       "stroke": "#232323",
       "stroke-opacity": 1.0,
-      "stroke-width": "0.26"
+      "stroke-width": 0.26
     }
   },
   "3": {
@@ -40,7 +40,7 @@
       "fill-opacity": 1.0,
       "stroke": "#232323",
       "stroke-opacity": 1.0,
-      "stroke-width": "0.26"
+      "stroke-width": 0.26
     }
   }
 }
