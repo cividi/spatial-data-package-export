@@ -252,7 +252,6 @@ class StylesToAttributes:
         legend = {}
         i = 0
         for index, item in self.symbols.items():
-            # TODO: check if
             legend_style = item["style"].legend_style
             legend_style['size'] = 1
             legend_style["primary"] = self.primary_layer and (i == 0 or i == (len(self.symbols.items()) - 1))
