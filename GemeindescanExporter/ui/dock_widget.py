@@ -265,13 +265,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     @pyqtSlot()
     def on_btn_calculate_extent_clicked(self):
         canvas = self.iface.mapCanvas()
-        rows = list(self.layer_rows.values())
-
         crs = canvas.mapSettings().destinationCrs()
-        if len(rows):
-            layer = rows[0]['layer'].currentLayer()
-            if layer is not None:
-                crs = layer.crs()
 
         extent_chooser = ExtentChooserDialog(canvas, crs)
         result = extent_chooser.exec()
