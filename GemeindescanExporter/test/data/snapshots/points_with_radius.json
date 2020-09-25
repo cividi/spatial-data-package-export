@@ -95,7 +95,9 @@
               "fillOpacity": 0.8,
               "color": "#ffffff",
               "opacity": 0.8,
-              "weight": 3.0
+              "weight": 3.0,
+              "fill": true,
+              "stroke": true
             },
             "geometry": {
               "type": "Point",
@@ -116,7 +118,9 @@
               "fillOpacity": 0.8,
               "color": "#ffffff",
               "opacity": 0.8,
-              "weight": 3.0
+              "weight": 3.0,
+              "fill": true,
+              "stroke": true
             },
             "geometry": {
               "type": "Point",
@@ -137,7 +141,9 @@
               "fillOpacity": 0.8,
               "color": "#ffffff",
               "opacity": 0.8,
-              "weight": 3.0
+              "weight": 3.0,
+              "fill": true,
+              "stroke": true
             },
             "geometry": {
               "type": "Point",

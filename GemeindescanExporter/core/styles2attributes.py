@@ -134,9 +134,11 @@ class StylesToAttributes:
                 style.type = "circle"
                 style.fill = self._rgb_extract(sym['color'])[0]
                 style.fill_opacity = symbol_opacity * self._rgb_extract(sym['color'])[1]
+                style.has_fill = style.fill_opacity > 0.0
                 style.stroke = self._rgb_extract(sym['outline_color'])[0]
                 style.stroke_opacity = symbol_opacity * self._rgb_extract(sym['outline_color'])[1]
                 style.stroke_width = float(sym['outline_width'])
+                style.has_stroke = style.stroke_opacity > 0.0
                 style.radius = sym['size']
 
         else:

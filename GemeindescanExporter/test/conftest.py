@@ -56,7 +56,7 @@ def layer_points(test_gpkg):
 
 @pytest.fixture
 def layer_lines(test_gpkg):
-    name = 'roads_line'
+    name = 'simple_lines'
     layer = get_layer(name, test_gpkg)
     return layer
 
@@ -79,6 +79,13 @@ def centroid_poly(layer_simple_poly):
 def points_with_radius(layer_points):
     add_layer(layer_points)
     set_styles(layer_points, 'points_with_radius.qml')
+    return layer_points
+
+
+@pytest.fixture
+def points_with_no_fill_and_no_stroke(layer_points):
+    add_layer(layer_points)
+    set_styles(layer_points, 'points_with_no_fill_and_no_stroke.qml')
     return layer_points
 
 
@@ -109,7 +116,7 @@ def layer_empty_points(tmp_dir, layer_points):
 @pytest.fixture
 def layer_empty_lines(tmp_dir, layer_lines):
     dp: QgsVectorDataProvider = layer_lines.dataProvider()
-    layer = QgsVectorLayer('MultiLineString', 'test_lines', 'memory')
+    layer = QgsVectorLayer('LineString', 'test_lines', 'memory')
     layer.setCrs(dp.crs())
     verify_layer_copy(layer, layer_lines)
     return layer

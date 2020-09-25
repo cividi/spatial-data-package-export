@@ -73,12 +73,11 @@ class SimpleStyle(Style):
 class PointStyle(Style):
     LEGEND_MAPPER = {'fillColor': 'fillColor', 'fillOpacity': 'fillOpacity', 'color': 'strokeColor',
                      'opacity': 'strokeOpacity', 'weight': 'strokeWidth', 'type': 'shape'}
-    # TODO: check what to do with commented fields
     FIELD_MAPPER = {
-        # 'fill': 'has_fill',
+        'fill': 'has_fill',
         'fillColor': 'fill',
         'fillOpacity': 'fill_opacity',
-        # 'stroke': 'has_stroke',
+        'stroke': 'has_stroke',
         'color': 'stroke',
         'opacity': 'stroke_opacity',
         'weight': 'stroke_width',

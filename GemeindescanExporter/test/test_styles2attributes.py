@@ -76,6 +76,13 @@ def test_points_with_radius(new_project, points_with_radius, layer_empty_points)
     common_asserts(converter, expected_legend, expected_symbols, layer_empty_points)
 
 
+def test_points_with_no_fill_and_no_stroke(new_project, points_with_no_fill_and_no_stroke, layer_empty_points):
+    converter = simple_asserts(points_with_no_fill_and_no_stroke, layer_empty_points, SymbolType.categorizedSymbol)
+
+    expected_symbols, expected_legend = get_symbols_and_legend('points_with_no_fill_and_no_stroke')
+    common_asserts(converter, expected_legend, expected_symbols, layer_empty_points)
+
+
 def simple_asserts(src_layer, dst_layer, symbol=SymbolType.singleSymbol):
     feedback = LoggerProcessingFeedBack()
     converter = StylesToAttributes(src_layer, src_layer.name(), feedback)
