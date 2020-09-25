@@ -11,4 +11,11 @@
 
 * Remove dataclass in order to support Python 3.6
 
+### 0.0.3 - 25/09/2020
+
+* Add support for Leaflet Styles
+* Improve tests
+* Use symbol opacity and store widths as float
+* Fixed bug with bounding box chooser coordinate reference system
+
 ###
