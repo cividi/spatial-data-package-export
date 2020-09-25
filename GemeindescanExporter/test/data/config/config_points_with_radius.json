@@ -1,0 +1,36 @@
+{
+  "project_name": "PROJECT-FOLDER-NAME",
+  "data_dir": "data",
+  "snapshots_dir": "snapshots",
+  "dp_template_file": "lib/template.json",
+  "snapshots": [
+    {
+      "point-sample-snapshot": {
+        "title": "Point Sample",
+        "description": "Points with radii.",
+        "keywords": [
+          "europe",
+          "switzerland",
+          "gemeindescan",
+          "geodata"
+        ],
+        "gemeindescan_meta": {
+          "topic": "Sample"
+        },
+        "bounds": [
+          "geo:47.35694079,8.50916232",
+          "geo:47.38801477,8.56700647"
+        ],
+        "sources": [
+          {
+            "url": "https://www.openstreetmap.org/copyright",
+            "title": "Karte: Mapbox, © OpenStreetMap"
+          }
+        ],
+        "resources": [
+          "simple poly"
+        ]
+      }
+    }
+  ]
+}

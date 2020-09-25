@@ -1,0 +1,174 @@
+{
+  "name": "point-sample-snapshot",
+  "title": "Point Sample",
+  "description": "Points with radii.",
+  "version": "1.0.0",
+  "datapackage_version": "1.0.0",
+  "gemeindescan_version": "0.3.1",
+  "gemeindescan_meta": {
+    "topic": "Sample"
+  },
+  "format": "geojson",
+  "license": "ODC-By-1.0",
+  "licenses": [
+    {
+      "url": "https://opendatacommons.org/licenses/by/1.0/",
+      "type": "ODC-By-1.0"
+    }
+  ],
+  "keywords": [
+    "europe",
+    "switzerland",
+    "gemeindescan",
+    "geodata"
+  ],
+  "views": [
+    {
+      "name": "mapview",
+      "specType": "gemeindescanSnapshot",
+      "spec": {
+        "title": "",
+        "description": "",
+        "attribution": "",
+        "bounds": [
+          "geo:47.35694079,8.50916232",
+          "geo:47.38801477,8.56700647"
+        ],
+        "legend": [
+          {
+            "label": "one",
+            "size": 1,
+            "shape": "circle",
+            "primary": true,
+            "fillColor": "#76a8c8",
+            "fillOpacity": 0.8,
+            "strokeColor": "#ffffff",
+            "strokeWidth": 3,
+            "strokeOpacity": 1
+          },
+          {
+            "label": "two",
+            "size": 1,
+            "shape": "circle",
+            "primary": true,
+            "fillColor": "#a6cd6a",
+            "fillOpacity": 0.8,
+            "strokeColor": "#ffffff",
+            "strokeWidth": 3,
+            "strokeOpacity": 1
+          }
+        ]
+      },
+      "resources": [
+        "point-sample-snapshot",
+        "mapbox-background"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://www.openstreetmap.org/copyright",
+      "title": "Karte: Mapbox, \u00a9 OpenStreetMap"
+    }
+  ],
+  "resources": [
+    {
+      "name": "point-sample-snapshot",
+      "data": {
+        "type": "FeatureCollection",
+        "name": "point-sample-snapshot",
+        "crs": {
+          "type": "name",
+          "properties": {
+            "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+          }
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "fid": 1,
+              "score": 10.0,
+              "category": "one",
+              "radius": 50.0,
+              "fillColor": "#76a8c8",
+              "fillOpacity": 0.8,
+              "color": "#ffffff",
+              "opacity": 1.0,
+              "weight": 3.0
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                8.541908951750896,
+                47.366701739853255
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "fid": 2,
+              "score": 2.0,
+              "category": "two",
+              "radius": 25.982587430391774,
+              "fillColor": "#a6cd6a",
+              "fillOpacity": 0.8,
+              "color": "#ffffff",
+              "opacity": 1.0,
+              "weight": 3.0
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                8.539875275316673,
+                47.37720052365108
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "fid": 3,
+              "score": 8.0,
+              "category": "one",
+              "radius": 45.22258970898781,
+              "fillColor": "#76a8c8",
+              "fillOpacity": 0.8,
+              "color": "#ffffff",
+              "opacity": 1.0,
+              "weight": 3.0
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [
+                8.530295587945494,
+                47.36785630229774
+              ]
+            }
+          }
+        ]
+      },
+      "mediatype": "application/vnd.simplestyle-extended"
+    },
+    {
+      "name": "mapbox-background",
+      "path": "mapbox://styles/gemeindescan/ck6rp249516tg1iqkmt48o4pz",
+      "mediatype": "application/vnd.mapbox-vector-tile"
+    }
+  ],
+  "maintainers": [
+    {
+      "web": "https://github.com/n0rdlicht/",
+      "name": "Thorben Westerhuys"
+    }
+  ],
+  "contributors": [
+    {
+      "web": "https://cividi.ch",
+      "role": "publisher",
+      "email": "info@cividi.ch",
+      "title": "cividi"
+    }
+  ]
+}

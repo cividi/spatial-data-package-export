@@ -176,7 +176,8 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         row = self.layer_rows[id]
         if succesful:
             legends = [Legend.from_dict(legend) for legend in results["OUTPUT_LEGEND"].values()]
-            LOGGER.info(tr('Exporting styles for {} finished successfully', input_layer.name()))
+            style_type = results['OUTPUT_STYLE_TYPE']
+            LOGGER.info(tr('Exporting styles for {} ({}) finished successfully', input_layer.name(), style_type))
 
             output_layer: QgsVectorLayer = context.takeResultLayer(results['OUTPUT'])
             if output_layer and output_layer.isValid():
@@ -189,7 +190,8 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                         LOGGER.error(tr('Could not load style'), extra=bar_msg(msg))
 
                 QgsProject.instance().addMapLayer(output_layer)
-                row['styled_layer'] = StyledLayer(row['layer_name'], output_layer.id(), legends)
+
+                row['styled_layer'] = StyledLayer(row['layer_name'], output_layer.id(), legends, style_type)
 
             row['finished'] = True
         else:

@@ -19,20 +19,22 @@
 import json
 import os
 import tempfile
-from typing import List, Dict
+from typing import List, Dict, Union
 
 from qgis.core import QgsVectorFileWriter, QgsCoordinateReferenceSystem, QgsProject
 
 from .snapshot import Legend
+from ..definitions.types import StyleType
 from ..qgis_plugin_tools.tools.resources import resources_path
 
 
 class StyledLayer:
 
-    def __init__(self, resource_name: str, layer_id: str, legend: List[Legend]):
+    def __init__(self, resource_name: str, layer_id: str, legend: List[Legend], style_type: Union[str, StyleType]):
         self.resource_name = resource_name
         self.layer_id = layer_id
         self.legend = legend
+        self.style_type: StyleType = StyleType[style_type] if isinstance(style_type, str) else style_type
 
     @property
     def layer(self):

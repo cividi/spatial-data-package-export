@@ -1,0 +1,24 @@
+[
+  {
+    "label": "one",
+    "size": 1,
+    "shape": "circle",
+    "primary": false,
+    "fillColor": "#76a8c8",
+    "fillOpacity": 1.0,
+    "strokeColor": "#ffffff",
+    "strokeWidth": "3",
+    "strokeOpacity": 1.0
+  },
+  {
+    "label": "two",
+    "size": 1,
+    "shape": "circle",
+    "primary": false,
+    "fillColor": "#a6cd6a",
+    "fillOpacity": 1.0,
+    "strokeColor": "#ffffff",
+    "strokeWidth": "3",
+    "strokeOpacity": 1.0
+  }
+]
