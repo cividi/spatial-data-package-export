@@ -1,0 +1,17 @@
+[general]
+name=SpatialDataPackageExport
+description=Spatial Data Package Export plugin
+about=Plugin to export layers to spatial data packages according to <a href="https://frictionlessdata.io/">Frictionless Data Standard</a> compatible with <a href="https://bitbucket.org/cividi/gemeindescan-webui">Gemeindescan</a>.
+version=0.0.1
+qgisMinimumVersion=3.10
+author=Gispo Ltd.
+email=joona@gispo.fi
+changelog=
+tags=frictionless, gemeindescan, export, datapackage
+repository=https://github.com/cividi/spatial-data-package-export
+homepage=https://github.com/cividi/spatial-data-package-export
+tracker=https://github.com/cividi/spatial-data-package-export/issues
+category=Plugins
+icon=resources/icons/icon-highres.png
+experimental=True
+deprecated=False
