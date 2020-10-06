@@ -25,7 +25,7 @@ from qgis.PyQt import QtWidgets
 from qgis.core import QgsApplication
 from qgis.gui import QgisInterface
 
-from .core.processing.provider import GemeindescanProcessingProvider
+from .core.processing.provider import SpatialDataPackageProcessingProvider
 from .qgis_plugin_tools.tools.custom_logging import setup_logger
 from .qgis_plugin_tools.tools.i18n import setup_translation, tr
 from .qgis_plugin_tools.tools.resources import plugin_name
@@ -60,7 +60,7 @@ class Plugin:
         self.dock_widget: Optional[QtWidgets.QDockWidget] = None
         self.plugin_is_active = False
 
-        self.processing_provider = GemeindescanProcessingProvider()
+        self.processing_provider = SpatialDataPackageProcessingProvider()
 
     def add_action(
             self,

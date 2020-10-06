@@ -1,8 +1,11 @@
-# Gemeindescan Exporter
+# Spatial Data Package Export
 ![](https://github.com/GispoCoding/gemeindescan-exporter/workflows/Tests/badge.svg)
 ![](https://github.com/GispoCoding/gemeindescan-exporter/workflows/Release/badge.svg)
 
 QGIS plugin to export data and styles to [Gemeindescan](https://gemeindescan.ch/de/).
+
+This tool exports Gemeindescan data package. Data package specification is based on the [Frictionless Data toolkit](https://frictionlessdata.io/).
+Main development by [Gispo Ltd](https://www.gispo.fi/en/home/).
 
 
 ### Installation instructions

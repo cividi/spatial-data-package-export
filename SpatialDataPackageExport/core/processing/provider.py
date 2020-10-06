@@ -21,8 +21,8 @@ from qgis.core import QgsProcessingProvider
 from .algorithms import StyleToAttributesAlg
 
 
-class GemeindescanProcessingProvider(QgsProcessingProvider):
-    ID = 'gemeindescan'
+class SpatialDataPackageProcessingProvider(QgsProcessingProvider):
+    ID = 'spatial_data_package'
 
     def __init__(self):
         QgsProcessingProvider.__init__(self)
@@ -32,10 +32,10 @@ class GemeindescanProcessingProvider(QgsProcessingProvider):
             self.addAlgorithm(alg)
 
     def id(self) -> str:
-        return GemeindescanProcessingProvider.ID
+        return SpatialDataPackageProcessingProvider.ID
 
     def name(self):
-        return self.tr('Gemeindescan')
+        return self.tr('Spatial Data Package')
 
     def longName(self):
         return self.name()

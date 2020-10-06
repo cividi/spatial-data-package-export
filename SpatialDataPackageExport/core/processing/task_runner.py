@@ -24,7 +24,7 @@ from qgis.core import (QgsApplication, QgsProcessingAlgRunnerTask, QgsRectangle,
                        QgsProcessingContext)
 
 from .algorithms import StyleToAttributesAlg
-from .provider import GemeindescanProcessingProvider
+from .provider import SpatialDataPackageProcessingProvider
 
 
 class TaskWrapper:
@@ -66,7 +66,7 @@ def create_styles_to_attributes_tasks(task_wrappers: List[TaskWrapper], complete
         raise ValueError()
     for task_wrapper in task_wrappers:
         alg = QgsApplication.processingRegistry().algorithmById(
-            f'{GemeindescanProcessingProvider.ID}:{StyleToAttributesAlg.ID}')
+            f'{SpatialDataPackageProcessingProvider.ID}:{StyleToAttributesAlg.ID}')
         task = QgsProcessingAlgRunnerTask(alg, task_wrapper.params, task_wrapper.context, task_wrapper.feedback)
         task.setDependentLayers([task_wrapper.layer])
         # noinspection PyUnresolvedReferences
