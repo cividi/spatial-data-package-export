@@ -1,0 +1,3 @@
+[submodule "SpatialDataPackageExport/qgis_plugin_tools"]
+	path = SpatialDataPackageExport/qgis_plugin_tools
+	url = https://github.com/GispoCoding/qgis_plugin_tools

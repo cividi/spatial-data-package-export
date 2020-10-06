@@ -6,11 +6,11 @@ use `--recurse-submodules` like so:
 `git clone --recurse-submodules https://github.com/GispoCoding/gemeindescan-exporter.git`
 
 
-The code for the plugin is in the [GemeindescanExporter](../GemeindescanExporter) folder. Make sure you have required tools, such as
+The code for the plugin is in the [GemeindescanExporter](../SpatialDataPackageExport) folder. Make sure you have required tools, such as
 Qt with Qt Editor and Qt Linquist installed by following this 
 [tutorial](https://www.qgistutorials.com/en/docs/3/building_a_python_plugin.html#get-the-tools). 
 
-For building the plugin use platform independent [build.py](../GemeindescanExporter/build.py) script. 
+For building the plugin use platform independent [build.py](../SpatialDataPackageExport/build.py) script. 
 
 ### Adding or editing  source files
 If you create or edit source files make sure that:
@@ -19,14 +19,14 @@ If you create or edit source files make sure that:
     
     from ..utils.exceptions import TestException # Good
     
-    from GemeindescanExporter.utils.exceptions import TestException # Bad
+    from SpatialDataPackageExport.utils.exceptions import TestException # Bad
     ```
-* they will be found by [build.py](../GemeindescanExporter/build.py) script (`py_files` and `ui_files` values)
+* they will be found by [build.py](../SpatialDataPackageExport/build.py) script (`py_files` and `ui_files` values)
 * you consider adding test files for the new functionality
 
 ### Deployment
 
-Edit [build.py](../GemeindescanExporter/build.py) to contain working values for *profile*, *lrelease* and *pyrcc*. 
+Edit [build.py](../SpatialDataPackageExport/build.py) to contain working values for *profile*, *lrelease* and *pyrcc*. 
 If you are running on Windows, make sure the value *QGIS_INSTALLATION_DIR* points to right folder
 
 Run the deployment with:
@@ -47,7 +47,7 @@ python build.py test
 
 #### Translating
 
-The translation files are in [i18n](../GemeindescanExporter/resources/i18n) folder.
+The translation files are in [i18n](../SpatialDataPackageExport/resources/i18n) folder.
 Translatable content in python files is code such as `tr(u"Hello World")`. 
 
 To update language *.ts* files to contain newest lines to translate, run
