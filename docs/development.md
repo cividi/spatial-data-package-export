@@ -6,7 +6,7 @@ use `--recurse-submodules` like so:
 `git clone --recurse-submodules https://github.com/GispoCoding/gemeindescan-exporter.git`
 
 
-The code for the plugin is in the [GemeindescanExporter](../SpatialDataPackageExport) folder. Make sure you have required tools, such as
+The code for the plugin is in the [SpatialDataPackageExport](../SpatialDataPackageExport) folder. Make sure you have required tools, such as
 Qt with Qt Editor and Qt Linquist installed by following this 
 [tutorial](https://www.qgistutorials.com/en/docs/3/building_a_python_plugin.html#get-the-tools). 
 

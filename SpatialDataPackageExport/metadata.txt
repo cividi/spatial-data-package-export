@@ -1,5 +1,5 @@
 [general]
-name=GemeindescanExporter
+name=SpatialDataPackageExport
 description=Gemeindescan Exporter plugin
 about=Plugin to export data and styles to a Spatial Data Package compatible with <a href="https://bitbucket.org/cividi/gemeindescan-webui">Gemeindescan</a>.
 version=0.0.1
