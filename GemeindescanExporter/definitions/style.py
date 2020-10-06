@@ -16,9 +16,15 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with GemeindescanExporter.  If not, see <https://www.gnu.org/licenses/>.
+import logging
 from typing import Dict, Union
 
 from qgis._core import QgsFeature, QgsExpression, QgsExpressionContext
+
+from ..qgis_plugin_tools.tools.i18n import tr
+from ..qgis_plugin_tools.tools.resources import plugin_name
+
+LOGGER = logging.getLogger(plugin_name())
 
 
 class Style:
@@ -48,14 +54,23 @@ class Style:
                 if key in self.LEGEND_MAPPER.keys()}
 
     def add_data_defined_expression(self, field_name: str, expression: str):
-        self.data_defined_expressions[field_name] = QgsExpression(expression)
+        exp = QgsExpression(expression)
+        if not exp.hasParserError():
+            self.data_defined_expressions[field_name] = exp
+        else:
+            LOGGER.warning(tr('Skipping data defined field {} for having parse error: {}',
+                              field_name, exp.parserErrorString()))
 
     def evaluate_data_defined_expressions(self, feature: QgsFeature):
         context = QgsExpressionContext()
         context.setFeature(feature)
         for fld_name, exp in self.data_defined_expressions.items():
             evaluate = exp.evaluate(context)
-            self.__dict__[fld_name] = evaluate
+            if not exp.hasEvalError():
+                self.__dict__[fld_name] = evaluate
+            else:
+                LOGGER.warning(tr('Skipping data defined field {} for having evaluation error: {}',
+                                  fld_name, exp.evalErrorString()))
 
     def to_dict(self, for_legend: bool = False) -> Dict[str, any]:
         values_dict = self.__dict__
