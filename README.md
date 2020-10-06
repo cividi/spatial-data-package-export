@@ -1,6 +1,6 @@
 # Spatial Data Package Export
-![](https://github.com/GispoCoding/gemeindescan-exporter/workflows/Tests/badge.svg)
-![](https://github.com/GispoCoding/gemeindescan-exporter/workflows/Release/badge.svg)
+![](https://github.com/cividi/spatial-data-package-export/workflows/Tests/badge.svg)
+![](https://github.com/cividi/spatial-data-package-export/workflows/Release/badge.svg)
 
 QGIS plugin to export data and styles to [Gemeindescan](https://gemeindescan.ch/de/).
 

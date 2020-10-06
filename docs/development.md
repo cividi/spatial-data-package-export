@@ -3,7 +3,7 @@ Development of Gemeindescan Exporter plugin
 
 This project uses [qgis_plugin_tools](https://github.com/GispoCoding/qgis_plugin_tools) submodule, so when cloning 
 use `--recurse-submodules` like so:
-`git clone --recurse-submodules https://github.com/GispoCoding/gemeindescan-exporter.git`
+`git clone --recurse-submodules https://github.com/cividi/spatial-data-package-export.git`
 
 
 The code for the plugin is in the [SpatialDataPackageExport](../SpatialDataPackageExport) folder. Make sure you have required tools, such as

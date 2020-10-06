@@ -359,17 +359,21 @@
        <item>
         <widget class="QLabel" name="metadataLabel">
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This tool exports Spatial Data Packages, compatible with &lt;a href=&quot;
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This tool exports Spatial Data Packages, compatible with
+           &lt;a href=&quot;
            https://bitbucket.org/cividi/gemeindescan-webui&quot;&gt;&lt;span style=&quot;text-decoration: underline;&quot;&gt;
            Gemeindescan.&lt;/span&gt;&lt;/a&gt;
-           The Spatial Data Package is based on the &lt;a href=&quot;https://frictionlessdata.io/&quot;&gt;&lt;span style=&quot;
+           The Spatial Data Package is based on the &lt;a href=&quot;https://frictionlessdata.io/&quot;&gt;&lt;span
+           style=&quot;
            text-decoration: underline;&quot;&gt;Frictionless Data specifications.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Main
            development by &lt;a href=&quot;https://www.gispo.fi/en/home/&quot;&gt;&lt;span style=&quot; text-decoration:
            underline;&quot;&gt;Gispo Ltd &lt;/span&gt;&lt;/a&gt;, curated by &lt;a href=&quot;https://www.cividi.ch&quot;
-           &gt;&lt;span style=&quot; text-decoration:underline;&quot;&gt;cividi GmbH&lt;/span&gt;&lt;/a&gt;. The tool is licensed
-           under &lt;a href=&quot;https://www.gnu.org/licenses/gpl-3.0.en.html&quot;&gt;&lt;span style=&quot; text-decoration:
+           &gt;&lt;span style=&quot; text-decoration:underline;&quot;&gt;cividi GmbH&lt;/span&gt;&lt;/a&gt;. The tool is
+           licensed
+           under &lt;a href=&quot;https://www.gnu.org/licenses/gpl-3.0.en.html&quot;&gt;&lt;span style=&quot;
+           text-decoration:
            underline;&quot;&gt;GPL v3 license.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Spatial Data Package
-           Exporter &lt;a href=&quot;https://github.com/GispoCoding/gemeindescan-exporter&quot;&gt;&lt;span style=&quot;
+           Exporter &lt;a href=&quot;https://github.com/cividi/spatial-data-package-export&quot;&gt;&lt;span style=&quot;
            text-decoration: underline;&quot;&gt;GitHub repository&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
           </string>
          </property>
