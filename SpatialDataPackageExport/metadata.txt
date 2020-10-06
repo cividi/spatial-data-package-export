@@ -12,5 +12,6 @@ repository=https://github.com/GispoCoding/gemeindescan-exporter
 homepage=https://github.com/GispoCoding/gemeindescan-exporter
 tracker=https://github.com/GispoCoding/gemeindescan-exporter/issues
 category=Plugins
+icon=resources/icons/icon-highres.png
 experimental=True
 deprecated=False

@@ -28,7 +28,7 @@ from qgis.gui import QgisInterface
 from .core.processing.provider import SpatialDataPackageProcessingProvider
 from .qgis_plugin_tools.tools.custom_logging import setup_logger
 from .qgis_plugin_tools.tools.i18n import setup_translation, tr
-from .qgis_plugin_tools.tools.resources import plugin_name
+from .qgis_plugin_tools.tools.resources import plugin_name, resources_path
 from .ui.dock_widget import ExporterDockWidget
 
 
@@ -132,11 +132,11 @@ class Plugin:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
         self.add_action(
-            "",
+            resources_path('icons', 'icon.png'),
             text=tr(plugin_name()),
             callback=self.run,
             parent=self.iface.mainWindow(),
-            add_to_toolbar=False
+            add_to_toolbar=True
         )
 
         QgsApplication.processingRegistry().addProvider(self.processing_provider)
