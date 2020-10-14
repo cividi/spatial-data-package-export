@@ -18,4 +18,10 @@
 * Use symbol opacity and store widths as float
 * Fixed bug with bounding box chooser coordinate reference system
 
+### 0.1.0 - 14/10/2020
+
+* Project renamed to Spatial Data Package Export
+* Project moved to githum.com/cividi/spatial-data-package-export
+* Add logo
+
 ###

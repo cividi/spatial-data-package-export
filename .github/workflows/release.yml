@@ -23,4 +23,11 @@ jobs:
 
       # When osgeo upload is wanted: --osgeo-username usrname --osgeo-password ${{ secrets.OSGEO_PASSWORD }}
       - name: Deploy plugin
-        run: qgis-plugin-ci release ${GITHUB_REF/refs\/tags\//} --github-token ${{ secrets.GITHUB_TOKEN }} --disable-submodule-update
+        run: qgis-plugin-ci release ${GITHUB_REF/refs\/tags\//} --github-token ${{ secrets.GITHUB_TOKEN }} --osgeo-username ThorbenW --osgeo-password ${{ secrets.OSGEO_PASSWORD }} --disable-submodule-update
+      
+      - name: Post to slack
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        uses: pullreminders/slack-action@master
+        with:
+          args: '{\"channel\":\"CGLP572JV\",\"text\":\"🎉 New version of the QGIS Plugin Spatial Data Package Export released.\nVersion: ${GITHUB_REF/refs\/tags\//}\nDownload: <https://github.com/cividi/spatial-data-package-export/releases|Release>\"}'
