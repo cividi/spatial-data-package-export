@@ -27,8 +27,8 @@
       "name": "mapview",
       "specType": "gemeindescanSnapshot",
       "spec": {
-        "title": "",
-        "description": "",
+        "title": "Point Sample",
+        "description": "Points with radii.",
         "attribution": "",
         "bounds": [
           "geo:47.35694079,8.50916232",

@@ -47,8 +47,10 @@ def test_categorized_poly(new_project, categorized_poly, layer_empty_poly):
     snapshot_config = config.snapshots[0]
     name = list(snapshot_config.keys())[0]
     snapshot_config = list(snapshot_config.values())[0]
+    snapshot_config.description = 'test description'
+    snapshot_config.title = 'test title'
     snapshot = writer.create_snapshot(name, snapshot_config, [styled_layer])
-    expected_snapshot_dict = get_test_json('snapshots', 'categorized_poly.json')
+    expected_snapshot_dict = get_test_json('snapshots', 'categorized_poly_custom_config.json')
     assert snapshot.to_dict() == expected_snapshot_dict
 
 
