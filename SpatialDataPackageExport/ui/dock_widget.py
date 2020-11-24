@@ -57,6 +57,10 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     def __init__(self, iface: QgisInterface, parent=None):
         super(ExporterDockWidget, self).__init__(parent)
         self.setupUi(self)
+
+        # noinspection PyCallByClass
+        self.btn_settings.setIcon(QgsApplication.getThemeIcon('/propertyicons/settings.svg'))
+
         self.iface = iface
         # Template can be configured via settings
         self.config = load_config_from_template()
