@@ -112,7 +112,7 @@ class StylesToAttributes:
                 if sym_type == SymbolLayerType.CentroidFill:
                     style.type = "circle"
                 else:
-                    style.type = "rectangle"
+                    style.type = "square"
                 style.fill = self._rgb_extract(sym['color'])[0]
                 style.fill_opacity = symbol_opacity * self._rgb_extract(sym['color'])[1]
                 style.stroke = self._rgb_extract(sym['outline_color'])[0]

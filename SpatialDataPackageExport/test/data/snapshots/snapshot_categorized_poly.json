@@ -40,7 +40,7 @@
           {
             "label": "1",
             "size": 1,
-            "shape": "rectangle",
+            "shape": "square",
             "primary": true,
             "fillColor": "#ec1182",
             "fillOpacity": 1.0,
@@ -51,7 +51,7 @@
           {
             "label": "2",
             "size": 1,
-            "shape": "rectangle",
+            "shape": "square",
             "primary": false,
             "fillColor": "#3df091",
             "fillOpacity": 1.0,
@@ -62,7 +62,7 @@
           {
             "label": "3",
             "size": 1,
-            "shape": "rectangle",
+            "shape": "square",
             "primary": false,
             "fillColor": "#4b50e2",
             "fillOpacity": 1.0,
@@ -73,7 +73,7 @@
           {
             "label": "",
             "size": 1,
-            "shape": "rectangle",
+            "shape": "square",
             "primary": true,
             "fillColor": "#cecd73",
             "fillOpacity": 1.0,
