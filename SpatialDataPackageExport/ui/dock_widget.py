@@ -33,6 +33,7 @@ from qgis.core import (QgsProcessingContext, QgsVectorLayer, QgsProject,
 from qgis.gui import QgsMapLayerComboBox, QgisInterface
 
 from .extent_dialog import ExtentChooserDialog
+from .settings_dialog import SettingsDialog
 from ..core.datapackage import DatapackageWriter
 from ..core.processing.task_runner import TaskWrapper, create_styles_to_attributes_tasks
 from ..core.utils import load_config_from_template, extent_to_datapackage_bounds, load_snapshot_template
@@ -276,6 +277,11 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         if result:
             self.extent = extent_chooser.get_extent(self.sb_extent_precision.value())
             self.le_extent.setText(self.extent.toString(self.sb_extent_precision.value()))
+
+    @pyqtSlot()
+    def on_btn_settings_clicked(self):
+        settings_dialog = SettingsDialog()
+        settings_dialog.exec()
 
     def _disable_ui(self):
         for item in self.responsive_items:
