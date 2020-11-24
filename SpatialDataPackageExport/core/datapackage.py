@@ -52,6 +52,8 @@ class DatapackageWriter:
         snapshot.name = snapshot_name
         snapshot.title = snapshot_config.title
         snapshot.views[0].spec.bounds = snapshot_config.bounds
+        snapshot.views[0].spec.title = snapshot_config.title
+        snapshot.views[0].spec.description = snapshot_config.description
         snapshot.description = snapshot_config.description
         snapshot.keywords = snapshot_config.keywords
         snapshot.sources = snapshot_config.sources
