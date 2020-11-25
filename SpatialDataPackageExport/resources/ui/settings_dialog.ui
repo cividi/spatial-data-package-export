@@ -28,7 +28,7 @@
                                 <x>0</x>
                                 <y>0</y>
                                 <width>477</width>
-                                <height>250</height>
+                                <height>219</height>
                             </rect>
                         </property>
                         <layout class="QVBoxLayout" name="verticalLayout">
@@ -79,8 +79,32 @@
                     </widget>
                 </widget>
             </item>
+            <item>
+                <widget class="QDialogButtonBox" name="buttonBox">
+                    <property name="standardButtons">
+                        <set>QDialogButtonBox::Ok</set>
+                    </property>
+                </widget>
+            </item>
         </layout>
     </widget>
     <resources/>
-    <connections/>
+    <connections>
+        <connection>
+            <sender>buttonBox</sender>
+            <signal>accepted()</signal>
+            <receiver>extent_chooser</receiver>
+            <slot>accept()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>248</x>
+                    <y>254</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>157</x>
+                    <y>274</y>
+                </hint>
+            </hints>
+        </connection>
+    </connections>
 </ui>
