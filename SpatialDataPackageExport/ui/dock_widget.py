@@ -38,7 +38,7 @@ from .settings_dialog import SettingsDialog
 from ..core.datapackage import DatapackageWriter
 from ..core.processing.task_runner import TaskWrapper, create_styles_to_attributes_tasks
 from ..core.utils import load_config_from_template, extent_to_datapackage_bounds, load_snapshot_template
-from ..definitions.configurable_settings import Settings
+from ..definitions.configurable_settings import Settings, LayerFormatOptions
 from ..model.config import SnapshotConfig
 from ..model.snapshot import Legend, Source
 from ..model.styled_layer import StyledLayer
@@ -174,7 +174,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         with open(output_file, 'w') as f:
             json.dump(snapshot.to_dict(), f)
 
-        if Settings.layer_format.get() == 'none':
+        if Settings.layer_format.get() == LayerFormatOptions.none.value:
             LOGGER.debug('Removing memory layers')
             for row in self.layer_rows.values():
                 QgsProject.instance().removeMapLayer(row['styled_layer'].layer_id)
@@ -195,7 +195,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                 QgsProject.instance().addMapLayer(output_layer)
                 styled_layer = StyledLayer(row['layer_name'], output_layer.id(), legends, style_type)
 
-                if Settings.layer_format.get() == 'geojson':
+                if Settings.layer_format.get() == LayerFormatOptions.geojson.value:
                     geojson_path = styled_layer.save_as_geojson(Path(self.f_output.filePath()))
                     output_layer = QgsVectorLayer(str(geojson_path), output_layer.name())
                     QgsProject.instance().removeMapLayer(styled_layer.layer_id)

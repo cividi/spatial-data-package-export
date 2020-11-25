@@ -26,13 +26,20 @@ from ..qgis_plugin_tools.tools.settings import get_setting, set_setting
 
 
 @enum.unique
+class LayerFormatOptions(enum.Enum):
+    memory = 'memory'
+    geojson = 'geojson'
+    none = 'none'
+
+
+@enum.unique
 class Settings(enum.Enum):
     extent_precision = 8
     export_config_template = resources_path('templates', 'export-config.json')
     snapshot_template = resources_path('templates', 'snapshot-template.json')
     layer_format = 'memory'
 
-    _options = {'layer_format': ['memory', 'geojson', 'none']}
+    _options = {'layer_format': [option.value for option in LayerFormatOptions]}
 
     def get(self, typehint: type = str) -> any:
         """Gets the value of the setting"""
