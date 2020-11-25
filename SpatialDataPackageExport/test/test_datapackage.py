@@ -17,6 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 import json
+from pathlib import Path
 
 from qgis.core import QgsProcessingFeedback, QgsVectorLayer, QgsVectorDataProvider
 
@@ -76,6 +77,14 @@ def test_points_with_radius(new_project, points_with_radius, layer_empty_points)
     snapshot = writer.create_snapshot(name, snapshot_config, [styled_layer])
     expected_snapshot_dict = get_test_json('snapshots', 'points_with_radius.json')
     assert snapshot.to_dict() == expected_snapshot_dict
+
+
+def test_styled_layer(tmp_path, points_with_radius):
+    styled_layer: StyledLayer = StyledLayer('point-sample-snapshot', points_with_radius.id(),
+                                            [],
+                                            StyleType.PointStyle)
+    styled_layer.save_as_geojson(tmp_path)
+    assert Path(tmp_path, 'point-sample-snapshot.geojson').exists()
 
 
 def update_fields(converter: StylesToAttributes, layer: QgsVectorLayer):

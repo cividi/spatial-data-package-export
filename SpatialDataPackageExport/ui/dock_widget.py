@@ -23,6 +23,7 @@ import logging
 import os
 import tempfile
 import uuid
+from pathlib import Path
 from typing import Dict, Optional
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
@@ -33,10 +34,11 @@ from qgis.core import (QgsProcessingContext, QgsVectorLayer, QgsProject,
 from qgis.gui import QgsMapLayerComboBox, QgisInterface
 
 from .extent_dialog import ExtentChooserDialog
+from .settings_dialog import SettingsDialog
 from ..core.datapackage import DatapackageWriter
 from ..core.processing.task_runner import TaskWrapper, create_styles_to_attributes_tasks
 from ..core.utils import load_config_from_template, extent_to_datapackage_bounds, load_snapshot_template
-from ..definitions.configurable_settings import Settings
+from ..definitions.configurable_settings import Settings, LayerFormatOptions
 from ..model.config import SnapshotConfig
 from ..model.snapshot import Legend, Source
 from ..model.styled_layer import StyledLayer
@@ -57,6 +59,10 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     def __init__(self, iface: QgisInterface, parent=None):
         super(ExporterDockWidget, self).__init__(parent)
         self.setupUi(self)
+
+        # noinspection PyCallByClass
+        self.btn_settings.setIcon(QgsApplication.getThemeIcon('/propertyicons/settings.svg'))
+
         self.iface = iface
         # Template can be configured via settings
         self.config = load_config_from_template()
@@ -117,8 +123,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         return snapshot_config
 
     def run(self):
-        output_path: str = self.f_output.filePath()
-        if len(output_path) == 0 or len(self.input_name.text()) == 0:
+        if len(self.f_output.filePath()) == 0 or len(self.input_name.text()) == 0:
             LOGGER.warning(tr('No output path filled'),
                            extra=bar_msg(tr('Fill output path and snapshot name')))
             return
@@ -132,6 +137,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             row['new_layer_name'] = new_layer_name
             row['finished'] = False
             is_primary = row['primary'].isChecked()
+
             task_wrapper = TaskWrapper(id=id, layer=cb.currentLayer(), name=layer_name, extent=self.extent,
                                        primary=is_primary, output=f'memory:{new_layer_name}', feedback=row['feedback'],
                                        context=row['context'], executed=self.styles_to_attributes_finished
@@ -156,20 +162,25 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self._enable_ui()
         LOGGER.info(tr('Finished exporting style to attributes'))
 
+        output_path = Path(self.f_output.filePath())
+
         snapshot_config = self._create_snapshot_config()
-
         snapshot_name = self.input_name.text()
-        snapshot = self.writer.create_snapshot(snapshot_name, snapshot_config,
-                                               [row['styled_layer'] for row in self.layer_rows.values()])
+        styled_layers = [row['styled_layer'] for row in self.layer_rows.values()]
+        snapshot = self.writer.create_snapshot(snapshot_name, snapshot_config, styled_layers)
 
-        output_path = self.f_output.filePath()
-        output_file = os.path.join(output_path, f'{snapshot_name}.json')
+        output_file = Path(output_path, f'{snapshot_name}.json')
 
         with open(output_file, 'w') as f:
             json.dump(snapshot.to_dict(), f)
 
+        if Settings.layer_format.get() == LayerFormatOptions.none.value:
+            LOGGER.debug('Removing memory layers')
+            for row in self.layer_rows.values():
+                QgsProject.instance().removeMapLayer(row['styled_layer'].layer_id)
+
         LOGGER.info(tr('Snapshot succesfully exported'),
-                    extra=bar_msg(tr('Snapshot can be found in {}', output_file), success=True))
+                    extra=bar_msg(tr('Snapshot can be found in {}', str(output_file)), success=True))
 
     def styles_to_attributes_finished(self, input_layer: QgsVectorLayer, context: QgsProcessingContext, id: uuid.UUID,
                                       succesful: bool, results: Dict[str, any]) -> None:
@@ -181,6 +192,16 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
             output_layer: QgsVectorLayer = context.takeResultLayer(results['OUTPUT'])
             if output_layer and output_layer.isValid():
+                QgsProject.instance().addMapLayer(output_layer)
+                styled_layer = StyledLayer(row['layer_name'], output_layer.id(), legends, style_type)
+
+                if Settings.layer_format.get() == LayerFormatOptions.geojson.value:
+                    geojson_path = styled_layer.save_as_geojson(Path(self.f_output.filePath()))
+                    output_layer = QgsVectorLayer(str(geojson_path), output_layer.name())
+                    QgsProject.instance().removeMapLayer(styled_layer.layer_id)
+                    QgsProject.instance().addMapLayer(output_layer)
+                    styled_layer.layer_id = output_layer.id()
+
                 with tempfile.TemporaryDirectory(dir=resources_path()) as tmpdirname:
                     style_file = os.path.join(tmpdirname, 'style.qml')
                     msg, succeeded = input_layer.saveNamedStyle(style_file)
@@ -189,9 +210,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                     else:
                         LOGGER.error(tr('Could not load style'), extra=bar_msg(msg))
 
-                QgsProject.instance().addMapLayer(output_layer)
-
-                row['styled_layer'] = StyledLayer(row['layer_name'], output_layer.id(), legends, style_type)
+                row['styled_layer'] = styled_layer
 
             row['finished'] = True
         else:
@@ -272,6 +291,11 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         if result:
             self.extent = extent_chooser.get_extent(self.sb_extent_precision.value())
             self.le_extent.setText(self.extent.toString(self.sb_extent_precision.value()))
+
+    @pyqtSlot()
+    def on_btn_settings_clicked(self):
+        settings_dialog = SettingsDialog()
+        settings_dialog.exec()
 
     def _disable_ui(self):
         for item in self.responsive_items:

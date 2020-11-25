@@ -17,8 +17,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 import json
-import os
 import tempfile
+from pathlib import Path
 from typing import List, Dict, Union
 
 from qgis.core import QgsVectorFileWriter, QgsCoordinateReferenceSystem, QgsProject
@@ -47,10 +47,14 @@ class StyledLayer:
                 data = json.load(f)
         else:
             with tempfile.TemporaryDirectory(dir=resources_path()) as tmpdirname:
-                f_name = os.path.join(tmpdirname, f'{self.resource_name}.geojson')
-                _writer = QgsVectorFileWriter.writeAsVectorFormat(self.layer, f_name, "utf-8",
-                                                                  QgsCoordinateReferenceSystem("EPSG:4326"),
-                                                                  driverName="GeoJSON")
-                with open(f_name) as f:
+                output_file = self.save_as_geojson(Path(tmpdirname))
+                with open(output_file) as f:
                     data = json.load(f)
         return data
+
+    def save_as_geojson(self, output_path: Path) -> Path:
+        output_file = Path(output_path, f'{self.resource_name}.geojson')
+        _writer = QgsVectorFileWriter.writeAsVectorFormat(self.layer, str(output_file), "utf-8",
+                                                          QgsCoordinateReferenceSystem("EPSG:4326"),
+                                                          driverName="GeoJSON")
+        return output_file
