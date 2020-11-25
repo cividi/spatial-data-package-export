@@ -21,7 +21,12 @@
 ### 0.1.0 - 14/10/2020
 
 * Project renamed to Spatial Data Package Export
-* Project moved to githum.com/cividi/spatial-data-package-export
+* Project moved to github.com/cividi/spatial-data-package-export
 * Add logo
+
+### 0.2.0-beta1 - 25/11/2020
+
+* Fixed export bugs (title, description, single symbol layer names)
+* Added a plugin setting for snapshot layers to be discarded, kept as memory layers ot written as GeoJSON
 
 ###
