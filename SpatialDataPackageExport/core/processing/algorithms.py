@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from qgis.core import (
     QgsProcessingContext, QgsProcessingFeedback, QgsProcessingParameterFeatureSink,
@@ -39,6 +39,7 @@ class StyleToAttributesAlg(BaseProcessingAlgorithm):
     INPUT = 'INPUT'
     NAME = 'NAME'
     PRIMARY = 'PRIMARY'
+    LEGEND_SHAPE = 'LEGEND_SHAPE'
     OUTPUT = 'OUTPUT'
     OUTPUT_LEGEND = 'OUTPUT_LEGEND'
     OUTPUT_STYLE_TYPE = 'OUTPUT_STYLE_TYPE'
@@ -66,6 +67,10 @@ class StyleToAttributesAlg(BaseProcessingAlgorithm):
         self.addParameter(QgsProcessingParameterExtent(self.EXTENT, tr('Input extent'), defaultValue=None))
         self.addParameter(
             QgsProcessingParameterBoolean(self.PRIMARY, tr('Is layer a primary layer'), defaultValue=False))
+        self.addParameter(
+            QgsProcessingParameterString(self.LEGEND_SHAPE, tr(
+                'Shape of a legend. Leave empty for automatic choice or choose one of: '
+                'automatic, circle, square or line'), defaultValue='automatic', optional=True))
 
         self.addParameter(QgsProcessingParameterFeatureSink(self.OUTPUT, tr('Layer with attributes')))
 
@@ -81,8 +86,11 @@ class StyleToAttributesAlg(BaseProcessingAlgorithm):
             output_name = f'{source.name()}-snapshot'
 
         primary_layer: bool = self.parameterAsBool(parameters, self.PRIMARY, context)
+        legend_shape: Optional[str] = self.parameterAsString(parameters, self.LEGEND_SHAPE, context)
+        if legend_shape == 'automatic':
+            legend_shape = None
 
-        wrkr = StylesToAttributes(source, output_name, feedback, primary_layer=primary_layer)
+        wrkr = StylesToAttributes(source, output_name, feedback, primary_layer=primary_layer, legend_shape=legend_shape)
 
         extent_crs = QgsCoordinateReferenceSystem('EPSG:4326')
         extent: QgsRectangle = self.parameterAsExtent(parameters, self.EXTENT, context,

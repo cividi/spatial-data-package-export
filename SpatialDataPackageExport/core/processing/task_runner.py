@@ -33,13 +33,14 @@ class TaskWrapper:
     """
 
     def __init__(self, id: uuid.UUID, layer: QgsVectorLayer, name: str, extent: Optional[QgsRectangle], primary: bool,
-                 output: str, feedback: QgsProcessingFeedback, context: QgsProcessingContext,
+                 legend_shape: str, output: str, feedback: QgsProcessingFeedback, context: QgsProcessingContext,
                  executed: Callable) -> None:
         self.id = id
         self.layer = layer
         self.name = name
         self.extent = extent
         self.primary = primary
+        self.legend_shape = legend_shape
         self.output = output
         self.feedback = feedback
         self.context = context
@@ -52,6 +53,7 @@ class TaskWrapper:
             'INPUT': self.layer,
             'NAME': self.name,
             'PRIMARY': self.primary,
+            'LEGEND_SHAPE': self.legend_shape,
             'OUTPUT': self.output
         }
 

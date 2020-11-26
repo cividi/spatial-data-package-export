@@ -27,7 +27,7 @@ from pathlib import Path
 from typing import Dict, Optional
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
-from PyQt5.QtWidgets import QCheckBox, QGridLayout, QPushButton, QWidget, QLineEdit
+from PyQt5.QtWidgets import QCheckBox, QGridLayout, QPushButton, QWidget, QLineEdit, QComboBox
 from qgis.PyQt import QtWidgets
 from qgis.core import (QgsProcessingContext, QgsVectorLayer, QgsProject,
                        QgsMapLayerProxyModel, QgsRectangle, QgsApplication)
@@ -134,6 +134,10 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             LOGGER.warning(tr('No output path filled'),
                            extra=bar_msg(tr('Fill output path and snapshot name')))
             return
+        if self.extent is None:
+            LOGGER.warning(tr('No bounds filled'),
+                           extra=bar_msg(tr('Fill bounds by clicking Calculate Bounds')))
+            return
 
         task_wrappers = []
         for id, row in self.layer_rows.items():
@@ -144,10 +148,12 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             row['new_layer_name'] = new_layer_name
             row['finished'] = False
             is_primary = row['primary'].isChecked()
+            legend_shape = row['legend_shape'].currentText()
             extent = self.extent if self.cb_crop_layers.isChecked() else None
 
             task_wrapper = TaskWrapper(id=id, layer=cb.currentLayer(), name=layer_name, extent=extent,
-                                       primary=is_primary, output=f'memory:{new_layer_name}', feedback=row['feedback'],
+                                       primary=is_primary, legend_shape=legend_shape, output=f'memory:{new_layer_name}',
+                                       feedback=row['feedback'],
                                        context=row['context'], executed=self.__styles_to_attributes_finished
                                        )
             LOGGER.info(f"Exporting {layer_name}")
@@ -241,10 +247,13 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                                                           QgsMapLayerProxyModel.Filter.PolygonLayer |
                                                           QgsMapLayerProxyModel.Filter.LineLayer))
         cb_primary = QCheckBox(text='')
+        combo_box_shape = QComboBox()
+        combo_box_shape.addItems(('automatic', 'circle', 'square', 'line'))
 
         row = {
             'layer': bx_layer,
             'primary': cb_primary,
+            'legend_shape': combo_box_shape,
             'rm': b_rm,
             'feedback': LoggerProcessingFeedBack(use_logger=True),
             'context': QgsProcessingContext()
@@ -253,6 +262,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.layer_grid.addWidget(b_rm, row_index, 0)
         self.layer_grid.addWidget(bx_layer, row_index, 1)
         self.layer_grid.addWidget(cb_primary, row_index, 2)
+        self.layer_grid.addWidget(combo_box_shape, row_index, 3)
 
     # noinspection PyUnresolvedReferences
     @log_if_fails

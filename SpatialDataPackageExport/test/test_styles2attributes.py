@@ -44,7 +44,17 @@ def test_point_style_fields(new_project, layer_points):
 
 
 def test_simple_poly(new_project, layer_simple_poly, layer_empty_poly):
-    simple_asserts(layer_simple_poly, layer_empty_poly)
+    converter = simple_asserts(layer_simple_poly, layer_empty_poly)
+    legend = [val.to_dict() for val in converter.legend.values()]
+    assert len(legend) == 1
+    assert legend[0]['shape'] == 'square'
+
+
+def test_poly_with_circle_shaped_legend(new_project, layer_simple_poly, layer_empty_poly):
+    converter = simple_asserts(layer_simple_poly, layer_empty_poly, legend_shape='circle')
+    legend = [val.to_dict() for val in converter.legend.values()]
+    assert len(legend) == 1
+    assert legend[0]['shape'] == 'circle'
 
 
 def test_simple_lines(new_project, layer_lines, layer_empty_lines):
@@ -83,9 +93,9 @@ def test_points_with_no_fill_and_no_stroke(new_project, points_with_no_fill_and_
     common_asserts(converter, expected_legend, expected_symbols, layer_empty_points)
 
 
-def simple_asserts(src_layer, dst_layer, symbol=SymbolType.singleSymbol):
+def simple_asserts(src_layer, dst_layer, symbol=SymbolType.singleSymbol, legend_shape=None):
     feedback = LoggerProcessingFeedBack()
-    converter = StylesToAttributes(src_layer, src_layer.name(), feedback)
+    converter = StylesToAttributes(src_layer, src_layer.name(), feedback, legend_shape=legend_shape)
     assert converter.symbol_type == symbol
     update_fields(converter, dst_layer)
     dst_layer.startEditing()

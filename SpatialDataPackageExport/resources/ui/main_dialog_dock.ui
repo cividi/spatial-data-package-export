@@ -6,7 +6,7 @@
          <rect>
              <x>0</x>
              <y>0</y>
-             <width>748</width>
+             <width>672</width>
              <height>756</height>
          </rect>
      </property>
@@ -61,8 +61,8 @@
                          <property name="geometry">
                              <rect>
                                  <x>0</x>
-                                 <y>-22</y>
-                                 <width>714</width>
+                                 <y>-1</y>
+                                 <width>638</width>
                                  <height>531</height>
                              </rect>
                          </property>
@@ -142,7 +142,8 @@
                                      </property>
                                      <layout class="QVBoxLayout" name="verticalLayout_2">
                                          <item>
-                                             <layout class="QGridLayout" name="layer_grid" columnminimumwidth="0,150,0">
+                                             <layout class="QGridLayout" name="layer_grid"
+                                                     columnminimumwidth="0,150,0,0">
                                                  <item row="0" column="1">
                                                      <widget class="QLabel" name="label_2">
                                                          <property name="text">
@@ -167,6 +168,19 @@
                                                      <widget class="QLabel" name="label_5">
                                                          <property name="text">
                                                              <string>Primary</string>
+                                                         </property>
+                                                     </widget>
+                                                 </item>
+                                                 <item row="0" column="3">
+                                                     <widget class="QLabel" name="label_4">
+                                                         <property name="font">
+                                                             <font>
+                                                                 <weight>50</weight>
+                                                                 <bold>false</bold>
+                                                             </font>
+                                                         </property>
+                                                         <property name="text">
+                                                             <string>Shape in legend</string>
                                                          </property>
                                                      </widget>
                                                  </item>
@@ -408,16 +422,21 @@
                                          underline;&quot;&gt;
                                          Gemeindescan.&lt;/span&gt;&lt;/a&gt;
                                          The Spatial Data Package is based on the &lt;a href=&quot;https://frictionlessdata.io/&quot;&gt;&lt;span
-           style=&quot;
-           text-decoration: underline;&quot;&gt;Frictionless Data specifications.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Main
-           development by &lt;a href=&quot;https://www.gispo.fi/en/home/&quot;&gt;&lt;span style=&quot; text-decoration:
-           underline;&quot;&gt;Gispo Ltd &lt;/span&gt;&lt;/a&gt;, curated by &lt;a href=&quot;https://www.cividi.ch&quot;
-           &gt;&lt;span style=&quot; text-decoration:underline;&quot;&gt;cividi GmbH&lt;/span&gt;&lt;/a&gt;. The tool is
-           licensed
-           under &lt;a href=&quot;https://www.gnu.org/licenses/gpl-3.0.en.html&quot;&gt;&lt;span style=&quot;
-           text-decoration:
-           underline;&quot;&gt;GPL v3 license.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Spatial Data Package
-           Exporter &lt;a href=&quot;https://github.com/cividi/spatial-data-package-export&quot;&gt;&lt;span style=&quot;
+                                         style=&quot;
+                                         text-decoration: underline;&quot;&gt;Frictionless Data specifications.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Main
+                                         development by &lt;a href=&quot;https://www.gispo.fi/en/home/&quot;&gt;&lt;span
+                                         style=&quot; text-decoration:
+                                         underline;&quot;&gt;Gispo Ltd &lt;/span&gt;&lt;/a&gt;, curated by &lt;a href=&quot;https://www.cividi.ch&quot;
+                                         &gt;&lt;span style=&quot; text-decoration:underline;&quot;&gt;cividi GmbH&lt;/span&gt;&lt;/a&gt;.
+                                         The tool is
+                                         licensed
+                                         under &lt;a href=&quot;https://www.gnu.org/licenses/gpl-3.0.en.html&quot;&gt;&lt;span
+                                         style=&quot;
+                                         text-decoration:
+                                         underline;&quot;&gt;GPL v3 license.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Spatial
+                                         Data Package
+                                         Exporter &lt;a href=&quot;https://github.com/cividi/spatial-data-package-export&quot;&gt;&lt;span
+                                         style=&quot;
            text-decoration: underline;&quot;&gt;GitHub repository&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
           </string>
          </property>
