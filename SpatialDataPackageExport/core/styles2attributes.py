@@ -35,10 +35,11 @@ from ..qgis_plugin_tools.tools.i18n import tr
 class StylesToAttributes:
 
     def __init__(self, layer: QgsVectorLayer, layer_name: str, feedback: QgsProcessingFeedback,
-                 primary_layer: bool = False):
+                 primary_layer: bool = False, legend_shape: Optional[str] = None):
         self.layer = layer
         self.layer_name = layer_name
         self.feedback = feedback
+        self.legend_shape = legend_shape
 
         self.renderer = self.layer.renderer()
         self.symbol_type: SymbolType = SymbolType[self.renderer.type()]
@@ -56,6 +57,7 @@ class StylesToAttributes:
 
         self.fields: QgsFields = self._generate_fields()
         self.legend = {}
+
 
     @staticmethod
     def _rgb_extract(prop):
@@ -253,10 +255,13 @@ class StylesToAttributes:
         i = 0
         for index, item in self.symbols.items():
             legend_style = item["style"].legend_style
-            legend_style['size'] = 1
+            legend_style["size"] = 1
             legend_style["primary"] = self.primary_layer and (i == 0 or i == (len(self.symbols.items()) - 1))
             legend_style["label"] = item["label"]
+            if self.legend_shape:
+                legend_style["shape"] = self.legend_shape
+
             legend[item["label"]] = Legend.from_dict(legend_style)
-            i = i + 1
+            i += 1
 
         self.legend = legend
