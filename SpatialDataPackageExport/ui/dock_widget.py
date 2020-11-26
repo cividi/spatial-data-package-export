@@ -89,9 +89,15 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
         self.btn_export.clicked.connect(self.run)
         self.btn_reset_settings.clicked.connect(self._set_initial_values)
+
+        self.cb_crop_layers.stateChanged.connect(lambda: Settings.crop_layers.set(self.cb_crop_layers.isChecked()))
+
         self._set_initial_values()
 
     def _set_initial_values(self):
+        self.cb_crop_layers: QCheckBox
+        self.cb_crop_layers.setChecked(Settings.crop_layers.value)
+
         for name, snapshot_config in self.config.snapshots[0].items():
             self.input_name.setText(name)
             self.input_title.setText(snapshot_config.title)
@@ -137,8 +143,9 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             row['new_layer_name'] = new_layer_name
             row['finished'] = False
             is_primary = row['primary'].isChecked()
+            extent = self.extent if self.cb_crop_layers.isChecked() else None
 
-            task_wrapper = TaskWrapper(id=id, layer=cb.currentLayer(), name=layer_name, extent=self.extent,
+            task_wrapper = TaskWrapper(id=id, layer=cb.currentLayer(), name=layer_name, extent=extent,
                                        primary=is_primary, output=f'memory:{new_layer_name}', feedback=row['feedback'],
                                        context=row['context'], executed=self.styles_to_attributes_finished
                                        )

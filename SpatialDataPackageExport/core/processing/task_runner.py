@@ -18,7 +18,7 @@
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 import uuid
 from functools import partial
-from typing import List, Dict, Callable
+from typing import List, Dict, Callable, Optional
 
 from qgis.core import (QgsApplication, QgsProcessingAlgRunnerTask, QgsRectangle, QgsVectorLayer, QgsProcessingFeedback,
                        QgsProcessingContext)
@@ -32,7 +32,7 @@ class TaskWrapper:
     Helper class for task parameters. Could be replaced with TypedDict, but support for Python 3.8 is not that wide yet
     """
 
-    def __init__(self, id: uuid.UUID, layer: QgsVectorLayer, name: str, extent: QgsRectangle, primary: bool,
+    def __init__(self, id: uuid.UUID, layer: QgsVectorLayer, name: str, extent: Optional[QgsRectangle], primary: bool,
                  output: str, feedback: QgsProcessingFeedback, context: QgsProcessingContext,
                  executed: Callable) -> None:
         self.id = id

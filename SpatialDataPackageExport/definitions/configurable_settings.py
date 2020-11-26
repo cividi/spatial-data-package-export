@@ -38,11 +38,15 @@ class Settings(enum.Enum):
     export_config_template = resources_path('templates', 'export-config.json')
     snapshot_template = resources_path('templates', 'snapshot-template.json')
     layer_format = 'memory'
+    crop_layers = True
 
     _options = {'layer_format': [option.value for option in LayerFormatOptions]}
 
-    def get(self, typehint: type = str) -> any:
+    def get(self) -> any:
         """Gets the value of the setting"""
+        typehint: type = str
+        if self == Settings.crop_layers:
+            typehint = bool
         return get_setting(self.name, self.value, typehint)
 
     def set(self, value: Union[str, int, float, bool]) -> None:

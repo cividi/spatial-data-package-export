@@ -165,7 +165,7 @@ class StylesToAttributes:
 
     def _copy_fields(self, sink: QgsFeatureSink, extent: Optional[QgsRectangle] = None):
         total = 100.0 / self.layer.featureCount() if self.layer.featureCount() > 0 else 100
-        if extent is not None:
+        if extent is not None and not extent.isEmpty():
             self.feedback.pushDebugInfo(f'Extent: {extent.toString()}')
             source_index = QgsSpatialIndex(self.layer, self.feedback)
             ids = source_index.intersects(extent)
