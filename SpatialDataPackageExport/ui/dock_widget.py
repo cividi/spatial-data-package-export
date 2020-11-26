@@ -248,7 +248,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                                                           QgsMapLayerProxyModel.Filter.LineLayer))
         cb_primary = QCheckBox(text='')
         combo_box_shape = QComboBox()
-        combo_box_shape.addItems(('circle', 'square', 'line'))
+        combo_box_shape.addItems(('automatic', 'circle', 'square', 'line'))
 
         row = {
             'layer': bx_layer,
