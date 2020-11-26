@@ -74,24 +74,31 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.layer_rows: Dict = {}
         self.source_rows: Dict = {}
         # TODO: add items here
-        self.responsive_items = [self.btn_export]
+        self.responsive_items = (self.btn_export, self.btn_reset_settings, self.btn_calculate_extent)
 
+        self.__set_initial_values()
+
+    # noinspection PyUnresolvedReferences,PyCallByClass
+    def __set_initial_values(self):
+        # Dialog items
         self.sb_extent_precision.setValue(
             get_setting(Settings.extent_precision.name, Settings.extent_precision.value, int))
         self.le_extent.setText(
             self.extent.toString(self.sb_extent_precision.value()) if self.extent is not None else '')
 
         self.btn_add_layer_row.setIcon(QgsApplication.getThemeIcon('/mActionAdd.svg'))
-        self.btn_add_layer_row.clicked.connect(lambda _: self._add_layer_row(len(self.layer_rows) + 1))
+        self.btn_add_layer_row.clicked.connect(lambda _: self.__add_layer_row(len(self.layer_rows) + 1))
 
         self.btn_add_source_row.setIcon(QgsApplication.getThemeIcon('/mActionAdd.svg'))
-        self.btn_add_source_row.clicked.connect(lambda _: self._add_source_row(len(self.source_rows) + 1))
+        self.btn_add_source_row.clicked.connect(lambda _: self.__add_source_row(len(self.source_rows) + 1))
 
         self.btn_export.clicked.connect(self.run)
-        self.btn_reset_settings.clicked.connect(self._set_initial_values)
-        self._set_initial_values()
+        self.btn_reset_settings.clicked.connect(self.__set_initial_values)
 
-    def _set_initial_values(self):
+        self.cb_crop_layers: QCheckBox
+        self.cb_crop_layers.setChecked(Settings.crop_layers.get())
+        self.cb_crop_layers.stateChanged.connect(lambda: Settings.crop_layers.set(self.cb_crop_layers.isChecked()))
+
         for name, snapshot_config in self.config.snapshots[0].items():
             self.input_name.setText(name)
             self.input_title.setText(snapshot_config.title)
@@ -99,10 +106,10 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             break
 
         for i, source in enumerate(self.snapshot_template.sources, start=1):
-            self._add_source_row(1, source.url, source.title)
-        self._add_layer_row(1)
+            self.__add_source_row(1, source.url, source.title)
+        self.__add_layer_row(1)
 
-    def _create_snapshot_config(self):
+    def __create_snapshot_config(self):
         snapshot_config_template = None
         for snapshot_config_template in self.config.snapshots[0].values():
             break
@@ -137,10 +144,11 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             row['new_layer_name'] = new_layer_name
             row['finished'] = False
             is_primary = row['primary'].isChecked()
+            extent = self.extent if self.cb_crop_layers.isChecked() else None
 
-            task_wrapper = TaskWrapper(id=id, layer=cb.currentLayer(), name=layer_name, extent=self.extent,
+            task_wrapper = TaskWrapper(id=id, layer=cb.currentLayer(), name=layer_name, extent=extent,
                                        primary=is_primary, output=f'memory:{new_layer_name}', feedback=row['feedback'],
-                                       context=row['context'], executed=self.styles_to_attributes_finished
+                                       context=row['context'], executed=self.__styles_to_attributes_finished
                                        )
             LOGGER.info(f"Exporting {layer_name}")
             task_wrappers.append(task_wrapper)
@@ -151,20 +159,20 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             LOGGER.warning(tr('No layers selected'),
                            extra=bar_msg(tr('Select at least one layer to create snapshot')))
         else:
-            create_styles_to_attributes_tasks(task_wrappers, completed=lambda *args, **kwargs: self.completed())
-            self._disable_ui()
+            create_styles_to_attributes_tasks(task_wrappers, completed=lambda *args, **kwargs: self.__completed())
+            self.__disable_ui()
 
-    def completed(self, *args, **kwargs):
+    def __completed(self, *args, **kwargs):
         all_finished = all(map(lambda x: x['finished'], self.layer_rows.values()))
         if not all_finished:
             return
 
-        self._enable_ui()
+        self.__enable_ui()
         LOGGER.info(tr('Finished exporting style to attributes'))
 
         output_path = Path(self.f_output.filePath())
 
-        snapshot_config = self._create_snapshot_config()
+        snapshot_config = self.__create_snapshot_config()
         snapshot_name = self.input_name.text()
         styled_layers = [row['styled_layer'] for row in self.layer_rows.values()]
         snapshot = self.writer.create_snapshot(snapshot_name, snapshot_config, styled_layers)
@@ -182,8 +190,8 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         LOGGER.info(tr('Snapshot succesfully exported'),
                     extra=bar_msg(tr('Snapshot can be found in {}', str(output_file)), success=True))
 
-    def styles_to_attributes_finished(self, input_layer: QgsVectorLayer, context: QgsProcessingContext, id: uuid.UUID,
-                                      succesful: bool, results: Dict[str, any]) -> None:
+    def __styles_to_attributes_finished(self, input_layer: QgsVectorLayer, context: QgsProcessingContext, id: uuid.UUID,
+                                        succesful: bool, results: Dict[str, any]) -> None:
         row = self.layer_rows[id]
         if succesful:
             legends = [Legend.from_dict(legend) for legend in results["OUTPUT_LEGEND"].values()]
@@ -218,15 +226,15 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             error_msg = feedback.last_report_error
             LOGGER.error(tr('Exporting styles for {} finished with errors', input_layer.name()),
                          extra=bar_msg(details=tr(f'Details: {error_msg}. Check log file for more details')))
-            self._enable_ui()
+            self.__enable_ui()
 
     # noinspection PyUnresolvedReferences
     @log_if_fails
-    def _add_layer_row(self, row_index: int):
+    def __add_layer_row(self, row_index: int):
         row_uuid = str(uuid.uuid4())
         b_rm = QPushButton(text='', icon=QgsApplication.getThemeIcon('/mActionRemove.svg'))
         b_rm.setToolTip(tr('Remove row'))
-        b_rm.clicked.connect(lambda _: self._remove_row(row_uuid, self.layer_rows, self.layer_grid))
+        b_rm.clicked.connect(lambda _: self.__remove_row(row_uuid, self.layer_rows, self.layer_grid))
 
         bx_layer = QgsMapLayerComboBox()
         bx_layer.setFilters(QgsMapLayerProxyModel.Filters(QgsMapLayerProxyModel.Filter.PointLayer |
@@ -248,11 +256,11 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
     # noinspection PyUnresolvedReferences
     @log_if_fails
-    def _add_source_row(self, row_index: int, url: str = '', title: str = ''):
+    def __add_source_row(self, row_index: int, url: str = '', title: str = ''):
         row_uuid = str(uuid.uuid4())
         b_rm = QPushButton(text='', icon=QgsApplication.getThemeIcon('/mActionRemove.svg'))
         b_rm.setToolTip(tr('Remove row'))
-        b_rm.clicked.connect(lambda _: self._remove_row(row_uuid, self.source_rows, self.source_grid))
+        b_rm.clicked.connect(lambda _: self.__remove_row(row_uuid, self.source_rows, self.source_grid))
 
         le_url = QLineEdit(url)
         le_title = QLineEdit(title)
@@ -268,7 +276,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.source_grid.addWidget(le_title, row_index, 2)
 
     @log_if_fails
-    def _remove_row(self, row_uuid: str, row_dict: Dict, grid: QGridLayout):
+    def __remove_row(self, row_uuid: str, row_dict: Dict, grid: QGridLayout):
         row = row_dict.pop(row_uuid)
         for widget in row.values():
             if isinstance(widget, QWidget):
@@ -277,6 +285,18 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                 widget.setParent(None)
             # noinspection PyUnusedLocal
             widget = None
+
+    def __disable_ui(self):
+        for item in self.responsive_items:
+            item.setEnabled(False)
+
+    def __enable_ui(self):
+        for item in self.responsive_items:
+            item.setEnabled(True)
+
+    '''
+    Pyqt slots (called automatically based on method names)
+    '''
 
     def on_sb_extent_precision_valueChanged(self, new_val: int):
         set_setting(Settings.extent_precision.name, new_val)
@@ -296,11 +316,3 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     def on_btn_settings_clicked(self):
         settings_dialog = SettingsDialog()
         settings_dialog.exec()
-
-    def _disable_ui(self):
-        for item in self.responsive_items:
-            item.setEnabled(False)
-
-    def _enable_ui(self):
-        for item in self.responsive_items:
-            item.setEnabled(True)

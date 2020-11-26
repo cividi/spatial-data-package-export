@@ -61,9 +61,9 @@
                          <property name="geometry">
                              <rect>
                                  <x>0</x>
-                                 <y>0</y>
-                                 <width>728</width>
-                                 <height>509</height>
+                                 <y>-22</y>
+                                 <width>714</width>
+                                 <height>531</height>
                              </rect>
                          </property>
                          <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -323,23 +323,30 @@
                                          </item>
                                          <item row="6" column="1">
                                              <layout class="QGridLayout" name="gridLayout_2">
-                                                 <item row="1" column="1" colspan="2">
+                                                 <item row="0" column="0">
+                                                     <widget class="QLineEdit" name="le_extent"/>
+                                                 </item>
+                                                 <item row="0" column="2">
+                                                     <widget class="QSpinBox" name="sb_extent_precision"/>
+                                                 </item>
+                                                 <item row="2" column="1" colspan="2">
                                                      <widget class="QPushButton" name="btn_calculate_extent">
                                                          <property name="text">
                                                              <string>Calculate bounds</string>
                                                          </property>
                                                      </widget>
                                                  </item>
-                                                 <item row="0" column="2">
-                                                     <widget class="QSpinBox" name="sb_extent_precision"/>
-                                                 </item>
-                                                 <item row="0" column="0">
-                                                     <widget class="QLineEdit" name="le_extent"/>
-                                                 </item>
                                                  <item row="0" column="1">
                                                      <widget class="QLabel" name="label">
                                                          <property name="text">
                                                              <string>Precision</string>
+                                                         </property>
+                                                     </widget>
+                                                 </item>
+                                                 <item row="1" column="1" colspan="2">
+                                                     <widget class="QCheckBox" name="cb_crop_layers">
+                                                         <property name="text">
+                                                             <string>Crop layers</string>
                                                          </property>
                                                      </widget>
                                                  </item>
@@ -389,16 +396,18 @@
                      </property>
                      <property name="title">
                          <string>About</string>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QLabel" name="metadataLabel">
-         <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This tool exports Spatial Data Packages, compatible with
-           &lt;a href=&quot;
-           https://bitbucket.org/cividi/gemeindescan-webui&quot;&gt;&lt;span style=&quot;text-decoration: underline;&quot;&gt;
-           Gemeindescan.&lt;/span&gt;&lt;/a&gt;
-           The Spatial Data Package is based on the &lt;a href=&quot;https://frictionlessdata.io/&quot;&gt;&lt;span
+                     </property>
+                     <layout class="QVBoxLayout" name="verticalLayout_3">
+                         <item>
+                             <widget class="QLabel" name="metadataLabel">
+                                 <property name="text">
+                                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This tool exports Spatial
+                                         Data Packages, compatible with
+                                         &lt;a href=&quot;
+                                         https://bitbucket.org/cividi/gemeindescan-webui&quot;&gt;&lt;span style=&quot;text-decoration:
+                                         underline;&quot;&gt;
+                                         Gemeindescan.&lt;/span&gt;&lt;/a&gt;
+                                         The Spatial Data Package is based on the &lt;a href=&quot;https://frictionlessdata.io/&quot;&gt;&lt;span
            style=&quot;
            text-decoration: underline;&quot;&gt;Frictionless Data specifications.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Main
            development by &lt;a href=&quot;https://www.gispo.fi/en/home/&quot;&gt;&lt;span style=&quot; text-decoration:
