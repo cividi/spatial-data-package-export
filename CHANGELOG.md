@@ -29,4 +29,9 @@
 * Fixed export bugs (title, description, single symbol layer names)
 * Added a plugin setting for snapshot layers to be discarded, kept as memory layers ot written as GeoJSON
 
+### 0.2.0-beta2 - 26/11/2020
+
+* New: Shapes of legend entries can be manually changed before exporting
+* New: Option to not crop exported layers to bounds 
+
 ###
