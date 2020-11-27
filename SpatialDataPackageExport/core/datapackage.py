@@ -20,7 +20,7 @@ import logging
 from typing import List, Optional, Tuple
 
 from .utils import load_json
-from ..definitions.configurable_settings import Settings
+from ..definitions.configurable_settings import Settings, ProjectSettings
 from ..model.config import Config, SnapshotConfig
 from ..model.snapshot import Snapshot, Resource, Legend
 from ..model.styled_layer import StyledLayer
@@ -72,6 +72,19 @@ class DataPackageHandler:
         """
         template_path = get_setting(Settings.export_config_template.name, Settings.export_config_template.value, str)
         return Config.from_dict(load_json(template_path))
+
+    @staticmethod
+    def save_settings_to_project(snapshot_config: SnapshotConfig) -> bool:
+        """
+        Saves snapshot configuration to the project settings
+        :param snapshot_config:
+        :return: Whether saving is successful or not
+        """
+        existing_confs: List[SnapshotConfig] = [SnapshotConfig.from_dict(config) for config in
+                                                ProjectSettings.snapshot_configs.get()]
+        confs = [config for config in existing_confs if config.title != snapshot_config.title]
+        confs.append(snapshot_config)
+        return ProjectSettings.snapshot_configs.set([conf.to_dict() for conf in confs])
 
     def create_snapshot(self, snapshot_name: str, snapshot_config: SnapshotConfig,
                         styled_layers: List[StyledLayer]) -> Snapshot:

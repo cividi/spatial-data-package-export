@@ -125,6 +125,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         snapshot_config.description = self.input_description.toPlainText()
         snapshot_config.bounds = extent_to_datapackage_bounds(self.extent, self.sb_extent_precision.value())
         snapshot_config.sources = [Source(row['url'].text(), row['title'].text()) for row in self.source_rows.values()]
+        snapshot_config.resources = [row['layer_name'] for row in self.layer_rows.values()]
         return snapshot_config
 
     def run(self):
@@ -185,6 +186,8 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
         with open(output_file, 'w') as f:
             json.dump(snapshot.to_dict(), f)
+
+        self.data_pkg_handler.save_settings_to_project(snapshot_config)
 
         if Settings.layer_format.get() == LayerFormatOptions.none.value:
             LOGGER.debug('Removing memory layers')
