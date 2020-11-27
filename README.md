@@ -2,10 +2,18 @@
 ![](https://github.com/cividi/spatial-data-package-export/workflows/Tests/badge.svg)
 ![](https://github.com/cividi/spatial-data-package-export/workflows/Release/badge.svg)
 
-QGIS plugin to export data and styles to [Gemeindescan](https://gemeindescan.ch/de/).
+QGIS plugin to export data and styles to Spatial Data Packages that can be uploaded on the [Spatial Data Package Platform](https://github.com/cividi/spatial-data-package-platform), e.g. [gemeindescan.ch](https://gemeindescan.ch).
 
-This tool exports Gemeindescan data package. Data package specification is based on the [Frictionless Data toolkit](https://frictionlessdata.io/).
+This tool exports spatial data packages. The data package specification is based on the [Frictionless Data toolkit](https://frictionlessdata.io/).
 Main development by [Gispo Ltd](https://www.gispo.fi/en/home/).
+
+### Minimum Requirements
+
+| | |
+|-|-|
+| [QGIS](https://qgis.org/) | 3.10 |
+| [Python](https://www.python.org/downloads/) | 3.6 |
+| [Platform](https://github.com/cividi/spatial-data-package-platform/releases) | 0.2 |
 
 
 ### Installation instructions
