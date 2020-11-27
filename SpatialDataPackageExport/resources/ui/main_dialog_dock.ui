@@ -61,9 +61,9 @@
                          <property name="geometry">
                              <rect>
                                  <x>0</x>
-                                 <y>-1</y>
+                                 <y>-45</y>
                                  <width>638</width>
-                                 <height>531</height>
+                                 <height>543</height>
                              </rect>
                          </property>
                          <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -212,6 +212,19 @@
                                                      </spacer>
                                                  </item>
                                              </layout>
+                                         </item>
+                                         <item>
+                                             <spacer name="verticalSpacer">
+                                                 <property name="orientation">
+                                                     <enum>Qt::Vertical</enum>
+                                                 </property>
+                                                 <property name="sizeHint" stdset="0">
+                                                     <size>
+                                                         <width>20</width>
+                                                         <height>40</height>
+                                                     </size>
+                                                 </property>
+                                             </spacer>
                                          </item>
                                      </layout>
                                  </widget>
@@ -396,6 +409,19 @@
                                      </layout>
                                  </widget>
                              </item>
+                             <item>
+                                 <spacer name="verticalSpacer_2">
+                                     <property name="orientation">
+                                         <enum>Qt::Vertical</enum>
+                                     </property>
+                                     <property name="sizeHint" stdset="0">
+                                         <size>
+                                             <width>20</width>
+                                             <height>40</height>
+                                         </size>
+                                     </property>
+                                 </spacer>
+                             </item>
                          </layout>
                      </widget>
                  </widget>
@@ -437,16 +463,16 @@
                                          Data Package
                                          Exporter &lt;a href=&quot;https://github.com/cividi/spatial-data-package-export&quot;&gt;&lt;span
                                          style=&quot;
-           text-decoration: underline;&quot;&gt;GitHub repository&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
-          </string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
+                                         text-decoration: underline;&quot;&gt;GitHub repository&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                     </string>
+                                 </property>
+                                 <property name="wordWrap">
+                                     <bool>true</bool>
+                                 </property>
+                             </widget>
+                         </item>
+                     </layout>
+                 </widget>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">

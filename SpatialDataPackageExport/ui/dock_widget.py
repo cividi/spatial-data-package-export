@@ -35,9 +35,9 @@ from qgis.gui import QgsMapLayerComboBox, QgisInterface
 
 from .extent_dialog import ExtentChooserDialog
 from .settings_dialog import SettingsDialog
-from ..core.datapackage import DatapackageWriter
+from ..core.datapackage import DataPackageHandler
 from ..core.processing.task_runner import TaskWrapper, create_styles_to_attributes_tasks
-from ..core.utils import load_config_from_template, extent_to_datapackage_bounds, load_snapshot_template
+from ..core.utils import extent_to_datapackage_bounds
 from ..definitions.configurable_settings import Settings, LayerFormatOptions
 from ..model.config import SnapshotConfig
 from ..model.snapshot import Legend, Source
@@ -65,9 +65,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
         self.iface = iface
         # Template can be configured via settings
-        self.config = load_config_from_template()
-        self.snapshot_template = load_snapshot_template()
-        self.writer = DatapackageWriter(self.config)
+        self.data_pkg_handler = DataPackageHandler.create()
         self.extent: Optional[QgsRectangle] = None
         self.layer_grid: QGridLayout = self.layer_grid
         self.source_grid: QGridLayout = self.source_grid
@@ -99,19 +97,19 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.cb_crop_layers.setChecked(Settings.crop_layers.get())
         self.cb_crop_layers.stateChanged.connect(lambda: Settings.crop_layers.set(self.cb_crop_layers.isChecked()))
 
-        for name, snapshot_config in self.config.snapshots[0].items():
+        for name, snapshot_config in self.data_pkg_handler.config.snapshots[0].items():
             self.input_name.setText(name)
             self.input_title.setText(snapshot_config.title)
             self.input_description.setText(snapshot_config.description)
             break
 
-        for i, source in enumerate(self.snapshot_template.sources, start=1):
+        for i, source in enumerate(self.data_pkg_handler.snapshot_template.sources, start=1):
             self.__add_source_row(1, source.url, source.title)
         self.__add_layer_row(1)
 
     def __create_snapshot_config(self):
         snapshot_config_template = None
-        for snapshot_config_template in self.config.snapshots[0].values():
+        for snapshot_config_template in self.data_pkg_handler.config.snapshots[0].values():
             break
 
         if snapshot_config_template is None:
@@ -181,7 +179,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         snapshot_config = self.__create_snapshot_config()
         snapshot_name = self.input_name.text()
         styled_layers = [row['styled_layer'] for row in self.layer_rows.values()]
-        snapshot = self.writer.create_snapshot(snapshot_name, snapshot_config, styled_layers)
+        snapshot = self.data_pkg_handler.create_snapshot(snapshot_name, snapshot_config, styled_layers)
 
         output_file = Path(output_path, f'{snapshot_name}.json')
 
