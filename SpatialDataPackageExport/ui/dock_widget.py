@@ -56,11 +56,13 @@ LOGGER = logging.getLogger(plugin_name())
 class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     closingPlugin = pyqtSignal()
 
+    # noinspection PyCallByClass
     def __init__(self, iface: QgisInterface, parent=None):
         super(ExporterDockWidget, self).__init__(parent)
         self.setupUi(self)
 
-        # noinspection PyCallByClass
+        self.btn_open_conf.setIcon(QgsApplication.getThemeIcon('/mActionFileOpen.svg'))
+        self.btn_save_conf.setIcon(QgsApplication.getThemeIcon('/mActionFileSave.svg'))
         self.btn_settings.setIcon(QgsApplication.getThemeIcon('/propertyicons/settings.svg'))
 
         self.iface = iface
@@ -72,7 +74,10 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.layer_rows: Dict = {}
         self.source_rows: Dict = {}
         # TODO: add items here
-        self.responsive_items = (self.btn_export, self.btn_reset_settings, self.btn_calculate_extent)
+        self.responsive_items = (
+            self.btn_export, self.btn_reset_settings, self.btn_calculate_extent, self.btn_open_conf,
+            self.btn_save_conf, self.btn_settings
+        )
 
         self.__set_initial_values()
 
