@@ -106,7 +106,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.cb_license.clear()
         licenses = Settings.licences.get()
         self.cb_license.addItems(list(licenses.keys()))
-        self.cb_license.setCurrentText(self.data_pkg_handler.snapshot_template.licenses.title)
+        self.cb_license.setCurrentText(self.data_pkg_handler.snapshot_template.licenses[0].title)
 
         for name, snapshot_config in self.data_pkg_handler.config.snapshots[0].items():
             self.input_name.setText(name)
