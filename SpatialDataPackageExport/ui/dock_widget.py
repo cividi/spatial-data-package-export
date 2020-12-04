@@ -106,6 +106,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             self.input_name.setText(name)
             self.input_title.setText(snapshot_config.title)
             self.input_description.setText(snapshot_config.description)
+            self.input_keywords.setText('\n'.join(snapshot_config.keywords))
             break
 
         for i, source in enumerate(self.data_pkg_handler.snapshot_template.sources, start=1):
@@ -129,6 +130,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         snapshot_config.title = self.input_title.text()
 
         snapshot_config.description = self.input_description.toPlainText()
+        snapshot_config.keywords = [keyword.strip() for keyword in self.input_keywords.toPlainText().split('\n')]
         snapshot_config.bounds = extent_to_datapackage_bounds(self.extent, self.sb_extent_precision.value())
         snapshot_config.sources = [Source(row['url'].text(), row['title'].text()) for row in self.source_rows.values()]
         snapshot_config.resources = [row['layer'].currentText() for row in self.layer_rows.values()]
