@@ -9,11 +9,13 @@
     "topic": "Sample"
   },
   "format": "geojson",
-  "licenses": {
-    "title": "Open Data Commons Attribution License",
-    "type": "ODC-By-1.0",
-    "url": "https://opendatacommons.org/licenses/by/1.0/"
-  },
+  "licenses": [
+    {
+      "title": "Open Data Commons Attribution License",
+      "type": "ODC-By-1.0",
+      "url": "https://opendatacommons.org/licenses/by/1.0/"
+    }
+  ],
   "keywords": [
     "europe",
     "switzerland",

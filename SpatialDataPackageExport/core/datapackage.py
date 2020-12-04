@@ -116,7 +116,7 @@ class DataPackageHandler:
         snapshot.sources = snapshot_config.sources
         snapshot.gemeindescan_meta = snapshot_config.gemeindescan_meta
         if snapshot_license:
-            snapshot.licenses = snapshot_license
+            snapshot.licenses = [snapshot_license]
 
         LOGGER.debug('Updating resources')
         initial_resources = snapshot.resources
