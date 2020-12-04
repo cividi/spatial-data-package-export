@@ -21,7 +21,7 @@ import tempfile
 from pathlib import Path
 from typing import List, Dict, Union
 
-from qgis.core import QgsVectorFileWriter, QgsCoordinateReferenceSystem, QgsProject
+from qgis.core import QgsVectorFileWriter, QgsCoordinateReferenceSystem, QgsProject, QgsVectorLayer
 
 from .snapshot import Legend
 from ..definitions.types import StyleType
@@ -37,8 +37,12 @@ class StyledLayer:
         self.style_type: StyleType = StyleType[style_type] if isinstance(style_type, str) else style_type
 
     @property
-    def layer(self):
+    def layer(self) -> QgsVectorLayer:
         return QgsProject.instance().mapLayer(self.layer_id)
+
+    def get_keywords(self) -> List[str]:
+        keyword_lists = self.layer.metadata().keywords().values()
+        return [keyword for keyword_list in keyword_lists for keyword in keyword_list]
 
     def get_geojson_data(self) -> Dict:
         source = self.layer.source()

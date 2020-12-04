@@ -38,6 +38,9 @@ def test_categorized_poly(new_project, categorized_poly, layer_empty_poly):
     converter.extract_styles_to_layer(layer_empty_poly)
     layer_empty_poly.commitChanges()
     add_layer(layer_empty_poly)
+    metadata = layer_empty_poly.metadata()
+    metadata.setKeywords({'test': ['kw1', 'kw2'], 'test2': ['kw3']})
+    layer_empty_poly.setMetadata(metadata)
 
     styled_layer: StyledLayer = StyledLayer('asd', layer_empty_poly.id(), list(converter.legend.values()),
                                             StyleType.SimpleStyle)
