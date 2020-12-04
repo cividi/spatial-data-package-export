@@ -258,7 +258,7 @@ class View:
 class Snapshot:
 
     def __init__(self, name: str, title: str, description: str, version: str, datapackage_version: str,
-                 gemeindescan_version: str, gemeindescan_meta: GemeindescanMeta, format: str, license: str,
+                 gemeindescan_version: str, gemeindescan_meta: GemeindescanMeta, format: str,
                  licenses: List[License], keywords: List[str], views: List[View], sources: List[Source],
                  resources: List[Resource], maintainers: List[Maintainer], contributors: List[Contributor]) -> None:
         self.name = name
@@ -269,7 +269,6 @@ class Snapshot:
         self.gemeindescan_version = gemeindescan_version
         self.gemeindescan_meta = gemeindescan_meta
         self.format = format
-        self.license = license
         self.licenses = licenses
         self.keywords = keywords
         self.views = views
@@ -289,7 +288,6 @@ class Snapshot:
         gemeindescan_version = from_str(obj.get("gemeindescan_version"))
         gemeindescan_meta = GemeindescanMeta.from_dict(obj.get("gemeindescan_meta"))
         format = from_str(obj.get("format"))
-        license = from_str(obj.get("license"))
         licenses = from_list(License.from_dict, obj.get("licenses"))
         keywords = from_list(from_str, obj.get("keywords"))
         views = from_list(View.from_dict, obj.get("views", []))
@@ -310,7 +308,6 @@ class Snapshot:
         result["gemeindescan_version"] = from_str(self.gemeindescan_version)
         result["gemeindescan_meta"] = to_class(GemeindescanMeta, self.gemeindescan_meta)
         result["format"] = from_str(self.format)
-        result["license"] = from_str(self.license)
         result["licenses"] = from_list(lambda x: to_class(License, x), self.licenses)
         result["keywords"] = from_list(from_str, self.keywords)
         result["views"] = from_list(lambda x: to_class(View, x), self.views)
