@@ -31,7 +31,14 @@ from ..model.styled_layer import StyledLayer
 from ..qgis_plugin_tools.tools.resources import plugin_test_data_path
 
 
-def test_categorized_poly(new_project, categorized_poly, layer_empty_poly, odc_1_0_license):
+def mock_auth(*args, **kwargs):
+    return 'test_author'
+
+
+def test_categorized_poly(new_project, categorized_poly, layer_empty_poly,odc_1_0_license,  monkeypatch):
+    # Mock get_project_author
+    monkeypatch.setattr(DataPackageHandler, 'get_project_author', mock_auth)
+
     converter = StylesToAttributes(categorized_poly, categorized_poly.name(), QgsProcessingFeedback())
     update_fields(converter, layer_empty_poly)
     layer_empty_poly.startEditing()
@@ -54,12 +61,16 @@ def test_categorized_poly(new_project, categorized_poly, layer_empty_poly, odc_1
     snapshot_config = list(snapshot_config.values())[0]
     snapshot_config.description = 'test description'
     snapshot_config.title = 'test title'
+
     snapshot = handler.create_snapshot(name, snapshot_config, [styled_layer], odc_1_0_license)
     expected_snapshot_dict = get_test_json('snapshots', 'categorized_poly_custom_config.json')
     assert snapshot.to_dict() == expected_snapshot_dict
 
 
-def test_points_with_radius(new_project, points_with_radius, layer_empty_points):
+def test_points_with_radius(new_project, points_with_radius, layer_empty_points, monkeypatch):
+    # Mock get_project_author
+    monkeypatch.setattr(DataPackageHandler, 'get_project_author', mock_auth)
+
     converter = StylesToAttributes(points_with_radius, points_with_radius.name(), QgsProcessingFeedback(),
                                    primary_layer=True)
     update_fields(converter, layer_empty_points)

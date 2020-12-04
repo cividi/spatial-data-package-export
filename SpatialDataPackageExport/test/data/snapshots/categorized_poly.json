@@ -235,10 +235,10 @@
   ],
   "contributors": [
     {
-      "web": "https://cividi.ch",
-      "role": "publisher",
-      "email": "info@cividi.ch",
-      "title": "cividi"
+      "path": "",
+      "role": "author",
+      "email": "",
+      "title": ""
     }
   ]
 }

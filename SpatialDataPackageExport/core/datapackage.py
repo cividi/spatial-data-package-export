@@ -25,12 +25,13 @@ from ..model.config import Config, SnapshotConfig
 from ..model.snapshot import Snapshot, Resource, Legend, License
 from ..model.styled_layer import StyledLayer
 from ..qgis_plugin_tools.tools.resources import plugin_name
-from ..qgis_plugin_tools.tools.settings import get_setting
+from ..qgis_plugin_tools.tools.settings import get_setting, get_project_setting
 
 LOGGER = logging.getLogger(plugin_name())
 
 
 class DataPackageHandler:
+    PROJECT_AUTHOR = 'project_author'
 
     def __init__(self, config: Config, snapshot_template: Snapshot, legend_template: Legend) -> None:
         self.config = config
@@ -96,6 +97,14 @@ class DataPackageHandler:
         confs[snapshot_name] = snapshot_config
         return ProjectSettings.snapshot_configs.set({name: conf.to_dict() for name, conf in confs.items()})
 
+    @staticmethod
+    def get_project_author() -> str:
+        """
+        Get the author of the project
+        :return: Author or the default value
+        """
+        return get_project_setting(DataPackageHandler.PROJECT_AUTHOR, '', internal=False)
+
     def create_snapshot(self, snapshot_name: str, snapshot_config: SnapshotConfig,
                         styled_layers: List[StyledLayer], snapshot_license: Optional[License] = None) -> Snapshot:
         """
@@ -117,6 +126,7 @@ class DataPackageHandler:
         snapshot.gemeindescan_meta = snapshot_config.gemeindescan_meta
         if snapshot_license:
             snapshot.licenses = [snapshot_license]
+        snapshot.contributors[0].title = self.get_project_author()
 
         LOGGER.debug('Updating resources')
         initial_resources = snapshot.resources
