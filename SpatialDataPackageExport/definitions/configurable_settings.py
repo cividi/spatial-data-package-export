@@ -17,12 +17,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 import enum
-from typing import Union, List
+import json
+from typing import Union, List, Dict
 
 from ..qgis_plugin_tools.tools.exceptions import QgsPluginException
 from ..qgis_plugin_tools.tools.i18n import tr
 from ..qgis_plugin_tools.tools.resources import resources_path
-from ..qgis_plugin_tools.tools.settings import get_setting, set_setting
+from ..qgis_plugin_tools.tools.settings import get_setting, set_setting, get_project_setting, set_project_setting
 
 
 @enum.unique
@@ -47,15 +48,39 @@ class Settings(enum.Enum):
         typehint: type = str
         if self == Settings.crop_layers:
             typehint = bool
+        elif self == Settings.extent_precision:
+            typehint = int
         return get_setting(self.name, self.value, typehint)
 
-    def set(self, value: Union[str, int, float, bool]) -> None:
+    def set(self, value: Union[str, int, float, bool]) -> bool:
         """Sets the value of the setting"""
         options = self.get_options()
         if options and value not in options:
             raise QgsPluginException(tr('Invalid option. Choose something from values {}', options))
-        set_setting(self.name, value)
+        return set_setting(self.name, value)
 
     def get_options(self) -> List[any]:
         """Get options for the setting"""
         return Settings._options.value.get(self.name, [])
+
+
+@enum.unique
+class ProjectSettings(enum.Enum):
+    snapshot_configs = '{}'
+
+    def get(self) -> any:
+        """Gets the value of the setting"""
+        value = get_project_setting(self.name, self.value, str)
+        if self == ProjectSettings.snapshot_configs:
+            value = json.loads(value)
+        return value
+
+    def set(self, value: Union[str, int, float, bool, Dict, List]) -> bool:
+        """Sets the value of the setting"""
+        if self == ProjectSettings.snapshot_configs:
+            value = json.dumps(value)
+        return set_project_setting(self.name, value)
+
+    def reset(self) -> bool:
+        """Resets the setting back to its default value"""
+        return set_project_setting(self.name, self.value)

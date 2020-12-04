@@ -23,7 +23,7 @@ from qgis.core import QgsProcessingFeedback, QgsVectorLayer, QgsVectorDataProvid
 
 from .conftest import add_layer
 from .utils import get_test_json
-from ..core.datapackage import DatapackageWriter
+from ..core.datapackage import DataPackageHandler
 from ..core.styles2attributes import StylesToAttributes
 from ..definitions.types import StyleType
 from ..model.config import Config
@@ -44,13 +44,13 @@ def test_categorized_poly(new_project, categorized_poly, layer_empty_poly):
     with open(plugin_test_data_path('config', 'config_simple_poly.json')) as f:
         config = Config.from_dict(json.load(f))
 
-    writer = DatapackageWriter(config)
+    handler = DataPackageHandler.create(config)
     snapshot_config = config.snapshots[0]
     name = list(snapshot_config.keys())[0]
     snapshot_config = list(snapshot_config.values())[0]
     snapshot_config.description = 'test description'
     snapshot_config.title = 'test title'
-    snapshot = writer.create_snapshot(name, snapshot_config, [styled_layer])
+    snapshot = handler.create_snapshot(name, snapshot_config, [styled_layer])
     expected_snapshot_dict = get_test_json('snapshots', 'categorized_poly_custom_config.json')
     assert snapshot.to_dict() == expected_snapshot_dict
 
@@ -70,11 +70,11 @@ def test_points_with_radius(new_project, points_with_radius, layer_empty_points)
     with open(plugin_test_data_path('config', 'config_points_with_radius.json')) as f:
         config = Config.from_dict(json.load(f))
 
-    writer = DatapackageWriter(config)
+    handler = DataPackageHandler.create(config)
     snapshot_config = config.snapshots[0]
     name = list(snapshot_config.keys())[0]
     snapshot_config = list(snapshot_config.values())[0]
-    snapshot = writer.create_snapshot(name, snapshot_config, [styled_layer])
+    snapshot = handler.create_snapshot(name, snapshot_config, [styled_layer])
     expected_snapshot_dict = get_test_json('snapshots', 'points_with_radius.json')
     assert snapshot.to_dict() == expected_snapshot_dict
 

@@ -21,21 +21,6 @@ from typing import List
 
 from qgis.core import QgsRectangle
 
-from ..definitions.configurable_settings import Settings
-from ..model.config import Config
-from ..model.snapshot import Snapshot
-from ..qgis_plugin_tools.tools.settings import get_setting
-
-
-def load_config_from_template() -> Config:
-    template_path = get_setting(Settings.export_config_template.name, Settings.export_config_template.value, str)
-    return Config.from_dict(load_json(template_path))
-
-
-def load_snapshot_template() -> Snapshot:
-    template_path = get_setting(Settings.snapshot_template.name, Settings.snapshot_template.value, str)
-    return Snapshot.from_dict(load_json(template_path)['snapshot'])
-
 
 def load_json(template_path):
     with open(template_path) as f:
