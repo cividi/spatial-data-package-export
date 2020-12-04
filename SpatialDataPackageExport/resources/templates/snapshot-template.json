@@ -13,11 +13,11 @@
       "bfs_number": 1051
     },
     "format": "geojson",
-    "license": "ODC-By-1.0",
     "licenses": [
       {
         "url": "https://opendatacommons.org/licenses/by/1.0/",
-        "type": "ODC-By-1.0"
+        "type": "ODC-By-1.0",
+        "title": "Open Data Commons Attribution License"
       }
     ],
     "keywords": [

@@ -71,21 +71,24 @@ class GemeindescanMeta:
 
 class License:
 
-    def __init__(self, url: str, type: str) -> None:
+    def __init__(self, url: str, type: str, title: str) -> None:
         self.url = url
         self.type = type
+        self.title = title
 
     @staticmethod
     def from_dict(obj: Any) -> 'License':
         assert isinstance(obj, dict)
         url = from_str(obj.get("url"))
         type = from_str(obj.get("type"))
-        return License(url, type)
+        title = from_str(obj.get("title"))
+        return License(url, type, title)
 
     def to_dict(self) -> dict:
         result: dict = {}
         result["url"] = from_str(self.url)
         result["type"] = from_str(self.type)
+        result["title"] = from_str(self.title)
         return result
 
 
@@ -111,9 +114,11 @@ class Maintainer:
 
 class Resource:
 
-    def __init__(self, name: str, mediatype: str, data: Optional[Dict] = None, path: Optional[str] = None) -> None:
+    def __init__(self, name: str, mediatype: str, licenses: List[License], data: Optional[Dict] = None,
+                 path: Optional[str] = None) -> None:
         self.name = name
         self.mediatype = mediatype
+        self.licenses = licenses
         self.data = data
         self.path = path
 
@@ -122,14 +127,16 @@ class Resource:
         assert isinstance(obj, dict)
         name = from_str(obj.get("name"))
         mediatype = from_str(obj.get("mediatype"))
+        licenses = from_list(License.from_dict, obj.get("licenses", []))
         data = from_union([from_dict, from_none], obj.get("data"))
         path = from_union([from_str, from_none], obj.get("path"))
-        return Resource(name, mediatype, data, path)
+        return Resource(name, mediatype, licenses, data, path)
 
     def to_dict(self) -> dict:
         result: dict = {}
         result["name"] = from_str(self.name)
         result["mediatype"] = from_str(self.mediatype)
+        result["licenses"] = from_list(lambda x: to_class(License, x), self.licenses)
         if self.data is not None:
             result["data"] = self.data
         if self.path is not None:
@@ -258,7 +265,7 @@ class View:
 class Snapshot:
 
     def __init__(self, name: str, title: str, description: str, version: str, datapackage_version: str,
-                 gemeindescan_version: str, gemeindescan_meta: GemeindescanMeta, format: str, license: str,
+                 gemeindescan_version: str, gemeindescan_meta: GemeindescanMeta, format: str,
                  licenses: List[License], keywords: List[str], views: List[View], sources: List[Source],
                  resources: List[Resource], maintainers: List[Maintainer], contributors: List[Contributor]) -> None:
         self.name = name
@@ -269,7 +276,6 @@ class Snapshot:
         self.gemeindescan_version = gemeindescan_version
         self.gemeindescan_meta = gemeindescan_meta
         self.format = format
-        self.license = license
         self.licenses = licenses
         self.keywords = keywords
         self.views = views
@@ -289,7 +295,6 @@ class Snapshot:
         gemeindescan_version = from_str(obj.get("gemeindescan_version"))
         gemeindescan_meta = GemeindescanMeta.from_dict(obj.get("gemeindescan_meta"))
         format = from_str(obj.get("format"))
-        license = from_str(obj.get("license"))
         licenses = from_list(License.from_dict, obj.get("licenses"))
         keywords = from_list(from_str, obj.get("keywords"))
         views = from_list(View.from_dict, obj.get("views", []))
@@ -298,7 +303,7 @@ class Snapshot:
         maintainers = from_list(Maintainer.from_dict, obj.get("maintainers"))
         contributors = from_list(Contributor.from_dict, obj.get("contributors"))
         return Snapshot(name, title, description, version, datapackage_version, gemeindescan_version, gemeindescan_meta,
-                        format, license, licenses, keywords, views, sources, resources, maintainers, contributors)
+                        format, licenses, keywords, views, sources, resources, maintainers, contributors)
 
     def to_dict(self) -> dict:
         result: dict = {}
@@ -310,7 +315,6 @@ class Snapshot:
         result["gemeindescan_version"] = from_str(self.gemeindescan_version)
         result["gemeindescan_meta"] = to_class(GemeindescanMeta, self.gemeindescan_meta)
         result["format"] = from_str(self.format)
-        result["license"] = from_str(self.license)
         result["licenses"] = from_list(lambda x: to_class(License, x), self.licenses)
         result["keywords"] = from_list(from_str, self.keywords)
         result["views"] = from_list(lambda x: to_class(View, x), self.views)
