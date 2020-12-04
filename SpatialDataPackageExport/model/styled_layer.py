@@ -23,7 +23,8 @@ from typing import List, Dict, Union
 
 from qgis.core import QgsVectorFileWriter, QgsCoordinateReferenceSystem, QgsProject, QgsVectorLayer
 
-from .snapshot import Legend
+from .snapshot import Legend, License
+from ..definitions.configurable_settings import Settings
 from ..definitions.types import StyleType
 from ..qgis_plugin_tools.tools.resources import resources_path
 
@@ -43,6 +44,11 @@ class StyledLayer:
     def get_keywords(self) -> List[str]:
         keyword_lists = self.layer.metadata().keywords().values()
         return [keyword for keyword_list in keyword_lists for keyword in keyword_list]
+
+    def get_licenses(self) -> List[License]:
+        licenses = self.layer.metadata().licenses()
+        available_licenses = Settings.licences.get()
+        return [License(available_licenses.get(license_, ''), license_) for license_ in licenses]
 
     def get_geojson_data(self) -> Dict:
         source = self.layer.source()

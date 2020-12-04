@@ -97,12 +97,13 @@ class DataPackageHandler:
         return ProjectSettings.snapshot_configs.set({name: conf.to_dict() for name, conf in confs.items()})
 
     def create_snapshot(self, snapshot_name: str, snapshot_config: SnapshotConfig,
-                        styled_layers: List[StyledLayer]) -> Snapshot:
+                        styled_layers: List[StyledLayer], snapshot_license: Optional[str] = None) -> Snapshot:
         """
         Creates new Snapshot with data
         :param snapshot_name:
         :param snapshot_config:
         :param styled_layers:
+        :param snapshot_license:
         :return:
         """
         snapshot = Snapshot.from_dict(self.snapshot_template.to_dict())
@@ -114,19 +115,24 @@ class DataPackageHandler:
         snapshot.description = snapshot_config.description
         snapshot.sources = snapshot_config.sources
         snapshot.gemeindescan_meta = snapshot_config.gemeindescan_meta
+        if snapshot_license:
+            snapshot.license = snapshot_license
 
         LOGGER.debug('Updating resources')
         initial_resources = snapshot.resources
         snapshot.resources = []
         keywords = snapshot_config.keywords
+        licenses = snapshot.licenses
 
         for styled_layer in styled_layers:
             resource = Resource(styled_layer.resource_name, mediatype=styled_layer.style_type.media_type,
                                 data=styled_layer.get_geojson_data())
             keywords += styled_layer.get_keywords()
+            licenses += styled_layer.get_licenses()
             snapshot.resources.append(resource)
 
         snapshot.keywords = keywords
+        snapshot.licenses = licenses
         snapshot.resources += initial_resources
         snapshot.views[0].resources = [res.name for res in snapshot.resources]
 

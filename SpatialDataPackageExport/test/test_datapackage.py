@@ -40,6 +40,7 @@ def test_categorized_poly(new_project, categorized_poly, layer_empty_poly):
     add_layer(layer_empty_poly)
     metadata = layer_empty_poly.metadata()
     metadata.setKeywords({'test': ['kw1', 'kw2'], 'test2': ['kw3']})
+    metadata.setLicenses(['Creative Commons CC Zero', 'Creative Commons Attribution Share-Alike 4.0'])
     layer_empty_poly.setMetadata(metadata)
 
     styled_layer: StyledLayer = StyledLayer('asd', layer_empty_poly.id(), list(converter.legend.values()),
@@ -53,7 +54,7 @@ def test_categorized_poly(new_project, categorized_poly, layer_empty_poly):
     snapshot_config = list(snapshot_config.values())[0]
     snapshot_config.description = 'test description'
     snapshot_config.title = 'test title'
-    snapshot = handler.create_snapshot(name, snapshot_config, [styled_layer])
+    snapshot = handler.create_snapshot(name, snapshot_config, [styled_layer], 'Open Data Commons Open Database License')
     expected_snapshot_dict = get_test_json('snapshots', 'categorized_poly_custom_config.json')
     assert snapshot.to_dict() == expected_snapshot_dict
 

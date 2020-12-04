@@ -9,11 +9,19 @@
     "topic": "GEMEINDESCAN TOPIC"
   },
   "format": "geojson",
-  "license": "ODC-By-1.0",
+  "license": "Open Data Commons Open Database License",
   "licenses": [
     {
       "url": "https://opendatacommons.org/licenses/by/1.0/",
       "type": "ODC-By-1.0"
+    },
+    {
+      "type": "Creative Commons CC Zero",
+      "url": "https://creativecommons.org/share-your-work/public-domain/cc0/"
+    },
+    {
+      "type": "Creative Commons Attribution Share-Alike 4.0",
+      "url": "https://creativecommons.org/licenses/by-sa/4.0/"
     }
   ],
   "keywords": [

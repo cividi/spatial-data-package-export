@@ -40,6 +40,14 @@ class Settings(enum.Enum):
     snapshot_template = resources_path('templates', 'snapshot-template.json')
     layer_format = 'memory'
     crop_layers = True
+    licences = {
+        'Creative Commons CC Zero': 'https://creativecommons.org/share-your-work/public-domain/cc0/',
+        'Open Data Commons Public Domain Dedication and Licence': 'https://opendatacommons.org/licenses/pddl/',
+        'Creative Commons Attribution 4.0': 'https://creativecommons.org/licenses/by/4.0/',
+        'Open Data Commons Attribution License': 'https://opendatacommons.org/licenses/by/1-0/',
+        'Creative Commons Attribution Share-Alike 4.0': 'https://creativecommons.org/licenses/by-sa/4.0/',
+        'Open Data Commons Open Database License': 'https://opendatacommons.org/licenses/odbl/',
+    }
 
     _options = {'layer_format': [option.value for option in LayerFormatOptions]}
 
@@ -50,6 +58,8 @@ class Settings(enum.Enum):
             typehint = bool
         elif self == Settings.extent_precision:
             typehint = int
+        elif self == Settings.licences:
+            return json.loads(get_setting(self.name, json.dumps(self.value), str))
         return get_setting(self.name, self.value, typehint)
 
     def set(self, value: Union[str, int, float, bool]) -> bool:
@@ -57,6 +67,8 @@ class Settings(enum.Enum):
         options = self.get_options()
         if options and value not in options:
             raise QgsPluginException(tr('Invalid option. Choose something from values {}', options))
+        if self == Settings.licences:
+            value = json.dumps(value)
         return set_setting(self.name, value)
 
     def get_options(self) -> List[any]:
