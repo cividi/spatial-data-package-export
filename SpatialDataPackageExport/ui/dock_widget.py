@@ -102,6 +102,12 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.cb_crop_layers.setChecked(Settings.crop_layers.get())
         self.cb_crop_layers.stateChanged.connect(lambda: Settings.crop_layers.set(self.cb_crop_layers.isChecked()))
 
+        self.cb_license: QComboBox
+        self.cb_license.clear()
+        licenses = Settings.licences.get()
+        self.cb_license.addItems(list(licenses.keys()))
+        self.cb_license.setCurrentText(self.data_pkg_handler.snapshot_template.license)
+
         for name, snapshot_config in self.data_pkg_handler.config.snapshots[0].items():
             self.input_name.setText(name)
             self.input_title.setText(snapshot_config.title)
@@ -213,7 +219,8 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         snapshot_config = self.__create_snapshot_config()
         snapshot_name = self.input_name.text()
         styled_layers = [row['styled_layer'] for row in self.layer_rows.values()]
-        snapshot = self.data_pkg_handler.create_snapshot(snapshot_name, snapshot_config, styled_layers)
+        license_ = self.cb_license.currentText()
+        snapshot = self.data_pkg_handler.create_snapshot(snapshot_name, snapshot_config, styled_layers, license_)
 
         output_file = Path(output_path, f'{snapshot_name}.json')
 
