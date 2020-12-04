@@ -9,14 +9,14 @@
             <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>497</width>
-                <height>270</height>
+                <width>564</width>
+                <height>331</height>
             </rect>
         </property>
         <property name="windowTitle">
             <string>Dialog</string>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
                 <widget class="QScrollArea" name="scrollArea">
                     <property name="widgetResizable">
@@ -27,8 +27,8 @@
                             <rect>
                                 <x>0</x>
                                 <y>0</y>
-                                <width>477</width>
-                                <height>219</height>
+                                <width>544</width>
+                                <height>280</height>
                             </rect>
                         </property>
                         <layout class="QVBoxLayout" name="verticalLayout">
@@ -63,6 +63,55 @@
                                 </widget>
                             </item>
                             <item>
+                                <widget class="QGroupBox" name="groupBox_2">
+                                    <property name="title">
+                                        <string>Template paths</string>
+                                    </property>
+                                    <layout class="QVBoxLayout" name="verticalLayout_2">
+                                        <item>
+                                            <widget class="QLabel" name="label_3">
+                                                <property name="text">
+                                                    <string>QGIS has to be restarted for the change to take effect
+                                                    </string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                        <item>
+                                            <layout class="QGridLayout" name="gridLayout">
+                                                <item row="0" column="1">
+                                                    <widget class="QgsFileWidget" name="f_snapshot_template">
+                                                        <property name="filter">
+                                                            <string>*.json</string>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item row="0" column="0">
+                                                    <widget class="QLabel" name="label">
+                                                        <property name="text">
+                                                            <string>Snapshot template</string>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item row="1" column="0">
+                                                    <widget class="QLabel" name="label_2">
+                                                        <property name="text">
+                                                            <string>Configuration template</string>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item row="1" column="1">
+                                                    <widget class="QgsFileWidget" name="f_snapshot_config_template">
+                                                        <property name="filter">
+                                                            <string>*.json</string>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                            </layout>
+                                        </item>
+                                    </layout>
+                                </widget>
+                            </item>
+                            <item>
                                 <spacer name="verticalSpacer">
                                     <property name="orientation">
                                         <enum>Qt::Vertical</enum>
@@ -88,6 +137,13 @@
             </item>
         </layout>
     </widget>
+    <customwidgets>
+        <customwidget>
+            <class>QgsFileWidget</class>
+            <extends>QWidget</extends>
+            <header>qgsfilewidget.h</header>
+        </customwidget>
+    </customwidgets>
     <resources/>
     <connections>
         <connection>

@@ -65,6 +65,12 @@ class SettingsDialog(QDialog, FORM_CLASS):
         if rb_button:
             rb_button.setChecked(True)
 
+        # Template paths
+        self.f_snapshot_template.setFilePath(Settings.snapshot_template.get())
+        self.f_snapshot_template.fileChanged.connect(lambda path: Settings.snapshot_template.set(path))
+        self.f_snapshot_config_template.setFilePath(Settings.export_config_template.get())
+        self.f_snapshot_config_template.fileChanged.connect(lambda path: Settings.export_config_template.set(path))
+
     def __get_widget(self, widget_name: str) -> Optional:
         try:
             LOGGER.debug(widget_name)
