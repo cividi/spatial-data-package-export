@@ -48,7 +48,9 @@ class StyledLayer:
     def get_licenses(self) -> List[License]:
         licenses = self.layer.metadata().licenses()
         available_licenses = Settings.licences.get()
-        return [License(available_licenses.get(license_, ''), license_) for license_ in licenses]
+        return [License(available_licenses.get(license_, {}).get('url', ''),
+                        available_licenses.get(license_, {}).get('type', ''), license_)
+                for license_ in licenses]
 
     def get_geojson_data(self) -> Dict:
         source = self.layer.source()

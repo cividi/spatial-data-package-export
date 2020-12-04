@@ -21,6 +21,7 @@ import tempfile
 import pytest
 from qgis.core import QgsProject, QgsVectorLayer, QgsVectorDataProvider
 
+from ..model.snapshot import License
 from ..qgis_plugin_tools.testing.utilities import get_qgis_app
 from ..qgis_plugin_tools.tools.resources import plugin_test_data_path
 
@@ -120,6 +121,12 @@ def layer_empty_lines(tmp_dir, layer_lines):
     layer.setCrs(dp.crs())
     verify_layer_copy(layer, layer_lines)
     return layer
+
+
+@pytest.fixture
+def odc_1_0_license():
+    return License("https://opendatacommons.org/licenses/by/1.0/", "ODC-By-1.0",
+                   "Open Data Commons Attribution License")
 
 
 # Helper functions

@@ -9,13 +9,11 @@
     "topic": "Sample"
   },
   "format": "geojson",
-  "license": "Open Data Commons Attribution License",
-  "licenses": [
-    {
-      "url": "https://opendatacommons.org/licenses/by/1.0/",
-      "type": "Open Data Commons Attribution License"
-    }
-  ],
+  "licenses": {
+    "title": "Open Data Commons Attribution License",
+    "type": "ODC-By-1.0",
+    "url": "https://opendatacommons.org/licenses/by/1.0/"
+  },
   "keywords": [
     "europe",
     "switzerland",
@@ -74,6 +72,7 @@
   "resources": [
     {
       "name": "point-sample-snapshot",
+      "licenses": [],
       "data": {
         "type": "FeatureCollection",
         "name": "point-sample-snapshot",
@@ -159,6 +158,7 @@
     },
     {
       "name": "mapbox-background",
+      "licenses": [],
       "path": "mapbox://styles/gemeindescan/ck6rp249516tg1iqkmt48o4pz",
       "mediatype": "application/vnd.mapbox-vector-tile"
     }

@@ -41,12 +41,18 @@ class Settings(enum.Enum):
     layer_format = 'memory'
     crop_layers = True
     licences = {
-        'Creative Commons CC Zero': 'https://creativecommons.org/share-your-work/public-domain/cc0/',
-        'Open Data Commons Public Domain Dedication and Licence': 'https://opendatacommons.org/licenses/pddl/',
-        'Creative Commons Attribution 4.0': 'https://creativecommons.org/licenses/by/4.0/',
-        'Open Data Commons Attribution License': 'https://opendatacommons.org/licenses/by/1-0/',
-        'Creative Commons Attribution Share-Alike 4.0': 'https://creativecommons.org/licenses/by-sa/4.0/',
-        'Open Data Commons Open Database License': 'https://opendatacommons.org/licenses/odbl/',
+        'Creative Commons CC Zero': {'type': 'CC0-1.0',
+                                     'url': 'https://creativecommons.org/publicdomain/zero/1.0/'},
+        'Open Data Commons Public Domain Dedication and Licence': {'type': 'PDDL-1.0',
+                                                                   'url': 'https://opendatacommons.org/licenses/pddl/'},
+        'Creative Commons Attribution 4.0': {'type': 'CC-BY-4.0',
+                                             'url': 'https://creativecommons.org/licenses/by/4.0/'},
+        'Open Data Commons Attribution License': {'type': 'ODC-BY-1.0',
+                                                  'url': 'https://opendefinition.org/licenses/odc-by'},
+        'Creative Commons Attribution Share-Alike 4.0': {'type': 'CC-BY-SA-4.0',
+                                                         'url': 'https://creativecommons.org/licenses/by-sa/4.0/'},
+        'Open Data Commons Open Database License': {'type': 'ODbL-1.0',
+                                                    'url': 'https://opendatacommons.org/licenses/odbl/'},
     }
 
     _options = {'layer_format': [option.value for option in LayerFormatOptions]}

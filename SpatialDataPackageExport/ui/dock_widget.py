@@ -41,7 +41,7 @@ from ..core.processing.task_runner import TaskWrapper, create_styles_to_attribut
 from ..core.utils import extent_to_datapackage_bounds, datapackage_bounds_to_extent
 from ..definitions.configurable_settings import Settings, LayerFormatOptions
 from ..model.config import SnapshotConfig
-from ..model.snapshot import Legend, Source
+from ..model.snapshot import Legend, Source, License
 from ..model.styled_layer import StyledLayer
 from ..qgis_plugin_tools.tools.custom_logging import bar_msg
 from ..qgis_plugin_tools.tools.decorations import log_if_fails
@@ -106,7 +106,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.cb_license.clear()
         licenses = Settings.licences.get()
         self.cb_license.addItems(list(licenses.keys()))
-        self.cb_license.setCurrentText(self.data_pkg_handler.snapshot_template.license)
+        self.cb_license.setCurrentText(self.data_pkg_handler.snapshot_template.licenses.title)
 
         for name, snapshot_config in self.data_pkg_handler.config.snapshots[0].items():
             self.input_name.setText(name)
@@ -219,7 +219,10 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         snapshot_config = self.__create_snapshot_config()
         snapshot_name = self.input_name.text()
         styled_layers = [row['styled_layer'] for row in self.layer_rows.values()]
-        license_ = self.cb_license.currentText()
+
+        license_title = self.cb_license.currentText()
+        license_dict = Settings.licences.get().get(license_title)
+        license_ = License(license_dict['url'], license_dict['type'], license_title)
         snapshot = self.data_pkg_handler.create_snapshot(snapshot_name, snapshot_config, styled_layers, license_)
 
         output_file = Path(output_path, f'{snapshot_name}.json')

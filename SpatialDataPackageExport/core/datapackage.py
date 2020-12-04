@@ -22,7 +22,7 @@ from typing import List, Optional, Tuple, Dict
 from .utils import load_json
 from ..definitions.configurable_settings import Settings, ProjectSettings
 from ..model.config import Config, SnapshotConfig
-from ..model.snapshot import Snapshot, Resource, Legend
+from ..model.snapshot import Snapshot, Resource, Legend, License
 from ..model.styled_layer import StyledLayer
 from ..qgis_plugin_tools.tools.resources import plugin_name
 from ..qgis_plugin_tools.tools.settings import get_setting
@@ -97,7 +97,7 @@ class DataPackageHandler:
         return ProjectSettings.snapshot_configs.set({name: conf.to_dict() for name, conf in confs.items()})
 
     def create_snapshot(self, snapshot_name: str, snapshot_config: SnapshotConfig,
-                        styled_layers: List[StyledLayer], snapshot_license: Optional[str] = None) -> Snapshot:
+                        styled_layers: List[StyledLayer], snapshot_license: Optional[License] = None) -> Snapshot:
         """
         Creates new Snapshot with data
         :param snapshot_name:
@@ -116,23 +116,21 @@ class DataPackageHandler:
         snapshot.sources = snapshot_config.sources
         snapshot.gemeindescan_meta = snapshot_config.gemeindescan_meta
         if snapshot_license:
-            snapshot.license = snapshot_license
+            snapshot.licenses = snapshot_license
 
         LOGGER.debug('Updating resources')
         initial_resources = snapshot.resources
         snapshot.resources = []
         keywords = snapshot_config.keywords
-        licenses = snapshot.licenses
 
         for styled_layer in styled_layers:
             resource = Resource(styled_layer.resource_name, mediatype=styled_layer.style_type.media_type,
+                                licenses=styled_layer.get_licenses(),
                                 data=styled_layer.get_geojson_data())
             keywords += styled_layer.get_keywords()
-            licenses += styled_layer.get_licenses()
             snapshot.resources.append(resource)
 
         snapshot.keywords = keywords
-        snapshot.licenses = licenses
         snapshot.resources += initial_resources
         snapshot.views[0].resources = [res.name for res in snapshot.resources]
 

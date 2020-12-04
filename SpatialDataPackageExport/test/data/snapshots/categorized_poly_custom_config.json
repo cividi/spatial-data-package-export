@@ -9,21 +9,11 @@
     "topic": "GEMEINDESCAN TOPIC"
   },
   "format": "geojson",
-  "license": "Open Data Commons Open Database License",
-  "licenses": [
-    {
-      "url": "https://opendatacommons.org/licenses/by/1.0/",
-      "type": "Open Data Commons Attribution License"
-    },
-    {
-      "type": "Creative Commons CC Zero",
-      "url": "https://creativecommons.org/share-your-work/public-domain/cc0/"
-    },
-    {
-      "type": "Creative Commons Attribution Share-Alike 4.0",
-      "url": "https://creativecommons.org/licenses/by-sa/4.0/"
-    }
-  ],
+  "licenses": {
+    "type": "ODC-By-1.0",
+    "url": "https://opendatacommons.org/licenses/by/1.0/",
+    "title": "Open Data Commons Attribution License"
+  },
   "keywords": [
     "KEYWORD 1",
     "KEYWORD 2",
@@ -106,6 +96,18 @@
     {
       "name": "asd",
       "mediatype": "application/geo+json",
+      "licenses": [
+        {
+          "title": "Creative Commons CC Zero",
+          "type": "CC0-1.0",
+          "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+        },
+        {
+          "title": "Creative Commons Attribution Share-Alike 4.0",
+          "type": "CC-BY-SA-4.0",
+          "url": "https://creativecommons.org/licenses/by-sa/4.0/"
+        }
+      ],
       "data": {
         "type": "FeatureCollection",
         "name": "asd",
@@ -234,6 +236,7 @@
     },
     {
       "name": "mapbox-background",
+      "licenses": [],
       "mediatype": "application/vnd.mapbox-vector-tile",
       "path": "mapbox://styles/gemeindescan/ck6rp249516tg1iqkmt48o4pz"
     }
