@@ -50,18 +50,12 @@
         "mediatype": "application/vnd.mapbox-vector-tile"
       }
     ],
-    "maintainers": [
-      {
-        "web": "https://github.com/n0rdlicht/",
-        "name": "Thorben Westerhuys"
-      }
-    ],
     "contributors": [
       {
-        "web": "https://cividi.ch",
-        "role": "publisher",
-        "email": "info@cividi.ch",
-        "title": "cividi"
+        "path": "",
+        "role": "author",
+        "email": "",
+        "title": ""
       }
     ]
   },

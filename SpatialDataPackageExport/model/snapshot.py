@@ -28,8 +28,8 @@ from .model_utils import (from_str, to_class, from_list, from_float, from_union,
 
 class Contributor:
 
-    def __init__(self, web: str, role: str, email: str, title: str) -> None:
-        self.web = web
+    def __init__(self, path: str, role: str, email: str, title: str) -> None:
+        self.path = path
         self.role = role
         self.email = email
         self.title = title
@@ -37,15 +37,15 @@ class Contributor:
     @staticmethod
     def from_dict(obj: Any) -> 'Contributor':
         assert isinstance(obj, dict)
-        web = from_str(obj.get("web"))
+        path = from_str(obj.get("path"))
         role = from_str(obj.get("role"))
         email = from_str(obj.get("email"))
         title = from_str(obj.get("title"))
-        return Contributor(web, role, email, title)
+        return Contributor(path, role, email, title)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["web"] = from_str(self.web)
+        result["path"] = from_str(self.path)
         result["role"] = from_str(self.role)
         result["email"] = from_str(self.email)
         result["title"] = from_str(self.title)
@@ -89,26 +89,6 @@ class License:
         result["url"] = from_str(self.url)
         result["type"] = from_str(self.type)
         result["title"] = from_str(self.title)
-        return result
-
-
-class Maintainer:
-
-    def __init__(self, web: str, name: str) -> None:
-        self.web = web
-        self.name = name
-
-    @staticmethod
-    def from_dict(obj: Any) -> 'Maintainer':
-        assert isinstance(obj, dict)
-        web = from_str(obj.get("web"))
-        name = from_str(obj.get("name"))
-        return Maintainer(web, name)
-
-    def to_dict(self) -> dict:
-        result: dict = {}
-        result["web"] = from_str(self.web)
-        result["name"] = from_str(self.name)
         return result
 
 
@@ -267,7 +247,7 @@ class Snapshot:
     def __init__(self, name: str, title: str, description: str, version: str, datapackage_version: str,
                  gemeindescan_version: str, gemeindescan_meta: GemeindescanMeta, format: str,
                  licenses: List[License], keywords: List[str], views: List[View], sources: List[Source],
-                 resources: List[Resource], maintainers: List[Maintainer], contributors: List[Contributor]) -> None:
+                 resources: List[Resource], contributors: List[Contributor]) -> None:
         self.name = name
         self.title = title
         self.description = description
@@ -281,7 +261,6 @@ class Snapshot:
         self.views = views
         self.sources = sources
         self.resources = resources
-        self.maintainers = maintainers
         self.contributors = contributors
 
     @staticmethod
@@ -300,10 +279,9 @@ class Snapshot:
         views = from_list(View.from_dict, obj.get("views", []))
         sources = from_list(Source.from_dict, obj.get("sources"))
         resources = from_list(Resource.from_dict, obj.get("resources"))
-        maintainers = from_list(Maintainer.from_dict, obj.get("maintainers"))
         contributors = from_list(Contributor.from_dict, obj.get("contributors"))
         return Snapshot(name, title, description, version, datapackage_version, gemeindescan_version, gemeindescan_meta,
-                        format, licenses, keywords, views, sources, resources, maintainers, contributors)
+                        format, licenses, keywords, views, sources, resources, contributors)
 
     def to_dict(self) -> dict:
         result: dict = {}
@@ -320,6 +298,5 @@ class Snapshot:
         result["views"] = from_list(lambda x: to_class(View, x), self.views)
         result["sources"] = from_list(lambda x: to_class(Source, x), self.sources)
         result["resources"] = from_list(lambda x: to_class(Resource, x), self.resources)
-        result["maintainers"] = from_list(lambda x: to_class(Maintainer, x), self.maintainers)
         result["contributors"] = from_list(lambda x: to_class(Contributor, x), self.contributors)
         return result
