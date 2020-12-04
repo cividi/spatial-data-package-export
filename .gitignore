@@ -127,5 +127,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-SpatialDataPackageExport/test/data/test_data.gpkg-shm
-SpatialDataPackageExport/test/data/test_data.gpkg-wal
+SpatialDataPackageExport/test/data/test_data*.gpkg-shm
+SpatialDataPackageExport/test/data/test_data*.gpkg-wal

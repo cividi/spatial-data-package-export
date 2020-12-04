@@ -48,6 +48,8 @@ class Settings(enum.Enum):
         typehint: type = str
         if self == Settings.crop_layers:
             typehint = bool
+        elif self == Settings.extent_precision:
+            typehint = int
         return get_setting(self.name, self.value, typehint)
 
     def set(self, value: Union[str, int, float, bool]) -> bool:
@@ -64,7 +66,7 @@ class Settings(enum.Enum):
 
 @enum.unique
 class ProjectSettings(enum.Enum):
-    snapshot_configs = '[]'
+    snapshot_configs = '{}'
 
     def get(self) -> any:
         """Gets the value of the setting"""

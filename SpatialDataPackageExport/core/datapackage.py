@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 import logging
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict
 
 from .utils import load_json
 from ..definitions.configurable_settings import Settings, ProjectSettings
@@ -74,17 +74,27 @@ class DataPackageHandler:
         return Config.from_dict(load_json(template_path))
 
     @staticmethod
-    def save_settings_to_project(snapshot_config: SnapshotConfig) -> bool:
+    def get_available_settings_from_project() -> Dict[str, SnapshotConfig]:
+        """
+        Get Snapshot configurations stored in a project
+        :return: Available Snapshot configurations
+        """
+        existing_confs: Dict[str, SnapshotConfig] = {name: SnapshotConfig.from_dict(config) for name, config in
+                                                     ProjectSettings.snapshot_configs.get().items()}
+        return existing_confs
+
+    @staticmethod
+    def save_settings_to_project(snapshot_name: str, snapshot_config: SnapshotConfig) -> bool:
         """
         Saves snapshot configuration to the project settings
-        :param snapshot_config:
+        :param snapshot_name: Name of the snapshot configuration
+        :param snapshot_config: Snapshot configuration
         :return: Whether saving is successful or not
         """
-        existing_confs: List[SnapshotConfig] = [SnapshotConfig.from_dict(config) for config in
-                                                ProjectSettings.snapshot_configs.get()]
-        confs = [config for config in existing_confs if config.title != snapshot_config.title]
-        confs.append(snapshot_config)
-        return ProjectSettings.snapshot_configs.set([conf.to_dict() for conf in confs])
+        existing_confs = DataPackageHandler.get_available_settings_from_project()
+        confs = {name: config for name, config in existing_confs.items() if config.title != snapshot_config.title}
+        confs[snapshot_name] = snapshot_config
+        return ProjectSettings.snapshot_configs.set({name: conf.to_dict() for name, conf in confs.items()})
 
     def create_snapshot(self, snapshot_name: str, snapshot_config: SnapshotConfig,
                         styled_layers: List[StyledLayer]) -> Snapshot:

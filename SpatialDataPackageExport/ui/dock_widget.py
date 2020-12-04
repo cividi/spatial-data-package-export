@@ -34,10 +34,11 @@ from qgis.core import (QgsProcessingContext, QgsVectorLayer, QgsProject,
 from qgis.gui import QgsMapLayerComboBox, QgisInterface
 
 from .extent_dialog import ExtentChooserDialog
+from .load_snapshot_conf_dialog import LoadSnapshotConfDialog
 from .settings_dialog import SettingsDialog
 from ..core.datapackage import DataPackageHandler
 from ..core.processing.task_runner import TaskWrapper, create_styles_to_attributes_tasks
-from ..core.utils import extent_to_datapackage_bounds
+from ..core.utils import extent_to_datapackage_bounds, datapackage_bounds_to_extent
 from ..definitions.configurable_settings import Settings, LayerFormatOptions
 from ..model.config import SnapshotConfig
 from ..model.snapshot import Legend, Source
@@ -47,7 +48,7 @@ from ..qgis_plugin_tools.tools.decorations import log_if_fails
 from ..qgis_plugin_tools.tools.i18n import tr
 from ..qgis_plugin_tools.tools.logger_processing import LoggerProcessingFeedBack
 from ..qgis_plugin_tools.tools.resources import load_ui, plugin_name, resources_path
-from ..qgis_plugin_tools.tools.settings import get_setting, set_setting
+from ..qgis_plugin_tools.tools.settings import set_setting
 
 FORM_CLASS = load_ui('main_dialog_dock.ui')
 LOGGER = logging.getLogger(plugin_name())
@@ -84,8 +85,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     # noinspection PyUnresolvedReferences,PyCallByClass
     def __set_initial_values(self):
         # Dialog items
-        self.sb_extent_precision.setValue(
-            get_setting(Settings.extent_precision.name, Settings.extent_precision.value, int))
+        self.sb_extent_precision.setValue(Settings.extent_precision.get())
         self.le_extent.setText(
             self.extent.toString(self.sb_extent_precision.value()) if self.extent is not None else '')
 
@@ -127,11 +127,37 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         snapshot_config = SnapshotConfig.from_dict(snapshot_config_template.to_dict())
 
         snapshot_config.title = self.input_title.text()
+
         snapshot_config.description = self.input_description.toPlainText()
         snapshot_config.bounds = extent_to_datapackage_bounds(self.extent, self.sb_extent_precision.value())
         snapshot_config.sources = [Source(row['url'].text(), row['title'].text()) for row in self.source_rows.values()]
-        snapshot_config.resources = [row['layer_name'] for row in self.layer_rows.values()]
+        snapshot_config.resources = [row['layer'].currentText() for row in self.layer_rows.values()]
         return snapshot_config
+
+    def __set_ui_based_on_snapshot_configuration(self, config_name: str, snaphot_conf: SnapshotConfig):
+        self.input_title.setText(snaphot_conf.title)
+        self.input_name.setText(config_name)
+        self.input_description.setText(snaphot_conf.description)
+        self.extent = datapackage_bounds_to_extent(snaphot_conf.bounds)
+        self.le_extent.setText(
+            self.extent.toString(self.sb_extent_precision.value()) if self.extent is not None else '')
+
+        for row_uuid in list(self.source_rows.keys()):
+            self.__remove_row(row_uuid, self.source_rows, self.source_grid)
+        for i, source in enumerate(snaphot_conf.sources, start=1):
+            self.__add_source_row(i, source.url, source.title)
+
+        for row_uuid in list(self.layer_rows.keys()):
+            self.__remove_row(row_uuid, self.layer_rows, self.layer_grid)
+        for i, layer_name in enumerate(snaphot_conf.resources, start=1):
+            self.__add_layer_row(i)
+            layers = QgsProject.instance().mapLayersByName(layer_name)
+            if layers:
+                row = self.layer_rows[list(self.layer_rows.keys())[i - 1]]
+                row['layer'].setLayer(layers[0])
+            else:
+                LOGGER.warning(tr('Unable to set layer'),
+                               extra=bar_msg(tr('There is no layer named {} in the project.', layer_name)))
 
     def run(self):
         if len(self.f_output.filePath()) == 0 or len(self.input_name.text()) == 0:
@@ -191,8 +217,6 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
         with open(output_file, 'w') as f:
             json.dump(snapshot.to_dict(), f)
-
-        self.data_pkg_handler.save_settings_to_project(snapshot_config)
 
         if Settings.layer_format.get() == LayerFormatOptions.none.value:
             LOGGER.debug('Removing memory layers')
@@ -332,3 +356,37 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     def on_btn_settings_clicked(self):
         settings_dialog = SettingsDialog()
         settings_dialog.exec()
+
+    @pyqtSlot()
+    def on_btn_save_conf_clicked(self):
+        LOGGER.debug("Save conf clicked")
+        try:
+            config = self.__create_snapshot_config()
+            name = self.input_name.text()
+            self.data_pkg_handler.save_settings_to_project(name, config)
+            LOGGER.info(tr('Snapshot configuration saved'),
+                        extra=bar_msg(tr('Configuration {} saved successfully', name), success=True))
+        except (KeyError, AttributeError):
+            LOGGER.warning(tr('Unable to save Snapshot configuration'),
+                           extra=bar_msg(tr('Please select layer and bounding box before saving the configuration')))
+        except Exception as e:
+            LOGGER.exception(tr('Error occurred'),
+                             extra=bar_msg(tr('Traceback: {}. Check log file for more details', str(e))))
+
+    @pyqtSlot()
+    def on_btn_open_conf_clicked(self):
+        LOGGER.info("Open conf clicked")
+        confs = self.data_pkg_handler.get_available_settings_from_project()
+        if not confs:
+            LOGGER.info(tr('No saved Snapshot configurations'),
+                        extra=bar_msg(tr('There are no saved snapshot configurations in the project')))
+            return
+
+        load_dialog = LoadSnapshotConfDialog(list(confs.keys()))
+        result = load_dialog.exec()
+        if result:
+            config_name = load_dialog.get_chosen_snapshot_config_name()
+            LOGGER.debug(f"Chosen snapshot config: {config_name}")
+            self.__set_ui_based_on_snapshot_configuration(config_name, confs[config_name])
+            LOGGER.info(tr('Snapshot configuration loaded'),
+                        extra=bar_msg(tr('Configuration {} loaded successfully', config_name), success=True))
