@@ -244,6 +244,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                     output_layer = QgsVectorLayer(str(geojson_path), output_layer.name())
                     QgsProject.instance().removeMapLayer(styled_layer.layer_id)
                     QgsProject.instance().addMapLayer(output_layer)
+
                     styled_layer.layer_id = output_layer.id()
 
                 with tempfile.TemporaryDirectory(dir=resources_path()) as tmpdirname:
@@ -253,6 +254,8 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                         output_layer.loadNamedStyle(style_file)
                     else:
                         LOGGER.error(tr('Could not load style'), extra=bar_msg(msg))
+
+                output_layer.setMetadata(input_layer.metadata())
 
                 row['styled_layer'] = styled_layer
 

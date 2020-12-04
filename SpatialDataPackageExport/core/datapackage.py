@@ -112,19 +112,21 @@ class DataPackageHandler:
         snapshot.views[0].spec.title = snapshot_config.title
         snapshot.views[0].spec.description = snapshot_config.description
         snapshot.description = snapshot_config.description
-        snapshot.keywords = snapshot_config.keywords
         snapshot.sources = snapshot_config.sources
         snapshot.gemeindescan_meta = snapshot_config.gemeindescan_meta
 
         LOGGER.debug('Updating resources')
         initial_resources = snapshot.resources
         snapshot.resources = []
+        keywords = snapshot_config.keywords
 
         for styled_layer in styled_layers:
             resource = Resource(styled_layer.resource_name, mediatype=styled_layer.style_type.media_type,
                                 data=styled_layer.get_geojson_data())
+            keywords += styled_layer.get_keywords()
             snapshot.resources.append(resource)
 
+        snapshot.keywords = keywords
         snapshot.resources += initial_resources
         snapshot.views[0].resources = [res.name for res in snapshot.resources]
 
