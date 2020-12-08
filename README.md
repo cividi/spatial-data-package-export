@@ -19,16 +19,24 @@ Main development by [Gispo Ltd](https://www.gispo.fi/en/home/).
 ### Installation instructions
 
 The plugin can be installed by downloading a release from this 
-repository or a stable release from the QGIS Plugin Repository:
+repository or a stable release from the [QGIS Plugin Repository](https://plugins.qgis.org/plugins/SpatialDataPackageExport/).
 
-1. Download the latest release zip from GitHub releases (above).
+To download from GitHub:
 
-🚨 Make sure to grab the first asset (zip of compiled version) and not the source code zip
+1. Download the latest release from [Releases](https://github.com/cividi/spatial-data-package-export/releases).
+
+    - [Latest stable version](https://github.com/cividi/spatial-data-package-export/releases/download/0.1.0/SpatialDataPackageExport.0.1.0.zip)
+    - [Latest testing version](https://github.com/cividi/spatial-data-package-export/releases/download/0.2.0-rc1/SpatialDataPackageExport.0.2.0-rc1.zip)
 
 2. Launch QGIS and the plugins menu by selecting Plugins - Manage and Install Plugins from the top menu.
 
 3. Select the Install from ZIP tab, browse to the zip file you just downloaded, and click Install Plugin!
 
+#### Troubleshooting notes
+
+> Unable to Install Plugin - No Python Support Detected
+
+[Some versions of QGIS](https://github.com/qgis/QGIS/issues/32135) on some operating systems come without a working python environment. Seen on fresh installs on Fedora 33.
 
 ### Supported QGIS Symbol Types and Symbol Layer Types
 

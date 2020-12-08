@@ -555,11 +555,11 @@
                              <widget class="QLabel" name="metadataLabel">
                                  <property name="text">
                                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This tool exports Spatial
-                                         Data Packages, compatible with
+                                         Data Packages, compatible with the
                                          &lt;a href=&quot;
-                                         https://bitbucket.org/cividi/gemeindescan-webui&quot;&gt;&lt;span style=&quot;text-decoration:
+                                         https://github.com/cividi/spatial-data-package-platform&quot;&gt;&lt;span style=&quot;text-decoration:
                                          underline;&quot;&gt;
-                                         Gemeindescan.&lt;/span&gt;&lt;/a&gt;
+                                         Spatial Data Package Platform.&lt;/span&gt;&lt;/a&gt;
                                          The Spatial Data Package is based on the &lt;a href=&quot;https://frictionlessdata.io/&quot;&gt;&lt;span
                                          style=&quot;
                                          text-decoration: underline;&quot;&gt;Frictionless Data specifications.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Main
