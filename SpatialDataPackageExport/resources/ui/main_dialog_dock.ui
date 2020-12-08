@@ -51,7 +51,7 @@
                                  </size>
                              </property>
                              <property name="toolTip">
-                                 <string>Save Snapshot cnfiguration to the project</string>
+                                 <string>Save Snapshot configuration to the project</string>
                              </property>
                              <property name="text">
                                  <string/>
