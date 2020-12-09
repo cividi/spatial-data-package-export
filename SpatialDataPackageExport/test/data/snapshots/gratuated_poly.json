@@ -1,0 +1,251 @@
+{
+  "name": "simple-poly",
+  "title": "test title",
+  "description": "test description",
+  "version": "1.0.0",
+  "datapackage_version": "1.0.0",
+  "gemeindescan_version": "0.3.1",
+  "gemeindescan_meta": {
+    "topic": "GEMEINDESCAN TOPIC"
+  },
+  "format": "geojson",
+  "licenses": [
+    {
+      "url": "https://opendatacommons.org/licenses/by/1.0/",
+      "type": "ODC-By-1.0",
+      "title": "Open Data Commons Attribution License"
+    }
+  ],
+  "keywords": [
+    "KEYWORD 1",
+    "KEYWORD 2"
+  ],
+  "views": [
+    {
+      "name": "mapview",
+      "specType": "gemeindescanSnapshot",
+      "spec": {
+        "title": "test title",
+        "description": "test description",
+        "attribution": "",
+        "bounds": [
+          "geo:8.35507485,47.06690836",
+          "geo:8.37991615,47.07424457"
+        ],
+        "legend": [
+          {
+            "label": "1 - 1,6",
+            "size": 1,
+            "shape": "square",
+            "primary": false,
+            "fillColor": "#ffffff",
+            "fillOpacity": 1.0,
+            "strokeColor": "#232323",
+            "strokeWidth": 0.26,
+            "strokeOpacity": 1.0
+          },
+          {
+            "label": "1,6 - 2,2",
+            "size": 1,
+            "shape": "square",
+            "primary": false,
+            "fillColor": "#ffbfbf",
+            "fillOpacity": 1.0,
+            "strokeColor": "#232323",
+            "strokeWidth": 0.26,
+            "strokeOpacity": 1.0
+          },
+          {
+            "label": "2,2 - 2,8",
+            "size": 1,
+            "shape": "square",
+            "primary": false,
+            "fillColor": "#ff8080",
+            "fillOpacity": 1.0,
+            "strokeColor": "#232323",
+            "strokeWidth": 0.26,
+            "strokeOpacity": 1.0
+          },
+          {
+            "label": "2,8 - 11,6",
+            "size": 1,
+            "shape": "square",
+            "primary": false,
+            "fillColor": "#ff4040",
+            "fillOpacity": 1.0,
+            "strokeColor": "#232323",
+            "strokeWidth": 0.26,
+            "strokeOpacity": 1.0
+          },
+          {
+            "label": "11,6 - 12",
+            "size": 1,
+            "shape": "square",
+            "primary": false,
+            "fillColor": "#ff0000",
+            "fillOpacity": 1.0,
+            "strokeColor": "#232323",
+            "strokeWidth": 0.26,
+            "strokeOpacity": 1.0
+          }
+        ]
+      },
+      "resources": [
+        "asd",
+        "mapbox-background"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "url": "SOURCE URL",
+      "title": "SOURCE TITLE/DESCRIPTION"
+    }
+  ],
+  "resources": [
+    {
+      "name": "asd",
+      "mediatype": "application/geo+json",
+      "licenses": [],
+      "data": {
+        "type": "FeatureCollection",
+        "name": "asd",
+        "crs": {
+          "type": "name",
+          "properties": {
+            "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+          }
+        },
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "fid": 1,
+              "asd": 1,
+              "fill": "#ffffff",
+              "fill-opacity": 1.0,
+              "stroke": "#232323",
+              "stroke-opacity": 1.0,
+              "stroke-width": 0.26
+            },
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    25.7164,
+                    60.7097
+                  ],
+                  [
+                    26.1841,
+                    60.543
+                  ],
+                  [
+                    25.6994,
+                    60.5148
+                  ],
+                  [
+                    25.6994,
+                    60.5148
+                  ],
+                  [
+                    25.7164,
+                    60.7097
+                  ]
+                ]
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "fid": 2,
+              "asd": 2,
+              "fill": "#ffbfbf",
+              "fill-opacity": 1.0,
+              "stroke": "#232323",
+              "stroke-opacity": 1.0,
+              "stroke-width": 0.26
+            },
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    25.6056,
+                    60.4003
+                  ],
+                  [
+                    25.7168,
+                    60.2838
+                  ],
+                  [
+                    25.3571,
+                    60.288
+                  ],
+                  [
+                    25.6056,
+                    60.4003
+                  ]
+                ]
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {
+              "fid": 3,
+              "asd": 3,
+              "fill": "#ff4040",
+              "fill-opacity": 1.0,
+              "stroke": "#232323",
+              "stroke-opacity": 1.0,
+              "stroke-width": 0.26
+            },
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [
+                    24.6498,
+                    60.5776
+                  ],
+                  [
+                    24.9582,
+                    60.5258
+                  ],
+                  [
+                    24.7483,
+                    60.348
+                  ],
+                  [
+                    24.4788,
+                    60.4446
+                  ],
+                  [
+                    24.6498,
+                    60.5776
+                  ]
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "mapbox-background",
+      "mediatype": "application/vnd.mapbox-vector-tile",
+      "licenses": [],
+      "path": "mapbox://styles/gemeindescan/ck6rp249516tg1iqkmt48o4pz"
+    }
+  ],
+  "contributors": [
+    {
+      "path": "",
+      "role": "author",
+      "email": "",
+      "title": "test_author"
+    }
+  ]
+}

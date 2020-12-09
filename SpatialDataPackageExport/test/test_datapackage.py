@@ -66,6 +66,36 @@ def test_categorized_poly(new_project, categorized_poly, layer_empty_poly,odc_1_
     expected_snapshot_dict = get_test_json('snapshots', 'categorized_poly_custom_config.json')
     assert snapshot.to_dict() == expected_snapshot_dict
 
+def test_gratuated_poly(new_project, gratuated_poly, layer_empty_poly, monkeypatch):
+    # Mock get_project_author
+    monkeypatch.setattr(DataPackageHandler, 'get_project_author', mock_auth)
+
+    converter = StylesToAttributes(gratuated_poly, gratuated_poly.name(), QgsProcessingFeedback())
+    update_fields(converter, layer_empty_poly)
+    layer_empty_poly.startEditing()
+    converter.extract_styles_to_layer(layer_empty_poly)
+    layer_empty_poly.commitChanges()
+    add_layer(layer_empty_poly)
+    metadata = layer_empty_poly.metadata()
+    layer_empty_poly.setMetadata(metadata)
+
+    styled_layer: StyledLayer = StyledLayer('asd', layer_empty_poly.id(), list(converter.legend.values()),
+                                            StyleType.SimpleStyle)
+    with open(plugin_test_data_path('config', 'config_simple_poly.json')) as f:
+        config = Config.from_dict(json.load(f))
+
+    handler = DataPackageHandler.create(config)
+    snapshot_config = config.snapshots[0]
+    name = list(snapshot_config.keys())[0]
+    snapshot_config = list(snapshot_config.values())[0]
+    snapshot_config.description = 'test description'
+    snapshot_config.title = 'test title'
+
+    snapshot = handler.create_snapshot(name, snapshot_config, [styled_layer])
+    expected_snapshot_dict = get_test_json('snapshots', 'gratuated_poly.json')
+    print(json.dumps(snapshot.to_dict()))
+
+    assert snapshot.to_dict() == expected_snapshot_dict
 
 def test_points_with_radius(new_project, points_with_radius, layer_empty_points, monkeypatch):
     # Mock get_project_author
