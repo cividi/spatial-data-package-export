@@ -58,7 +58,6 @@ class StylesToAttributes:
         self.fields: QgsFields = self._generate_fields()
         self.legend = {}
 
-
     @staticmethod
     def _rgb_extract(prop):
         _prop = list(map(int, prop.split(",")))
@@ -66,8 +65,9 @@ class StylesToAttributes:
         alpha = round(_prop[-1] / 255, 2)
         return _rgb, alpha
 
-    def get_legend(self) -> Dict:
-        return {label: legend.to_dict() for label, legend in self.legend.items()}
+    def get_legend(self) -> List:
+        self.feedback.pushDebugInfo(f'Labels: {list(self.legend.keys())}')
+        return [legend.to_dict() for legend in self.legend.values()]
 
     def get_symbols(self) -> Dict:
         return {key: {**val, 'style': val['style'].to_dict()} for key, val in self.symbols.items()}

@@ -77,6 +77,13 @@ def centroid_poly(layer_simple_poly):
 
 
 @pytest.fixture
+def gratuated_poly(layer_simple_poly):
+    add_layer(layer_simple_poly)
+    set_styles(layer_simple_poly, 'gratuated_poly.qml')
+    return layer_simple_poly
+
+
+@pytest.fixture
 def points_with_radius(layer_points):
     add_layer(layer_points)
     set_styles(layer_points, 'points_with_radius.qml')

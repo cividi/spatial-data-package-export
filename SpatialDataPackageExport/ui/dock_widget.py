@@ -242,7 +242,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                                         succesful: bool, results: Dict[str, any]) -> None:
         row = self.layer_rows[id]
         if succesful:
-            legends = [Legend.from_dict(legend) for legend in results["OUTPUT_LEGEND"].values()]
+            legends = [Legend.from_dict(legend) for legend in results["OUTPUT_LEGEND"]]
             style_type = results['OUTPUT_STYLE_TYPE']
             LOGGER.info(tr('Exporting styles for {} ({}) finished successfully', input_layer.name(), style_type))
 
