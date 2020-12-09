@@ -1,5 +1,6 @@
 # Spatial Data Package Export
 ![](https://github.com/cividi/spatial-data-package-export/workflows/Tests/badge.svg)
+[![codecov.io](https://codecov.io/github/cividi/spatial-data-package-export/coverage.svg?branch=master)](https://codecov.io/github/cividi/spatial-data-package-export?branch=master)
 ![](https://github.com/cividi/spatial-data-package-export/workflows/Release/badge.svg)
 
 QGIS plugin to export data and styles to Spatial Data Packages that can be uploaded on the [Spatial Data Package Platform](https://github.com/cividi/spatial-data-package-platform), e.g. [gemeindescan.ch](https://gemeindescan.ch).
