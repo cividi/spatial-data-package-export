@@ -31,7 +31,7 @@ from PyQt5.QtWidgets import QCheckBox, QGridLayout, QPushButton, QWidget, QLineE
 from qgis.PyQt import QtWidgets
 from qgis.core import (QgsProcessingContext, QgsVectorLayer, QgsProject,
                        QgsMapLayerProxyModel, QgsRectangle, QgsApplication)
-from qgis.gui import QgsMapLayerComboBox, QgisInterface
+from qgis.gui import QgsMapLayerComboBox, QgisInterface, QgsFileWidget
 
 from .extent_dialog import ExtentChooserDialog
 from .load_snapshot_conf_dialog import LoadSnapshotConfDialog
@@ -40,7 +40,7 @@ from ..core.datapackage import DataPackageHandler
 from ..core.processing.task_runner import TaskWrapper, create_styles_to_attributes_tasks
 from ..core.utils import extent_to_datapackage_bounds, datapackage_bounds_to_extent
 from ..definitions.configurable_settings import Settings, LayerFormatOptions
-from ..model.config import SnapshotConfig
+from ..model.config import SnapshotConfig, SnapshotResource, Config
 from ..model.snapshot import Legend, Source, License
 from ..model.styled_layer import StyledLayer
 from ..qgis_plugin_tools.tools.custom_logging import bar_msg
@@ -85,9 +85,6 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     # noinspection PyUnresolvedReferences,PyCallByClass
     def __set_initial_values(self):
         # Dialog items
-        self.sb_extent_precision.setValue(Settings.extent_precision.get())
-        self.le_extent.setText(
-            self.extent.toString(self.sb_extent_precision.value()) if self.extent is not None else '')
 
         self.btn_add_layer_row.setIcon(QgsApplication.getThemeIcon('/mActionAdd.svg'))
         self.btn_add_layer_row.clicked.connect(lambda _: self.__add_layer_row(len(self.layer_rows) + 1))
@@ -98,31 +95,23 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.btn_export.clicked.connect(self.run)
         self.btn_reset_settings.clicked.connect(self.__set_initial_values)
 
-        self.cb_crop_layers: QCheckBox
-        self.cb_crop_layers.setChecked(Settings.crop_layers.get())
-        self.cb_crop_layers.stateChanged.connect(lambda: Settings.crop_layers.set(self.cb_crop_layers.isChecked()))
-
         self.cb_license: QComboBox
         self.cb_license.clear()
         licenses = Settings.licences.get()
         self.cb_license.addItems(list(licenses.keys()))
-        self.cb_license.setCurrentText(self.data_pkg_handler.snapshot_template.licenses[0].title)
 
+        name = ''
         for name, snapshot_config in self.data_pkg_handler.config.snapshots[0].items():
-            self.input_name.setText(name)
-            self.input_title.setText(snapshot_config.title)
-            self.input_description.setText(snapshot_config.description)
-            self.input_keywords.setText('\n'.join(snapshot_config.keywords))
             break
 
-        for i, source in enumerate(self.data_pkg_handler.snapshot_template.sources, start=1):
-            self.__add_source_row(1, source.url, source.title)
-        self.__add_layer_row(1)
+        self.__set_ui_based_on_snapshot_configuration(name, self.data_pkg_handler.config)
 
     def __create_snapshot_config(self):
-        snapshot_config_template = None
-        for snapshot_config_template in self.data_pkg_handler.config.snapshots[0].values():
-            break
+        config = Config.from_dict(self.data_pkg_handler.config.to_dict())
+
+        config.project_name = self.f_output.filePath()
+
+        snapshot_config_template = config.get_snapshot_config()
 
         if snapshot_config_template is None:
             LOGGER.warning(tr('Check your snapshot configuration'),
@@ -139,33 +128,61 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         snapshot_config.keywords = [keyword.strip() for keyword in self.input_keywords.toPlainText().split('\n')]
         snapshot_config.bounds = extent_to_datapackage_bounds(self.extent, self.sb_extent_precision.value())
         snapshot_config.sources = [Source(row['url'].text(), row['title'].text()) for row in self.source_rows.values()]
-        snapshot_config.resources = [row['layer'].currentText() for row in self.layer_rows.values()]
-        return snapshot_config
+        snapshot_config.resources = [
+            SnapshotResource(row['layer'].currentText(), row['primary'].isChecked(), row['legend_shape'].currentText())
+            for row
+            in self.layer_rows.values()]
+        snapshot_config.bounds_precision = self.sb_extent_precision.value()
+        snapshot_config.crop_layers = self.cb_crop_layers.isChecked()
+        snapshot_config.licenses = [License.from_setting(self.cb_license.currentText(),
+                                                         Settings.licences.get().get(self.cb_license.currentText()))]
+        config.snapshots = [{self.input_name.text(): snapshot_config}]
+        return config, snapshot_config
 
-    def __set_ui_based_on_snapshot_configuration(self, config_name: str, snaphot_conf: SnapshotConfig):
-        self.input_title.setText(snaphot_conf.title)
+    def __set_ui_based_on_snapshot_configuration(self, config_name: str, config: Config):
+        snapshot_conf = config.get_snapshot_config()
+        if snapshot_conf is None:
+            LOGGER.error(
+                tr('Configuration does not contain any snapshots!', extra=bar_msg(tr('Check your configuration'))))
+
+        self.input_title.setText(snapshot_conf.title)
         self.input_name.setText(config_name)
-        self.input_description.setText(snaphot_conf.description)
-        self.extent = datapackage_bounds_to_extent(snaphot_conf.bounds)
+        self.input_description.setText(snapshot_conf.description)
+        self.input_keywords.setText('\n'.join(snapshot_conf.keywords))
+        self.extent = datapackage_bounds_to_extent(snapshot_conf.bounds)
+        self.sb_extent_precision.setValue(snapshot_conf.bounds_precision)
+
+        self.f_output: QgsFileWidget
+        if config.project_name:
+            self.f_output.setFilePath(config.project_name)
+
+        self.cb_crop_layers: QCheckBox
+        self.cb_crop_layers.setChecked(snapshot_conf.crop_layers)
+
+        if snapshot_conf.licenses:
+            self.cb_license.setCurrentText(snapshot_conf.licenses[0].title)
+
         self.le_extent.setText(
             self.extent.toString(self.sb_extent_precision.value()) if self.extent is not None else '')
 
         for row_uuid in list(self.source_rows.keys()):
             self.__remove_row(row_uuid, self.source_rows, self.source_grid)
-        for i, source in enumerate(snaphot_conf.sources, start=1):
+        for i, source in enumerate(snapshot_conf.sources, start=1):
             self.__add_source_row(i, source.url, source.title)
 
         for row_uuid in list(self.layer_rows.keys()):
             self.__remove_row(row_uuid, self.layer_rows, self.layer_grid)
-        for i, layer_name in enumerate(snaphot_conf.resources, start=1):
-            self.__add_layer_row(i)
-            layers = QgsProject.instance().mapLayersByName(layer_name)
+        for i, layer_resource in enumerate(snapshot_conf.resources, start=1):
+            layers = QgsProject.instance().mapLayersByName(layer_resource.name)
             if layers:
-                row = self.layer_rows[list(self.layer_rows.keys())[i - 1]]
-                row['layer'].setLayer(layers[0])
+                self.__add_layer_row(i, layer_resource, layers[0])
             else:
                 LOGGER.warning(tr('Unable to set layer'),
-                               extra=bar_msg(tr('There is no layer named {} in the project.', layer_name)))
+                               extra=bar_msg(tr('There is no layer named {} in the project.', layer_resource.name)))
+
+        # Add one row initially
+        if not snapshot_conf.resources:
+            self.__add_layer_row(1)
 
     def run(self):
         if len(self.f_output.filePath()) == 0 or len(self.input_name.text()) == 0:
@@ -216,7 +233,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
         output_path = Path(self.f_output.filePath())
 
-        snapshot_config = self.__create_snapshot_config()
+        _, snapshot_config = self.__create_snapshot_config()
         snapshot_name = self.input_name.text()
         styled_layers = [row['styled_layer'] for row in self.layer_rows.values()]
 
@@ -281,7 +298,8 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
     # noinspection PyUnresolvedReferences
     @log_if_fails
-    def __add_layer_row(self, row_index: int):
+    def __add_layer_row(self, row_index: int, layer_resource: Optional[SnapshotResource] = None,
+                        layer: Optional[QgsVectorLayer] = None):
         row_uuid = str(uuid.uuid4())
         b_rm = QPushButton(text='', icon=QgsApplication.getThemeIcon('/mActionRemove.svg'))
         b_rm.setToolTip(tr('Remove row'))
@@ -292,8 +310,15 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                                                           QgsMapLayerProxyModel.Filter.PolygonLayer |
                                                           QgsMapLayerProxyModel.Filter.LineLayer))
         cb_primary = QCheckBox(text='')
+
         combo_box_shape = QComboBox()
         combo_box_shape.addItems(('automatic', 'circle', 'square', 'line'))
+
+        # Fill values
+        if layer_resource and layer:
+            bx_layer.setLayer(layer)
+            cb_primary.setChecked(layer_resource.primary)
+            combo_box_shape.setCurrentText(layer_resource.shape)
 
         row = {
             'layer': bx_layer,
@@ -376,7 +401,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     def on_btn_save_conf_clicked(self):
         LOGGER.debug("Save conf clicked")
         try:
-            config = self.__create_snapshot_config()
+            config, _ = self.__create_snapshot_config()
             name = self.input_name.text()
             self.data_pkg_handler.save_settings_to_project(name, config)
             LOGGER.info(tr('Snapshot configuration saved'),

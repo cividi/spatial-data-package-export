@@ -75,26 +75,26 @@ class DataPackageHandler:
         return Config.from_dict(load_json(template_path))
 
     @staticmethod
-    def get_available_settings_from_project() -> Dict[str, SnapshotConfig]:
+    def get_available_settings_from_project() -> Dict[str, Config]:
         """
         Get Snapshot configurations stored in a project
         :return: Available Snapshot configurations
         """
-        existing_confs: Dict[str, SnapshotConfig] = {name: SnapshotConfig.from_dict(config) for name, config in
-                                                     ProjectSettings.snapshot_configs.get().items()}
+        existing_confs: Dict[str, Config] = {name: Config.from_dict(config) for name, config in
+                                             ProjectSettings.snapshot_configs.get().items()}
         return existing_confs
 
     @staticmethod
-    def save_settings_to_project(snapshot_name: str, snapshot_config: SnapshotConfig) -> bool:
+    def save_settings_to_project(snapshot_name: str, config: Config) -> bool:
         """
         Saves snapshot configuration to the project settings
-        :param snapshot_name: Name of the snapshot configuration
-        :param snapshot_config: Snapshot configuration
+        :param snapshot_name: Name of the snapshot
+        :param config: Snapshot configuration
         :return: Whether saving is successful or not
         """
         existing_confs = DataPackageHandler.get_available_settings_from_project()
-        confs = {name: config for name, config in existing_confs.items() if config.title != snapshot_config.title}
-        confs[snapshot_name] = snapshot_config
+        confs = {name: config for name, config in existing_confs.items() if name != snapshot_name}
+        confs[snapshot_name] = config
         return ProjectSettings.snapshot_configs.set({name: conf.to_dict() for name, conf in confs.items()})
 
     @staticmethod

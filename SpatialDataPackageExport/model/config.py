@@ -22,8 +22,31 @@ Generated using https://app.quicktype.io/ from json file
 
 from typing import Optional, Any, List, Dict
 
-from .model_utils import (from_str, to_class, from_list, from_union, from_none, from_list_dict)
-from .snapshot import Source, GemeindescanMeta
+from .model_utils import (from_str, to_class, from_list, from_union, from_none, from_int, from_bool, from_list_dict)
+from .snapshot import Source, GemeindescanMeta, License
+
+
+class SnapshotResource:
+
+    def __init__(self, name: str, primary: bool, shape: str):
+        self.name = name
+        self.primary = primary
+        self.shape = shape
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'SnapshotResource':
+        assert isinstance(obj, dict)
+        name = from_str(obj.get("name"))
+        primary = from_bool(obj.get("primary"))
+        shape = from_str(obj.get("shape"))
+        return SnapshotResource(name, primary, shape)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["name"] = from_str(self.name)
+        result["primary"] = from_bool(self.primary)
+        result["shape"] = from_str(self.shape)
+        return result
 
 
 class SnapshotConfig:
@@ -31,7 +54,9 @@ class SnapshotConfig:
     def __init__(self, title: Optional[str] = None, description: Optional[str] = None,
                  keywords: Optional[List[str]] = None, gemeindescan_meta: Optional[GemeindescanMeta] = None,
                  bounds: Optional[List[str]] = None, sources: Optional[List[Source]] = None,
-                 resources: Optional[List[str]] = None) -> None:
+                 resources: Optional[List[SnapshotResource]] = None,
+                 licenses: Optional[List[License]] = None, bounds_precision: Optional[int] = None,
+                 crop_layers: Optional[bool] = None) -> None:
         self.title = title
         self.description = description
         self.keywords = keywords
@@ -39,6 +64,9 @@ class SnapshotConfig:
         self.bounds = bounds
         self.sources = sources
         self.resources = resources
+        self.licenses = licenses
+        self.bounds_precision = bounds_precision
+        self.crop_layers = crop_layers
 
     @staticmethod
     def from_dict(obj: Any) -> 'SnapshotConfig':
@@ -49,8 +77,12 @@ class SnapshotConfig:
         gemeindescan_meta = from_union([GemeindescanMeta.from_dict, from_none], obj.get("gemeindescan_meta"))
         bounds = from_union([lambda x: from_list(from_str, x), from_none], obj.get("bounds"))
         sources = from_union([lambda x: from_list(Source.from_dict, x), from_none], obj.get("sources"))
-        resources = from_union([lambda x: from_list(from_str, x), from_none], obj.get("resources"))
-        return SnapshotConfig(title, description, keywords, gemeindescan_meta, bounds, sources, resources)
+        resources = from_union([lambda x: from_list(SnapshotResource.from_dict, x), from_none], obj.get("resources"))
+        licenses = from_union([lambda x: from_list(License.from_dict, x), from_none], obj.get("licenses"))
+        bounds_precision = from_union([from_int, from_none], obj.get("bounds_precision"))
+        crop_layers = from_union([from_bool, from_none], obj.get("crop_layers"))
+        return SnapshotConfig(title, description, keywords, gemeindescan_meta, bounds, sources, resources, licenses,
+                              bounds_precision, crop_layers)
 
     def to_dict(self) -> dict:
         result: dict = {}
@@ -61,7 +93,13 @@ class SnapshotConfig:
                                                  self.gemeindescan_meta)
         result["bounds"] = from_union([lambda x: from_list(from_str, x), from_none], self.bounds)
         result["sources"] = from_union([lambda x: from_list(lambda x: to_class(Source, x), x), from_none], self.sources)
-        result["resources"] = from_union([lambda x: from_list(from_str, x), from_none], self.resources)
+        result["resources"] = from_union([lambda x: from_list(lambda x: to_class(SnapshotResource, x), x), from_none],
+                                         self.resources)
+        result["licenses"] = from_union(
+            [lambda x: from_list(lambda x: to_class(License, x), x), from_none],
+            self.licenses)
+        result["bounds_precision"] = from_union([from_int, from_none], self.bounds_precision)
+        result["crop_layers"] = from_union([from_bool, from_none], self.crop_layers)
         return result
 
 
@@ -96,3 +134,9 @@ class Config:
             [lambda x: from_list_dict(lambda x: to_class(SnapshotConfig, x), x), from_none],
             self.snapshots)
         return result
+
+    def get_snapshot_config(self) -> Optional[SnapshotConfig]:
+        if self.snapshots:
+            values = list(self.snapshots[0].values())
+            if values:
+                return values[0]

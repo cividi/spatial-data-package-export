@@ -35,7 +35,7 @@ def mock_auth(*args, **kwargs):
     return 'test_author'
 
 
-def test_categorized_poly(new_project, categorized_poly, layer_empty_poly,odc_1_0_license,  monkeypatch):
+def test_categorized_poly(new_project, categorized_poly, layer_empty_poly, odc_1_0_license, monkeypatch):
     # Mock get_project_author
     monkeypatch.setattr(DataPackageHandler, 'get_project_author', mock_auth)
 
@@ -130,6 +130,18 @@ def test_styled_layer(tmp_path, points_with_radius):
                                             StyleType.PointStyle)
     styled_layer.save_as_geojson(tmp_path)
     assert Path(tmp_path, 'point-sample-snapshot.geojson').exists()
+
+
+def test_config_saving_and_loading(new_project):
+    with open(plugin_test_data_path('config', 'config_simple_poly.json')) as f:
+        config = Config.from_dict(json.load(f))
+    config.snapshots = [{'test': config.get_snapshot_config()}]
+    DataPackageHandler.save_settings_to_project('test', config)
+
+    available_configs = DataPackageHandler.get_available_settings_from_project()
+    assert 'test' in available_configs
+    loaded_conf = available_configs['test']
+    assert loaded_conf.to_dict() == config.to_dict()
 
 
 def update_fields(converter: StylesToAttributes, layer: QgsVectorLayer):

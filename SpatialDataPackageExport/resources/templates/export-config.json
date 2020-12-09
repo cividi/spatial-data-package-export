@@ -1,5 +1,5 @@
 {
-  "project_name": "PROJECT-FOLDER-NAME",
+  "project_name": "",
   "data_dir": "data",
   "snapshots_dir": "snapshots",
   "dp_template_file": "lib/template.json",
@@ -21,14 +21,20 @@
         ],
         "sources": [
           {
-            "url": "SOURCE URL",
-            "title": "SOURCE TITLE/DESCRIPTION"
+            "url": "https://www.openstreetmap.org/copyright",
+            "title": "Karte: Mapbox, \u00a9 OpenStreetMap"
           }
         ],
-        "resources": [
-          "LAYER-01 (as named in QGIS)",
-          "LAYER-02 (as named in QGIS)"
-        ]
+        "resources": [],
+        "licenses": [
+          {
+            "url": "https://opendatacommons.org/licenses/by/1.0/",
+            "type": "ODC-By-1.0",
+            "title": "Open Data Commons Attribution License"
+          }
+        ],
+        "bounds_precision": 8,
+        "crop_layers": true
       }
     }
   ]
