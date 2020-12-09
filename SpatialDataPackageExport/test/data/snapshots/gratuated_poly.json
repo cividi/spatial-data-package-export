@@ -9,13 +9,7 @@
     "topic": "GEMEINDESCAN TOPIC"
   },
   "format": "geojson",
-  "licenses": [
-    {
-      "url": "https://opendatacommons.org/licenses/by/1.0/",
-      "type": "ODC-By-1.0",
-      "title": "Open Data Commons Attribution License"
-    }
-  ],
+  "licenses": [],
   "keywords": [
     "KEYWORD 1",
     "KEYWORD 2"
