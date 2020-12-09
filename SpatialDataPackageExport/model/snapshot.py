@@ -84,6 +84,10 @@ class License:
         title = from_str(obj.get("title"))
         return License(url, type, title)
 
+    @staticmethod
+    def from_setting(title: str, vals: Dict[str, str]):
+        return License.from_dict({**{'title': title}, **vals})
+
     def to_dict(self) -> dict:
         result: dict = {}
         result["url"] = from_str(self.url)

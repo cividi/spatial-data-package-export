@@ -34,4 +34,11 @@ def test_config_from_template():
     with open(resources_path('templates', 'export-config.json')) as f:
         config_data = json.load(f)
     config = Config.from_dict(config_data)
-    assert config.project_name == 'PROJECT-FOLDER-NAME'
+    assert config.project_name == ''
+    assert len(config.snapshots) == 1
+    snapshot_config = config.snapshots[0]["DATAPACKAGE-FILENAME"]
+    assert snapshot_config.licenses[0].to_dict() == {'title': 'Open Data Commons Attribution License',
+                                                     'type': 'ODC-By-1.0',
+                                                     'url': 'https://opendatacommons.org/licenses/by/1.0/'}
+    assert snapshot_config.bounds_precision == 8
+    assert snapshot_config.crop_layers

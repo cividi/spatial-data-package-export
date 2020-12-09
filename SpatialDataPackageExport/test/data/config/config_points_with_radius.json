@@ -28,7 +28,11 @@
           }
         ],
         "resources": [
-          "simple poly"
+          {
+            "name": "simple poly",
+            "primary": false,
+            "shape": "square"
+          }
         ]
       }
     }

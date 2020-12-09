@@ -35,7 +35,7 @@ def mock_auth(*args, **kwargs):
     return 'test_author'
 
 
-def test_categorized_poly(new_project, categorized_poly, layer_empty_poly,odc_1_0_license,  monkeypatch):
+def test_categorized_poly(new_project, categorized_poly, layer_empty_poly, odc_1_0_license, monkeypatch):
     # Mock get_project_author
     monkeypatch.setattr(DataPackageHandler, 'get_project_author', mock_auth)
 

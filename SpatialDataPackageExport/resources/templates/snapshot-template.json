@@ -13,19 +13,8 @@
       "bfs_number": 1051
     },
     "format": "geojson",
-    "licenses": [
-      {
-        "url": "https://opendatacommons.org/licenses/by/1.0/",
-        "type": "ODC-By-1.0",
-        "title": "Open Data Commons Attribution License"
-      }
-    ],
-    "keywords": [
-      "europe",
-      "switzerland",
-      "gemeindescan",
-      "geodata"
-    ],
+    "licenses": [],
+    "keywords": [],
     "views": [
       {
         "name": "mapview",
@@ -37,12 +26,7 @@
         }
       }
     ],
-    "sources": [
-      {
-        "url": "https://www.openstreetmap.org/copyright",
-        "title": "Karte: Mapbox, \u00a9 OpenStreetMap"
-      }
-    ],
+    "sources": [],
     "resources": [
       {
         "name": "mapbox-background",
