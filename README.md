@@ -26,8 +26,7 @@ To download from GitHub:
 
 1. Download the latest release from [Releases](https://github.com/cividi/spatial-data-package-export/releases).
 
-    - [Latest stable version](https://github.com/cividi/spatial-data-package-export/releases/download/0.1.0/SpatialDataPackageExport.0.1.0.zip)
-    - [Latest testing version](https://github.com/cividi/spatial-data-package-export/releases/download/0.2.0-rc1/SpatialDataPackageExport.0.2.0-rc1.zip)
+    - [Latest stable version](https://github.com/cividi/spatial-data-package-export/releases/download/0.2.0/SpatialDataPackageExport.0.2.0.zip)
 
 2. Launch QGIS and the plugins menu by selecting Plugins - Manage and Install Plugins from the top menu.
 

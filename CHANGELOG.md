@@ -42,4 +42,18 @@
 * New: Add template file paths to settings dialog
 * New: Use author of the QGIS project in contributor
 
+### 0.2.0 - 09/12/2020
+
+* Now left experimental stage
+* Added code coverage report on GitHub project
+* Fixed: export bugs (title, description, single symbol layer names)
+* New: Added a plugin setting for snapshot layers to be discarded, kept as memory layers ot written as GeoJSON
+* New: Shapes of legend entries can be manually changed before exporting
+* New: Option to not crop exported layers to bounds 
+* New: Store and load snapshot settings to the project 
+* New: Added Keywords UI to set snapshot keywords
+* New: Layer keywords and licenses are exported to Data Package
+* New: Add template file paths to settings dialog
+* New: Use author of the QGIS project in contributor
+
 ###
