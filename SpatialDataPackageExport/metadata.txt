@@ -13,5 +13,5 @@ homepage=https://github.com/cividi/spatial-data-package-export
 tracker=https://github.com/cividi/spatial-data-package-export/issues
 category=Plugins
 icon=resources/icons/icon-highres.png
-experimental=True
+experimental=False
 deprecated=False
