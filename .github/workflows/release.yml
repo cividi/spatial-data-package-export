@@ -2,7 +2,7 @@ name: Release
 
 on:
   release:
-    types: 
+    types:
       - published
       - prereleased
 
@@ -26,7 +26,7 @@ jobs:
       # When osgeo upload is wanted: --osgeo-username usrname --osgeo-password ${{ secrets.OSGEO_PASSWORD }}
       - name: Deploy plugin
         run: qgis-plugin-ci release ${GITHUB_REF/refs\/tags\//} --github-token ${{ secrets.GITHUB_TOKEN }} --osgeo-username ThorbenW --osgeo-password ${{ secrets.OSGEO_PASSWORD }} --disable-submodule-update
-      
+
       - name: Post to slack
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}

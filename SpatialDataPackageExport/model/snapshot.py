@@ -1,4 +1,5 @@
-#  Gispo Ltd., hereby disclaims all copyright interest in the program SpatialDataPackageExport
+#  Gispo Ltd., hereby disclaims all copyright interest in the program
+#  SpatialDataPackageExport
 #  Copyright (C) 2020 Gispo Ltd (https://www.gispo.fi/).
 #
 #
@@ -20,14 +21,22 @@
 Generated using https://app.quicktype.io/ from json file
 """
 
-from typing import Any, List, Optional, Dict, Union
+from typing import Any, Dict, List, Optional, Union
 
-from .model_utils import (from_str, to_class, from_list, from_float, from_union, from_none,
-                          from_int, from_bool, from_dict)
+from .model_utils import (
+    from_bool,
+    from_dict,
+    from_float,
+    from_int,
+    from_list,
+    from_none,
+    from_str,
+    from_union,
+    to_class,
+)
 
 
 class Contributor:
-
     def __init__(self, path: str, role: str, email: str, title: str) -> None:
         self.path = path
         self.role = role
@@ -35,7 +44,7 @@ class Contributor:
         self.title = title
 
     @staticmethod
-    def from_dict(obj: Any) -> 'Contributor':
+    def from_dict(obj: Any) -> "Contributor":
         assert isinstance(obj, dict)
         path = from_str(obj.get("path"))
         role = from_str(obj.get("role"))
@@ -53,12 +62,11 @@ class Contributor:
 
 
 class GemeindescanMeta:
-
     def __init__(self, topic: str) -> None:
         self.topic = topic
 
     @staticmethod
-    def from_dict(obj: Any) -> 'GemeindescanMeta':
+    def from_dict(obj: Any) -> "GemeindescanMeta":
         assert isinstance(obj, dict)
         topic = from_str(obj.get("topic"))
         return GemeindescanMeta(topic)
@@ -70,14 +78,13 @@ class GemeindescanMeta:
 
 
 class License:
-
     def __init__(self, url: str, type: str, title: str) -> None:
         self.url = url
         self.type = type
         self.title = title
 
     @staticmethod
-    def from_dict(obj: Any) -> 'License':
+    def from_dict(obj: Any) -> "License":
         assert isinstance(obj, dict)
         url = from_str(obj.get("url"))
         type = from_str(obj.get("type"))
@@ -85,8 +92,8 @@ class License:
         return License(url, type, title)
 
     @staticmethod
-    def from_setting(title: str, vals: Dict[str, str]):
-        return License.from_dict({**{'title': title}, **vals})
+    def from_setting(title: str, vals: Dict[str, str]) -> "License":
+        return License.from_dict({**{"title": title}, **vals})
 
     def to_dict(self) -> dict:
         result: dict = {}
@@ -97,9 +104,14 @@ class License:
 
 
 class Resource:
-
-    def __init__(self, name: str, mediatype: str, licenses: List[License], data: Optional[Dict] = None,
-                 path: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        name: str,
+        mediatype: str,
+        licenses: List[License],
+        data: Optional[Dict] = None,
+        path: Optional[str] = None,
+    ) -> None:
         self.name = name
         self.mediatype = mediatype
         self.licenses = licenses
@@ -107,7 +119,7 @@ class Resource:
         self.path = path
 
     @staticmethod
-    def from_dict(obj: Any) -> 'Resource':
+    def from_dict(obj: Any) -> "Resource":
         assert isinstance(obj, dict)
         name = from_str(obj.get("name"))
         mediatype = from_str(obj.get("mediatype"))
@@ -129,13 +141,12 @@ class Resource:
 
 
 class Source:
-
     def __init__(self, url: str, title: str) -> None:
         self.url = url
         self.title = title
 
     @staticmethod
-    def from_dict(obj: Any) -> 'Source':
+    def from_dict(obj: Any) -> "Source":
         assert isinstance(obj, dict)
         url = from_str(obj.get("url"))
         title = from_str(obj.get("title"))
@@ -149,10 +160,18 @@ class Source:
 
 
 class Legend:
-
-    def __init__(self, label: Union[str, int], size: int, shape: str, primary: bool, fill_color: str,
-                 fill_opacity: float, stroke_color: str, stroke_width: Union[str, int, float],
-                 stroke_opacity: float) -> None:
+    def __init__(
+        self,
+        label: Union[str, int],
+        size: int,
+        shape: str,
+        primary: bool,
+        fill_color: str,
+        fill_opacity: float,
+        stroke_color: str,
+        stroke_width: Union[str, int, float],
+        stroke_opacity: float,
+    ) -> None:
         self.label = label
         self.size = size
         self.shape = shape
@@ -164,7 +183,7 @@ class Legend:
         self.stroke_opacity = stroke_opacity
 
     @staticmethod
-    def from_dict(obj: Any) -> 'Legend':
+    def from_dict(obj: Any) -> "Legend":
         assert isinstance(obj, dict)
         label = from_union([from_str, from_int], obj.get("label"))
         size = from_int(obj.get("size"))
@@ -173,9 +192,21 @@ class Legend:
         fill_color = from_str(obj.get("fillColor"))
         fill_opacity = from_float(obj.get("fillOpacity"))
         stroke_color = from_str(obj.get("strokeColor"))
-        stroke_width = from_union([from_str, from_int, from_float], obj.get("strokeWidth"))
+        stroke_width = from_union(
+            [from_str, from_int, from_float], obj.get("strokeWidth")
+        )
         stroke_opacity = from_float(obj.get("strokeOpacity"))
-        return Legend(label, size, shape, primary, fill_color, fill_opacity, stroke_color, stroke_width, stroke_opacity)
+        return Legend(
+            label,
+            size,
+            shape,
+            primary,
+            fill_color,
+            fill_opacity,
+            stroke_color,
+            stroke_width,
+            stroke_opacity,
+        )
 
     def to_dict(self) -> dict:
         result: dict = {}
@@ -186,14 +217,22 @@ class Legend:
         result["fillColor"] = from_str(self.fill_color)
         result["fillOpacity"] = from_float(self.fill_opacity)
         result["strokeColor"] = from_str(self.stroke_color)
-        result["strokeWidth"] = from_union([from_str, from_int, from_float], self.stroke_width)
+        result["strokeWidth"] = from_union(
+            [from_str, from_int, from_float], self.stroke_width
+        )
         result["strokeOpacity"] = from_float(self.stroke_opacity)
         return result
 
 
 class Spec:
-
-    def __init__(self, title: str, description: str, attribution: str, bounds: List[str], legend: List[Legend]) -> None:
+    def __init__(
+        self,
+        title: str,
+        description: str,
+        attribution: str,
+        bounds: List[str],
+        legend: List[Legend],
+    ) -> None:
         self.title = title
         self.description = description
         self.attribution = attribution
@@ -201,7 +240,7 @@ class Spec:
         self.legend = legend
 
     @staticmethod
-    def from_dict(obj: Any) -> 'Spec':
+    def from_dict(obj: Any) -> "Spec":
         assert isinstance(obj, dict)
         title = from_str(obj.get("title"))
         description = from_str(obj.get("description"))
@@ -221,15 +260,16 @@ class Spec:
 
 
 class View:
-
-    def __init__(self, name: str, spec_type: str, spec: Spec, resources: List[str]) -> None:
+    def __init__(
+        self, name: str, spec_type: str, spec: Spec, resources: List[str]
+    ) -> None:
         self.name = name
         self.spec_type = spec_type
         self.spec = spec
         self.resources = resources
 
     @staticmethod
-    def from_dict(obj: Any) -> 'View':
+    def from_dict(obj: Any) -> "View":
         assert isinstance(obj, dict)
         name = from_str(obj.get("name"))
         spec_type = from_str(obj.get("specType"))
@@ -247,11 +287,23 @@ class View:
 
 
 class Snapshot:
-
-    def __init__(self, name: str, title: str, description: str, version: str, datapackage_version: str,
-                 gemeindescan_version: str, gemeindescan_meta: GemeindescanMeta, format: str,
-                 licenses: List[License], keywords: List[str], views: List[View], sources: List[Source],
-                 resources: List[Resource], contributors: List[Contributor]) -> None:
+    def __init__(
+        self,
+        name: str,
+        title: str,
+        description: str,
+        version: str,
+        datapackage_version: str,
+        gemeindescan_version: str,
+        gemeindescan_meta: GemeindescanMeta,
+        format: str,
+        licenses: List[License],
+        keywords: List[str],
+        views: List[View],
+        sources: List[Source],
+        resources: List[Resource],
+        contributors: List[Contributor],
+    ) -> None:
         self.name = name
         self.title = title
         self.description = description
@@ -268,7 +320,7 @@ class Snapshot:
         self.contributors = contributors
 
     @staticmethod
-    def from_dict(obj: Any) -> 'Snapshot':
+    def from_dict(obj: Any) -> "Snapshot":
         assert isinstance(obj, dict)
         name = from_str(obj.get("name"))
         title = from_str(obj.get("title"))
@@ -284,8 +336,22 @@ class Snapshot:
         sources = from_list(Source.from_dict, obj.get("sources"))
         resources = from_list(Resource.from_dict, obj.get("resources"))
         contributors = from_list(Contributor.from_dict, obj.get("contributors"))
-        return Snapshot(name, title, description, version, datapackage_version, gemeindescan_version, gemeindescan_meta,
-                        format, licenses, keywords, views, sources, resources, contributors)
+        return Snapshot(
+            name,
+            title,
+            description,
+            version,
+            datapackage_version,
+            gemeindescan_version,
+            gemeindescan_meta,
+            format,
+            licenses,
+            keywords,
+            views,
+            sources,
+            resources,
+            contributors,
+        )
 
     def to_dict(self) -> dict:
         result: dict = {}
@@ -302,5 +368,7 @@ class Snapshot:
         result["views"] = from_list(lambda x: to_class(View, x), self.views)
         result["sources"] = from_list(lambda x: to_class(Source, x), self.sources)
         result["resources"] = from_list(lambda x: to_class(Resource, x), self.resources)
-        result["contributors"] = from_list(lambda x: to_class(Contributor, x), self.contributors)
+        result["contributors"] = from_list(
+            lambda x: to_class(Contributor, x), self.contributors
+        )
         return result

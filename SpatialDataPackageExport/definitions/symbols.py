@@ -1,4 +1,5 @@
-#  Gispo Ltd., hereby disclaims all copyright interest in the program SpatialDataPackageExport
+#  Gispo Ltd., hereby disclaims all copyright interest in the program
+#  SpatialDataPackageExport
 #  Copyright (C) 2020 Gispo Ltd (https://www.gispo.fi/).
 #
 #
@@ -21,14 +22,14 @@ import enum
 
 @enum.unique
 class SymbolType(enum.Enum):
-    categorizedSymbol = 'categorizedSymbol'
-    graduatedSymbol = 'graduatedSymbol'
-    singleSymbol = 'singleSymbol'
+    categorizedSymbol = "categorizedSymbol"  # noqa: N815
+    graduatedSymbol = "graduatedSymbol"  # noqa: N815
+    singleSymbol = "singleSymbol"  # noqa: N815
 
 
 @enum.unique
 class SymbolLayerType(enum.Enum):
-    SimpleMarker = 'SimpleMarker'
-    SimpleLine = 'SimpleLine'
-    CentroidFill = 'CentroidFill'
-    SimpleFill = 'SimpleFill'
+    SimpleMarker = "SimpleMarker"
+    SimpleLine = "SimpleLine"
+    CentroidFill = "CentroidFill"
+    SimpleFill = "SimpleFill"

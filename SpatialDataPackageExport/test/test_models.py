@@ -16,29 +16,33 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
+
+# type: ignore
 import json
 
-from .utils import get_test_json
 from ..model.config import Config
 from ..model.snapshot import Snapshot
 from ..qgis_plugin_tools.tools.resources import resources_path
+from .utils import get_test_json
 
 
 def test_snapshot_from_categorized_polygons():
-    snapshot_data = get_test_json('snapshots', 'snapshot_categorized_poly.json')
+    snapshot_data = get_test_json("snapshots", "snapshot_categorized_poly.json")
     snapshot = Snapshot.from_dict(snapshot_data)
-    assert snapshot.name == snapshot_data['name']
+    assert snapshot.name == snapshot_data["name"]
 
 
 def test_config_from_template():
-    with open(resources_path('templates', 'export-config.json')) as f:
+    with open(resources_path("templates", "export-config.json")) as f:
         config_data = json.load(f)
     config = Config.from_dict(config_data)
-    assert config.project_name == ''
+    assert config.project_name == ""
     assert len(config.snapshots) == 1
     snapshot_config = config.snapshots[0]["DATAPACKAGE-FILENAME"]
-    assert snapshot_config.licenses[0].to_dict() == {'title': 'Open Data Commons Attribution License',
-                                                     'type': 'ODC-By-1.0',
-                                                     'url': 'https://opendatacommons.org/licenses/by/1.0/'}
+    assert snapshot_config.licenses[0].to_dict() == {
+        "title": "Open Data Commons Attribution License",
+        "type": "ODC-By-1.0",
+        "url": "https://opendatacommons.org/licenses/by/1.0/",
+    }
     assert snapshot_config.bounds_precision == 8
     assert snapshot_config.crop_layers

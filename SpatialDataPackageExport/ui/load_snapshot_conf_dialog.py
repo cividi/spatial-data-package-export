@@ -1,4 +1,5 @@
-#  Gispo Ltd., hereby disclaims all copyright interest in the program SpatialDataPackageExport
+#  Gispo Ltd., hereby disclaims all copyright interest in the program
+#  SpatialDataPackageExport
 #  Copyright (C) 2020 Gispo Ltd (https://www.gispo.fi/).
 #
 #
@@ -20,21 +21,20 @@
 import logging
 from typing import List
 
-from PyQt5.QtWidgets import QDialog, QComboBox
+from qgis.PyQt.QtWidgets import QComboBox, QDialog, QWidget
 
 from ..qgis_plugin_tools.tools.resources import load_ui, plugin_name
 
-FORM_CLASS = load_ui('load_snapshot_conf_dialog.ui')
+FORM_CLASS: QWidget = load_ui("load_snapshot_conf_dialog.ui")
 LOGGER = logging.getLogger(plugin_name())
 
 
 class LoadSnapshotConfDialog(QDialog, FORM_CLASS):
-
-    def __init__(self, snapshot_conf_names: List[str]):
+    def __init__(self, snapshot_conf_names: List[str]) -> None:
         QDialog.__init__(self)
         self.setupUi(self)
         self.cb_snapshot_confs: QComboBox = self.cb_snapshot_confs
         self.cb_snapshot_confs.addItems(snapshot_conf_names)
 
-    def get_chosen_snapshot_config_name(self):
+    def get_chosen_snapshot_config_name(self) -> str:
         return self.cb_snapshot_confs.currentText()

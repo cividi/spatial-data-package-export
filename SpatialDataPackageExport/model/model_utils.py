@@ -1,4 +1,5 @@
-#  Gispo Ltd., hereby disclaims all copyright interest in the program SpatialDataPackageExport
+#  Gispo Ltd., hereby disclaims all copyright interest in the program
+#  SpatialDataPackageExport
 #  Copyright (C) 2020 Gispo Ltd (https://www.gispo.fi/).
 #
 #
@@ -17,7 +18,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import TypeVar, Any, Type, cast, Callable, List, Dict
+from typing import Any, Callable, Dict, List, Type, TypeVar, cast
 
 T = TypeVar("T")
 
@@ -42,7 +43,7 @@ def from_dict(x: Any) -> Dict:
     return x
 
 
-def from_list_dict(f: Callable[[Any], T], x: Any) -> List[Dict[any, T]]:
+def from_list_dict(f: Callable[[Any], T], x: Any) -> List[Dict[Any, T]]:
     assert isinstance(x, list)
     if len(x):
         assert isinstance(x[0], dict)
@@ -55,13 +56,13 @@ def from_float(x: Any) -> float:
     return float(x)
 
 
-def from_union(fs, x):
+def from_union(fs: List[Callable], x: Any) -> Any:
     for f in fs:
         try:
             return f(x)
-        except:
+        except Exception:
             pass
-    assert False
+    raise AssertionError()
 
 
 def to_float(x: Any) -> float:

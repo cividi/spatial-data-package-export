@@ -1,4 +1,6 @@
-#  Gispo Ltd., hereby disclaims all copyright interest in the program SpatialDataPackageExport
+# type: ignore
+#  Gispo Ltd., hereby disclaims all copyright interest in the program
+#  SpatialDataPackageExport
 #  Copyright (C) 2020 Gispo Ltd (https://www.gispo.fi/).
 #
 #
@@ -17,31 +19,31 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 import json
-from typing import Dict, Tuple
+from typing import Dict, Set, Tuple
 
-from .conftest import IFACE, CANVAS
 from ..qgis_plugin_tools.tools.resources import plugin_test_data_path
+from .conftest import CANVAS, IFACE
 
 
 def get_symbols_and_legend(name: str) -> Tuple[Dict, Dict]:
-    f_name = f'{name}.json'
-    with open(plugin_test_data_path('symbols', f_name)) as f:
+    f_name = f"{name}.json"
+    with open(plugin_test_data_path("symbols", f_name)) as f:
         symbols = json.load(f)
     symbols = {int(key): val for key, val in symbols.items()}
 
-    with open(plugin_test_data_path('legend', f_name)) as f:
+    with open(plugin_test_data_path("legend", f_name)) as f:
         legend = json.load(f)
     return symbols, legend
 
 
 def get_test_json(*args: str) -> Dict:
     f_path = plugin_test_data_path(*args)
-    if not (f_path.endswith('.json') or f_path.endswith('.geojson')):
-        raise ValueError('Invalid path')
+    if not (f_path.endswith(".json") or f_path.endswith(".geojson")):
+        raise ValueError("Invalid path")
     with open(f_path) as f:
         data = json.load(f)
     return data
 
 
-def get_existing_layer_names():
+def get_existing_layer_names() -> Set[str]:
     return {layer.name() for layer in IFACE.getMockLayers() + CANVAS.layers()}

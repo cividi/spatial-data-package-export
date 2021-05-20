@@ -1,4 +1,5 @@
-#  Gispo Ltd., hereby disclaims all copyright interest in the program SpatialDataPackageExport
+#  Gispo Ltd., hereby disclaims all copyright interest in the program
+#  SpatialDataPackageExport
 #  Copyright (C) 2020 Gispo Ltd (https://www.gispo.fi/).
 #
 #
@@ -19,23 +20,35 @@
 import json
 import tempfile
 from pathlib import Path
-from typing import List, Dict, Union
+from typing import Dict, List, Union
 
-from qgis.core import QgsVectorFileWriter, QgsCoordinateReferenceSystem, QgsProject, QgsVectorLayer
+from qgis.core import (
+    QgsCoordinateReferenceSystem,
+    QgsProject,
+    QgsVectorFileWriter,
+    QgsVectorLayer,
+)
 
-from .snapshot import Legend, License
 from ..definitions.configurable_settings import Settings
 from ..definitions.types import StyleType
 from ..qgis_plugin_tools.tools.resources import resources_path
+from .snapshot import Legend, License
 
 
 class StyledLayer:
-
-    def __init__(self, resource_name: str, layer_id: str, legend: List[Legend], style_type: Union[str, StyleType]):
+    def __init__(
+        self,
+        resource_name: str,
+        layer_id: str,
+        legend: List[Legend],
+        style_type: Union[str, StyleType],
+    ) -> None:
         self.resource_name = resource_name
         self.layer_id = layer_id
         self.legend = legend
-        self.style_type: StyleType = StyleType[style_type] if isinstance(style_type, str) else style_type
+        self.style_type: StyleType = (
+            StyleType[style_type] if isinstance(style_type, str) else style_type
+        )
 
     @property
     def layer(self) -> QgsVectorLayer:
@@ -48,13 +61,18 @@ class StyledLayer:
     def get_licenses(self) -> List[License]:
         licenses = self.layer.metadata().licenses()
         available_licenses = Settings.licences.get()
-        return [License(available_licenses.get(license_, {}).get('url', ''),
-                        available_licenses.get(license_, {}).get('type', ''), license_)
-                for license_ in licenses]
+        return [
+            License(
+                available_licenses.get(license_, {}).get("url", ""),
+                available_licenses.get(license_, {}).get("type", ""),
+                license_,
+            )
+            for license_ in licenses
+        ]
 
     def get_geojson_data(self) -> Dict:
         source = self.layer.source()
-        if source.lower().endswith('.geojson') or source.lower().endswith('.json'):
+        if source.lower().endswith(".geojson") or source.lower().endswith(".json"):
             with open(source) as f:
                 data = json.load(f)
         else:
@@ -65,8 +83,12 @@ class StyledLayer:
         return data
 
     def save_as_geojson(self, output_path: Path) -> Path:
-        output_file = Path(output_path, f'{self.resource_name}.geojson')
-        _writer = QgsVectorFileWriter.writeAsVectorFormat(self.layer, str(output_file), "utf-8",
-                                                          QgsCoordinateReferenceSystem("EPSG:4326"),
-                                                          driverName="GeoJSON")
+        output_file = Path(output_path, f"{self.resource_name}.geojson")
+        _writer = QgsVectorFileWriter.writeAsVectorFormat(  # noqa: F841
+            self.layer,
+            str(output_file),
+            "utf-8",
+            QgsCoordinateReferenceSystem("EPSG:4326"),
+            driverName="GeoJSON",
+        )
         return output_file

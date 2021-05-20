@@ -32,11 +32,11 @@
 ### 0.2.0-beta2 - 26/11/2020
 
 * New: Shapes of legend entries can be manually changed before exporting
-* New: Option to not crop exported layers to bounds 
+* New: Option to not crop exported layers to bounds
 
 ### 0.2.0-rc1 - 04/12/2020
 
-* New: Store and load snapshot settings to the project 
+* New: Store and load snapshot settings to the project
 * New: Added Keywords UI to set snapshot keywords
 * New: Layer keywords and licenses are exported to Data Package
 * New: Add template file paths to settings dialog

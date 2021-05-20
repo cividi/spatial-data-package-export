@@ -19,7 +19,7 @@ Main development by [Gispo Ltd](https://www.gispo.fi/en/home/).
 
 ### Installation instructions
 
-The plugin can be installed by downloading a release from this 
+The plugin can be installed by downloading a release from this
 repository or a stable release from the [QGIS Plugin Repository](https://plugins.qgis.org/plugins/SpatialDataPackageExport/).
 
 To download from GitHub:
@@ -67,6 +67,6 @@ To download from GitHub:
 Refer to [development](docs/development.md) to instructions for developing the plugin.
 
 ## License
-This plugin is licenced with 
-[GNU Genereal Public License, version 3](https://www.gnu.org/licenses/gpl-3.0.html). 
+This plugin is licenced with
+[GNU Genereal Public License, version 3](https://www.gnu.org/licenses/gpl-3.0.html).
 See [LICENSE](LICENSE) for more information.

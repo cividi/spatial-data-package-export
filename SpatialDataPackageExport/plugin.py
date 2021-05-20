@@ -1,4 +1,5 @@
-#  Gispo Ltd., hereby disclaims all copyright interest in the program SpatialDataPackageExport
+#  Gispo Ltd., hereby disclaims all copyright interest in the program
+#  SpatialDataPackageExport
 #  Copyright (C) 2020 Gispo Ltd (https://www.gispo.fi/).
 #
 #
@@ -16,14 +17,15 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
-from typing import Callable, Optional
+from typing import Callable, List, Optional
 
-from PyQt5.QtCore import QTranslator, QCoreApplication, Qt
+from PyQt5.QtCore import QCoreApplication, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QWidget
-from qgis.PyQt import QtWidgets
 from qgis.core import QgsApplication
 from qgis.gui import QgisInterface
+from qgis.PyQt import QtWidgets
+from qgis.PyQt.QtCore import QTranslator
 
 from .core.processing.provider import SpatialDataPackageProcessingProvider
 from .qgis_plugin_tools.tools.custom_logging import setup_logger
@@ -35,7 +37,7 @@ from .ui.dock_widget import ExporterDockWidget
 class Plugin:
     """QGIS Plugin Implementation."""
 
-    def __init__(self, iface: QgisInterface):
+    def __init__(self, iface: QgisInterface) -> None:
 
         self.iface = iface
 
@@ -52,27 +54,27 @@ class Plugin:
         else:
             pass
 
-        self.actions = []
+        self.actions: List[QAction] = []
         self.menu = tr(plugin_name())
 
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
         self.dock_widget: Optional[QtWidgets.QDockWidget] = None
-        self.plugin_is_active = False
 
         self.processing_provider = SpatialDataPackageProcessingProvider()
 
     def add_action(
-            self,
-            icon_path: str,
-            text: str,
-            callback: Callable,
-            enabled_flag: bool = True,
-            add_to_menu: bool = True,
-            add_to_toolbar: bool = True,
-            status_tip: Optional[str] = None,
-            whats_this: Optional[str] = None,
-            parent: Optional[QWidget] = None) -> QAction:
+        self,
+        icon_path: str,
+        text: str,
+        callback: Callable,
+        enabled_flag: bool = True,
+        add_to_menu: bool = True,
+        add_to_toolbar: bool = True,
+        status_tip: Optional[str] = None,
+        whats_this: Optional[str] = None,
+        parent: Optional[QWidget] = None,
+    ) -> QAction:
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -121,50 +123,43 @@ class Plugin:
             self.iface.addToolBarIcon(action)
 
         if add_to_menu:
-            self.iface.addPluginToMenu(
-                self.menu,
-                action)
+            self.iface.addPluginToMenu(self.menu, action)
 
         self.actions.append(action)
 
         return action
 
-    def initGui(self):
+    def initGui(self) -> None:  # noqa: N802
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
         self.add_action(
-            resources_path('icons', 'icon.png'),
+            resources_path("icons", "icon.png"),
             text=tr(plugin_name()),
             callback=self.run,
             parent=self.iface.mainWindow(),
-            add_to_toolbar=True
+            add_to_toolbar=True,
         )
 
         QgsApplication.processingRegistry().addProvider(self.processing_provider)
 
-    def onClosePlugin(self):
+    def onClosePlugin(self) -> None:  # noqa: N802
         """Cleanup necessary items here when plugin dockwidget is closed"""
         if self.dock_widget is not None:
             self.dock_widget.closingPlugin.disconnect(self.onClosePlugin)
             self.plugin_is_active = False
 
-    def unload(self):
+    def unload(self) -> None:  # noqa: N802
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
-            self.iface.removePluginMenu(
-                tr(plugin_name()),
-                action)
+            self.iface.removePluginMenu(tr(plugin_name()), action)
             self.iface.removeToolBarIcon(action)
 
         QgsApplication.processingRegistry().removeProvider(self.processing_provider)
 
     # noinspection PyArgumentList
-    def run(self):
+    def run(self) -> None:
         """Run method that performs all the real work"""
-        if not self.plugin_is_active:
-            self.plugin_is_active = True
-
-            if self.dock_widget is None:
-                self.dock_widget = ExporterDockWidget(self.iface)
+        if self.dock_widget is None:
+            self.dock_widget = ExporterDockWidget(self.iface)
 
         self.dock_widget.closingPlugin.connect(self.onClosePlugin)
 

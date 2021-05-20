@@ -1,3 +1,6 @@
+# type: ignore
+# flake8: noqa ANN201, ANN001
+
 #  Gispo Ltd., hereby disclaims all copyright interest in the program SpatialDataPackageExport
 #  Copyright (C) 2020 Gispo Ltd (https://www.gispo.fi/).
 #
@@ -19,7 +22,7 @@
 import tempfile
 
 import pytest
-from qgis.core import QgsProject, QgsVectorLayer, QgsVectorDataProvider
+from qgis.core import QgsProject, QgsVectorDataProvider, QgsVectorLayer
 
 from ..model.snapshot import License
 from ..qgis_plugin_tools.testing.utilities import get_qgis_app
@@ -36,28 +39,28 @@ def new_project() -> None:
     yield IFACE.newProject()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def test_gpkg():
-    return plugin_test_data_path('test_data_4326.gpkg')
+    return plugin_test_data_path("test_data_4326.gpkg")
 
 
 @pytest.fixture
 def layer_simple_poly(test_gpkg):
-    name = 'simple_poly'
+    name = "simple_poly"
     layer = get_layer(name, test_gpkg)
     return layer
 
 
 @pytest.fixture
 def layer_points(test_gpkg):
-    name = 'points_with_radius'
+    name = "points_with_radius"
     layer = get_layer(name, test_gpkg)
     return layer
 
 
 @pytest.fixture
 def layer_lines(test_gpkg):
-    name = 'simple_lines'
+    name = "simple_lines"
     layer = get_layer(name, test_gpkg)
     return layer
 
@@ -65,35 +68,35 @@ def layer_lines(test_gpkg):
 @pytest.fixture
 def categorized_poly(layer_simple_poly):
     add_layer(layer_simple_poly)
-    set_styles(layer_simple_poly, 'categorized_poly.qml')
+    set_styles(layer_simple_poly, "categorized_poly.qml")
     return layer_simple_poly
 
 
 @pytest.fixture
 def centroid_poly(layer_simple_poly):
     add_layer(layer_simple_poly)
-    set_styles(layer_simple_poly, 'centroid_poly.qml')
+    set_styles(layer_simple_poly, "centroid_poly.qml")
     return layer_simple_poly
 
 
 @pytest.fixture
 def gratuated_poly(layer_simple_poly):
     add_layer(layer_simple_poly)
-    set_styles(layer_simple_poly, 'gratuated_poly.qml')
+    set_styles(layer_simple_poly, "gratuated_poly.qml")
     return layer_simple_poly
 
 
 @pytest.fixture
 def points_with_radius(layer_points):
     add_layer(layer_points)
-    set_styles(layer_points, 'points_with_radius.qml')
+    set_styles(layer_points, "points_with_radius.qml")
     return layer_points
 
 
 @pytest.fixture
 def points_with_no_fill_and_no_stroke(layer_points):
     add_layer(layer_points)
-    set_styles(layer_points, 'points_with_no_fill_and_no_stroke.qml')
+    set_styles(layer_points, "points_with_no_fill_and_no_stroke.qml")
     return layer_points
 
 
@@ -106,7 +109,7 @@ def tmp_dir():
 @pytest.fixture
 def layer_empty_poly(tmp_dir, layer_simple_poly):
     dp: QgsVectorDataProvider = layer_simple_poly.dataProvider()
-    layer = QgsVectorLayer('Polygon', 'test_poly', 'memory')
+    layer = QgsVectorLayer("Polygon", "test_poly", "memory")
     layer.setCrs(dp.crs())
     assert layer.isValid()
     return layer
@@ -115,7 +118,7 @@ def layer_empty_poly(tmp_dir, layer_simple_poly):
 @pytest.fixture
 def layer_empty_points(tmp_dir, layer_points):
     dp: QgsVectorDataProvider = layer_points.dataProvider()
-    layer = QgsVectorLayer('Point', 'test_point', 'memory')
+    layer = QgsVectorLayer("Point", "test_point", "memory")
     layer.setCrs(dp.crs())
     verify_layer_copy(layer, layer_points)
     return layer
@@ -124,7 +127,7 @@ def layer_empty_points(tmp_dir, layer_points):
 @pytest.fixture
 def layer_empty_lines(tmp_dir, layer_lines):
     dp: QgsVectorDataProvider = layer_lines.dataProvider()
-    layer = QgsVectorLayer('LineString', 'test_lines', 'memory')
+    layer = QgsVectorLayer("LineString", "test_lines", "memory")
     layer.setCrs(dp.crs())
     verify_layer_copy(layer, layer_lines)
     return layer
@@ -132,11 +135,15 @@ def layer_empty_lines(tmp_dir, layer_lines):
 
 @pytest.fixture
 def odc_1_0_license():
-    return License("https://opendatacommons.org/licenses/by/1.0/", "ODC-By-1.0",
-                   "Open Data Commons Attribution License")
+    return License(
+        "https://opendatacommons.org/licenses/by/1.0/",
+        "ODC-By-1.0",
+        "Open Data Commons Attribution License",
+    )
 
 
 # Helper functions
+
 
 def verify_layer_copy(layer, orig_layer):
     assert layer.wkbType() == orig_layer.wkbType()
@@ -144,13 +151,13 @@ def verify_layer_copy(layer, orig_layer):
 
 
 def get_layer(name: str, gpkg):
-    layer = QgsVectorLayer(f'{gpkg}|layername={name}', name, 'ogr')
+    layer = QgsVectorLayer(f"{gpkg}|layername={name}", name, "ogr")
     assert layer.isValid()
     return layer
 
 
 def set_styles(layer_simple_poly, style_file):
-    style_file = plugin_test_data_path('style', style_file)
+    style_file = plugin_test_data_path("style", style_file)
     msg, succeeded = layer_simple_poly.loadNamedStyle(style_file)
     assert succeeded, msg
 
