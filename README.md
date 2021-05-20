@@ -1,7 +1,11 @@
 # Spatial Data Package Export
-![](https://github.com/cividi/spatial-data-package-export/workflows/Tests/badge.svg)
+![tests](https://github.com/cividi/spatial-data-package-export/workflows/Tests/badge.svg)
 [![codecov.io](https://codecov.io/github/cividi/spatial-data-package-export/coverage.svg?branch=master)](https://codecov.io/github/cividi/spatial-data-package-export?branch=master)
-![](https://github.com/cividi/spatial-data-package-export/workflows/Release/badge.svg)
+![release](https://github.com/cividi/spatial-data-package-export/workflows/Release/badge.svg)
+[![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 QGIS plugin to export data and styles to Spatial Data Packages that can be uploaded on the [Spatial Data Package Platform](https://github.com/cividi/spatial-data-package-platform), e.g. [gemeindescan.ch](https://gemeindescan.ch).
 
