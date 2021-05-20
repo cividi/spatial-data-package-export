@@ -46,7 +46,7 @@ jobs:
 
       # Runs all tests
       - name: Run tests (LTR)
-        run: docker run --rm --net=host --volume `pwd`:/app -w=/app -e QGIS_PLUGIN_IN_CI=1 qgis/qgis:release-3_16 sh -c "pip3 install -q pytest pytest-cov && xvfb-run -s '+extension GLX -screen 0 1024x768x24' pytest -v --cov --cov-report=xml"
+        run: docker run --rm --net=host --volume `pwd`:/app -w=/app -e QGIS_PLUGIN_IN_CI=1 qgis/qgis:release-3_16 sh -c "pip3 install -q pytest pytest-cov && xvfb-run -s '+extension GLX -screen 0 1024x768x24' pytest -v --cov=SpatialDataPackageExport --cov-report=xml"
 
       # Upload coverage report
       - name: Upload coverage to Codecov
