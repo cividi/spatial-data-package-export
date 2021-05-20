@@ -28,7 +28,7 @@ from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import QTranslator
 
 from .core.processing.provider import SpatialDataPackageProcessingProvider
-from .qgis_plugin_tools.tools.custom_logging import setup_logger
+from .qgis_plugin_tools.tools.custom_logging import setup_logger, teardown_logger
 from .qgis_plugin_tools.tools.i18n import setup_translation, tr
 from .qgis_plugin_tools.tools.resources import plugin_name, resources_path
 from .ui.dock_widget import ExporterDockWidget
@@ -154,6 +154,7 @@ class Plugin:
             self.iface.removeToolBarIcon(action)
 
         QgsApplication.processingRegistry().removeProvider(self.processing_provider)
+        teardown_logger(plugin_name())
 
     # noinspection PyArgumentList
     def run(self) -> None:

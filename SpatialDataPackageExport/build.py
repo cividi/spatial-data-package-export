@@ -37,7 +37,7 @@ locales = ["fi"]
 profile = "gemeindescan"
 ui_files = list(glob.glob("**/*.ui", recursive=True))
 resources = list(glob.glob("**/*.qrc", recursive=True))
-extra_dirs = ["resources", "logs"]
+extra_dirs = ["resources"]
 compiled_resources: List[str] = []
 
 PluginMaker(
