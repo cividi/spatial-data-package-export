@@ -31,6 +31,12 @@ def test__hex_to_rgb_with_opacity():
     assert rgb == "180,251,184,153"
 
 
+def test_rgb_extract():
+    hex, alpha = Style.rgb_extract("180,251,184,153")
+    assert hex == "#b4fbb8"
+    assert alpha == 0.6
+
+
 def test_fill_based_on_feature(points_with_no_fill_and_no_stroke_with_style_attrs):
     style = PointStyle()
     style.fill_based_on_feature(

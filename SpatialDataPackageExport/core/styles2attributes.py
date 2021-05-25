@@ -18,7 +18,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, Dict, List, Optional, cast
 
 from PyQt5.QtCore import QVariant
 from qgis._core import QgsExpression, QgsRuleBasedRenderer
@@ -84,13 +84,6 @@ class StylesToAttributes:
         self.fields: QgsFields = self._generate_fields()
         self.legend: Dict[str, Legend] = {}
 
-    @staticmethod
-    def _rgb_extract(prop: str) -> Tuple[str, float]:
-        _prop = list(map(int, prop.split(",")))
-        _rgb = "#" + ("%02x%02x%02x" % tuple(_prop[0:-1]))
-        alpha = round(_prop[-1] / 255, 2)
-        return _rgb, alpha
-
     def get_legend(self) -> List:
         self.feedback.pushDebugInfo(f"Labels: {list(self.legend.keys())}")
         return [legend.to_dict() for legend in self.legend.values()]
@@ -140,9 +133,9 @@ class StylesToAttributes:
                 style.type = "line"
                 style.fill = "#000000"
                 style.fill_opacity = 0
-                style.stroke = self._rgb_extract(sym["outline_color"])[0]
+                style.stroke = style.rgb_extract(sym["outline_color"])[0]
                 style.stroke_opacity = (
-                    symbol_opacity * self._rgb_extract(sym["outline_color"])[1]
+                    symbol_opacity * style.rgb_extract(sym["outline_color"])[1]
                 )
                 style.stroke_width = float(sym["outline_width"])
             if sym_type in [SymbolLayerType.CentroidFill, SymbolLayerType.SimpleFill]:
@@ -150,11 +143,11 @@ class StylesToAttributes:
                     style.type = "circle"
                 else:
                     style.type = "square"
-                style.fill = self._rgb_extract(sym["color"])[0]
-                style.fill_opacity = symbol_opacity * self._rgb_extract(sym["color"])[1]
-                style.stroke = self._rgb_extract(sym["outline_color"])[0]
+                style.fill = style.rgb_extract(sym["color"])[0]
+                style.fill_opacity = symbol_opacity * style.rgb_extract(sym["color"])[1]
+                style.stroke = style.rgb_extract(sym["outline_color"])[0]
                 style.stroke_opacity = (
-                    symbol_opacity * self._rgb_extract(sym["outline_color"])[1]
+                    symbol_opacity * style.rgb_extract(sym["outline_color"])[1]
                 )
                 style.stroke_width = float(sym["outline_width"])
 
@@ -164,21 +157,21 @@ class StylesToAttributes:
                 style.type = "line"
                 style.fill = "transparent"
                 style.fill_opacity = 0
-                style.stroke = self._rgb_extract(sym["line_color"])[0]
+                style.stroke = style.rgb_extract(sym["line_color"])[0]
                 style.stroke_opacity = (
-                    symbol_opacity * self._rgb_extract(sym["line_color"])[1]
+                    symbol_opacity * style.rgb_extract(sym["line_color"])[1]
                 )
                 style.stroke_width = float(sym["line_width"])
         elif isinstance(symbol, QgsMarkerSymbol):
             if sym_type == SymbolLayerType.SimpleMarker:
                 assert isinstance(style, PointStyle)
                 style.type = "circle"
-                style.fill = self._rgb_extract(sym["color"])[0]
-                style.fill_opacity = symbol_opacity * self._rgb_extract(sym["color"])[1]
+                style.fill = style.rgb_extract(sym["color"])[0]
+                style.fill_opacity = symbol_opacity * style.rgb_extract(sym["color"])[1]
                 style.has_fill = style.fill_opacity > 0.0
-                style.stroke = self._rgb_extract(sym["outline_color"])[0]
+                style.stroke = style.rgb_extract(sym["outline_color"])[0]
                 style.stroke_opacity = (
-                    symbol_opacity * self._rgb_extract(sym["outline_color"])[1]
+                    symbol_opacity * style.rgb_extract(sym["outline_color"])[1]
                 )
                 style.stroke_width = float(sym["outline_width"])
                 style.has_stroke = style.stroke_opacity > 0.0

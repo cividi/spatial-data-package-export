@@ -18,7 +18,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 import logging
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Tuple, Union
 
 from qgis._core import QgsMarkerSymbol, QgsSymbol
 from qgis.core import QgsExpression, QgsFeature
@@ -66,6 +66,13 @@ class Style:
         rgb: List[int] = list(int(hex_val[i : i + 2], 16) for i in (0, 2, 4))
         rgb.append(int(opacity * 255))
         return ",".join(map(str, rgb))
+
+    @staticmethod
+    def rgb_extract(prop: str) -> Tuple[str, float]:
+        _prop = list(map(int, prop.split(",")))
+        _rgb = "#" + ("%02x%02x%02x" % tuple(_prop[0:-1]))
+        alpha = round(_prop[-1] / 255, 2)
+        return _rgb, alpha
 
     @property
     def legend_style(self) -> Dict[str, Any]:
