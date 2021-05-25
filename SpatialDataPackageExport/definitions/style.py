@@ -18,8 +18,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 import logging
-from typing import Any, Dict, Union
+from typing import Any, Dict, List, Union
 
+from qgis._core import QgsMarkerSymbol, QgsSymbol
 from qgis.core import QgsExpression, QgsFeature
 
 from ..qgis_plugin_tools.tools.exceptions import QgsPluginExpressionException
@@ -59,6 +60,13 @@ class Style:
 
         self.data_defined_expressions: Dict[str, QgsExpression] = {}
 
+    @staticmethod
+    def _hex_to_rgb(hex_color: str, opacity: float) -> str:
+        hex_val = hex_color.lstrip("#")
+        rgb: List[int] = list(int(hex_val[i : i + 2], 16) for i in (0, 2, 4))
+        rgb.append(int(opacity * 255))
+        return ",".join(map(str, rgb))
+
     @property
     def legend_style(self) -> Dict[str, Any]:
         values = self.to_dict(for_legend=True)
@@ -67,6 +75,10 @@ class Style:
             for key, value in values.items()
             if key in self.LEGEND_MAPPER.keys()
         }
+
+    def fill_based_on_feature(self, feature: QgsFeature) -> None:
+        for f_name, c_name in self.FIELD_MAPPER.items():
+            self.__dict__[c_name] = feature[f_name]
 
     def add_data_defined_expression(self, field_name: str, expression: str) -> None:
         exp = QgsExpression(expression)
@@ -108,6 +120,9 @@ class Style:
             values["type"] = self.type
         return values
 
+    def create_qgis_symbol(self) -> QgsSymbol:
+        pass
+
 
 class SimpleStyle(Style):
     pass
@@ -140,3 +155,14 @@ class PointStyle(Style):
         self.has_fill = True
         self.has_stroke = True
         self.title = ""
+
+    # noinspection PyArgumentList
+    def create_qgis_symbol(self) -> QgsMarkerSymbol:
+        return QgsMarkerSymbol.createSimple(
+            {
+                "color": self._hex_to_rgb(self.fill, self.fill_opacity),
+                "outline_color": self._hex_to_rgb(self.stroke, self.stroke_opacity),
+                "outline_width": str(self.stroke_width),
+                "size": self.radius,
+            }
+        )  # noqa

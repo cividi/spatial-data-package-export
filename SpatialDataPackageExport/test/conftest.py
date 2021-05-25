@@ -20,6 +20,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 import tempfile
+from pathlib import Path
 
 import pytest
 from qgis.core import QgsProject, QgsVectorDataProvider, QgsVectorLayer
@@ -56,9 +57,12 @@ def layer_points(test_gpkg):
 
 @pytest.fixture
 def layer_lines(test_gpkg):
-    name = "simple_lines"
-    layer = get_layer(name, test_gpkg)
-    return layer
+    return get_layer("simple_lines", test_gpkg)
+
+
+@pytest.fixture
+def points_with_no_fill_and_no_stroke_with_style_attrs(test_gpkg):
+    return get_layer("points_with_radius_and_styles", test_gpkg)
 
 
 @pytest.fixture
@@ -137,6 +141,11 @@ def odc_1_0_license():
         "ODC-By-1.0",
         "Open Data Commons Attribution License",
     )
+
+
+@pytest.fixture
+def tmp_path(tmpdir):
+    return Path(tmpdir)
 
 
 # Helper functions
