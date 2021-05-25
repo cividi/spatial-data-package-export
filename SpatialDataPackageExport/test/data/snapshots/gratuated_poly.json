@@ -35,7 +35,7 @@
             "fillColor": "#ffffff",
             "fillOpacity": 1.0,
             "strokeColor": "#232323",
-            "strokeWidth": 0.26,
+            "strokeWidth": 0.9286,
             "strokeOpacity": 1.0
           },
           {
@@ -46,7 +46,7 @@
             "fillColor": "#ffbfbf",
             "fillOpacity": 1.0,
             "strokeColor": "#232323",
-            "strokeWidth": 0.26,
+            "strokeWidth": 0.9286,
             "strokeOpacity": 1.0
           },
           {
@@ -57,7 +57,7 @@
             "fillColor": "#ff8080",
             "fillOpacity": 1.0,
             "strokeColor": "#232323",
-            "strokeWidth": 0.26,
+            "strokeWidth": 0.9286,
             "strokeOpacity": 1.0
           },
           {
@@ -68,7 +68,7 @@
             "fillColor": "#ff4040",
             "fillOpacity": 1.0,
             "strokeColor": "#232323",
-            "strokeWidth": 0.26,
+            "strokeWidth": 0.9286,
             "strokeOpacity": 1.0
           },
           {
@@ -79,7 +79,7 @@
             "fillColor": "#ff0000",
             "fillOpacity": 1.0,
             "strokeColor": "#232323",
-            "strokeWidth": 0.26,
+            "strokeWidth": 0.9286,
             "strokeOpacity": 1.0
           }
         ]
@@ -120,7 +120,7 @@
               "fill-opacity": 1.0,
               "stroke": "#232323",
               "stroke-opacity": 1.0,
-              "stroke-width": 0.26
+              "stroke-width": 0.9286
             },
             "geometry": {
               "type": "Polygon",
@@ -159,7 +159,7 @@
               "fill-opacity": 1.0,
               "stroke": "#232323",
               "stroke-opacity": 1.0,
-              "stroke-width": 0.26
+              "stroke-width": 0.9286
             },
             "geometry": {
               "type": "Polygon",
@@ -194,7 +194,7 @@
               "fill-opacity": 1.0,
               "stroke": "#232323",
               "stroke-opacity": 1.0,
-              "stroke-width": 0.26
+              "stroke-width": 0.9286
             },
             "geometry": {
               "type": "Polygon",

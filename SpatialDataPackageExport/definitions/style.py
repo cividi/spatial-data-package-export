@@ -20,9 +20,16 @@
 import logging
 from typing import Any, Dict, List, Tuple, Union
 
-from qgis._core import QgsMarkerSymbol, QgsSymbol
-from qgis.core import QgsExpression, QgsFeature
+from qgis.core import (
+    QgsExpression,
+    QgsFeature,
+    QgsMarkerSymbol,
+    QgsSymbol,
+    QgsUnitTypes,
+)
 
+from ..core.exceptions import StyleException
+from ..qgis_plugin_tools.tools.custom_logging import bar_msg
 from ..qgis_plugin_tools.tools.exceptions import QgsPluginExpressionException
 from ..qgis_plugin_tools.tools.i18n import tr
 from ..qgis_plugin_tools.tools.layers import evaluate_expressions
@@ -32,6 +39,10 @@ LOGGER = logging.getLogger(plugin_name())
 
 
 class Style:
+    MILLIMETER_SIZE_UNIT = "MM"
+    PIXEL_SIZE_UNIT = "Pixel"
+    MM_TO_PIXEL = 0.28  # Taken from qgssymbollayerutils.cpp
+
     LEGEND_MAPPER = {
         "fill": "fillColor",
         "fill-opacity": "fillOpacity",
@@ -73,6 +84,33 @@ class Style:
         _rgb = "#" + ("%02x%02x%02x" % tuple(_prop[0:-1]))
         alpha = round(_prop[-1] / 255, 2)
         return _rgb, alpha
+
+    @staticmethod
+    def convert_to_pixels(value: float, size_unit: str) -> float:
+        """
+        Converts size unit into pixel values.
+
+        This method is partly applied from https://github.com/UnfoldedInc/qgis-plugin
+        created by Gispo Ltd.
+        Licensed under GPLv2 License.
+        """
+        if size_unit == Style.MILLIMETER_SIZE_UNIT:
+            value = round(value / Style.MM_TO_PIXEL, 4)
+
+        if size_unit in (Style.MILLIMETER_SIZE_UNIT, Style.PIXEL_SIZE_UNIT):
+            return value
+        else:
+            raise StyleException(
+                tr('Size unit "{}" is unsupported.', size_unit),
+                bar_msg=bar_msg(
+                    tr(
+                        "Please use {} instead",
+                        tr("or").join(
+                            (Style.MILLIMETER_SIZE_UNIT, Style.PIXEL_SIZE_UNIT)
+                        ),
+                    )
+                ),
+            )
 
     @property
     def legend_style(self) -> Dict[str, Any]:
@@ -158,18 +196,24 @@ class PointStyle(Style):
 
     def __init__(self) -> None:
         super().__init__()
-        self.radius: Union[int, float, str] = 2.0  # based on QGIS default mm radius
+        # based on QGIS default mm radius converted to pixels
+        self.radius: Union[int, float, str] = 7.14
         self.has_fill = True
         self.has_stroke = True
         self.title = ""
 
     # noinspection PyArgumentList
     def create_qgis_symbol(self) -> QgsMarkerSymbol:
-        return QgsMarkerSymbol.createSimple(
+        marker_symbol = QgsMarkerSymbol.createSimple(
             {
                 "color": self._hex_to_rgb(self.fill, self.fill_opacity),
                 "outline_color": self._hex_to_rgb(self.stroke, self.stroke_opacity),
                 "outline_width": str(self.stroke_width),
+                "outline_width_unit": self.PIXEL_SIZE_UNIT,
                 "size": self.radius,
+                "size_unit": self.PIXEL_SIZE_UNIT,
             }
-        )  # noqa
+        )
+        marker_symbol.setSizeUnit(QgsUnitTypes.RenderPixels)
+        marker_symbol.sizeMapUnitScale()
+        return marker_symbol  # noqa

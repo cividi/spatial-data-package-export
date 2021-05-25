@@ -18,6 +18,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 #
+import pytest
+
+from ..core.exceptions import StyleException
 from ..definitions.style import PointStyle, Style
 
 
@@ -35,6 +38,21 @@ def test_rgb_extract():
     hex, alpha = Style.rgb_extract("180,251,184,153")
     assert hex == "#b4fbb8"
     assert alpha == 0.6
+
+
+def test_convert_to_pixels_mm():
+    pixel_value = Style.convert_to_pixels(2, "MM")
+    assert pixel_value == 7.1429
+
+
+def test_convert_to_pixels_pixel():
+    pixel_value = Style.convert_to_pixels(2, "Pixel")
+    assert pixel_value == 2
+
+
+def test_convert_to_pixels_pixel_invalid_format():
+    with pytest.raises(StyleException):
+        Style.convert_to_pixels(2, "invalid")
 
 
 def test_fill_based_on_feature(points_with_no_fill_and_no_stroke_with_style_attrs):

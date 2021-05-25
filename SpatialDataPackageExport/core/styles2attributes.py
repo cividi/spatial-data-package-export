@@ -21,8 +21,8 @@
 from typing import Any, Dict, List, Optional, cast
 
 from PyQt5.QtCore import QVariant
-from qgis._core import QgsExpression, QgsRuleBasedRenderer
 from qgis.core import (
+    QgsExpression,
     QgsFeature,
     QgsFeatureRequest,
     QgsFeatureSink,
@@ -35,6 +35,7 @@ from qgis.core import (
     QgsProperty,
     QgsPropertyCollection,
     QgsRectangle,
+    QgsRuleBasedRenderer,
     QgsSpatialIndex,
     QgsSymbol,
     QgsSymbolLayer,
@@ -137,7 +138,9 @@ class StylesToAttributes:
                 style.stroke_opacity = (
                     symbol_opacity * style.rgb_extract(sym["outline_color"])[1]
                 )
-                style.stroke_width = float(sym["outline_width"])
+                style.stroke_width = style.convert_to_pixels(
+                    float(sym["outline_width"]), sym["outline_width_unit"]
+                )
             if sym_type in [SymbolLayerType.CentroidFill, SymbolLayerType.SimpleFill]:
                 if sym_type == SymbolLayerType.CentroidFill:
                     style.type = "circle"
@@ -149,7 +152,9 @@ class StylesToAttributes:
                 style.stroke_opacity = (
                     symbol_opacity * style.rgb_extract(sym["outline_color"])[1]
                 )
-                style.stroke_width = float(sym["outline_width"])
+                style.stroke_width = style.convert_to_pixels(
+                    float(sym["outline_width"]), sym["outline_width_unit"]
+                )
 
         elif isinstance(symbol, QgsLineSymbol):
             if sym_type == SymbolLayerType.SimpleLine:
@@ -161,7 +166,9 @@ class StylesToAttributes:
                 style.stroke_opacity = (
                     symbol_opacity * style.rgb_extract(sym["line_color"])[1]
                 )
-                style.stroke_width = float(sym["line_width"])
+                style.stroke_width = style.convert_to_pixels(
+                    float(sym["line_width"]), sym["line_width_unit"]
+                )
         elif isinstance(symbol, QgsMarkerSymbol):
             if sym_type == SymbolLayerType.SimpleMarker:
                 assert isinstance(style, PointStyle)
@@ -173,9 +180,13 @@ class StylesToAttributes:
                 style.stroke_opacity = (
                     symbol_opacity * style.rgb_extract(sym["outline_color"])[1]
                 )
-                style.stroke_width = float(sym["outline_width"])
+                style.stroke_width = style.convert_to_pixels(
+                    float(sym["outline_width"]), sym["outline_width_unit"]
+                )
                 style.has_stroke = style.stroke_opacity > 0.0
-                style.radius = sym["size"]
+                style.radius = style.convert_to_pixels(
+                    float(sym["size"]), sym["size_unit"]
+                )
 
         else:
             raise ValueError(f"Unkown symbol type: {symbol_layer.layerType()}")
