@@ -25,6 +25,7 @@ class SymbolType(enum.Enum):
     categorizedSymbol = "categorizedSymbol"  # noqa: N815
     graduatedSymbol = "graduatedSymbol"  # noqa: N815
     singleSymbol = "singleSymbol"  # noqa: N815
+    RuleRenderer = "RuleRenderer"
 
 
 @enum.unique

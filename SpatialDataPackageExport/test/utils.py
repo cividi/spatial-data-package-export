@@ -19,8 +19,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 import json
-from typing import Dict, Set, Tuple
+from typing import Dict, List, Set, Tuple
 
+from ..model.snapshot import Legend
 from ..qgis_plugin_tools.tools.resources import plugin_test_data_path
 from .conftest import CANVAS, IFACE
 
@@ -34,6 +35,11 @@ def get_symbols_and_legend(name: str) -> Tuple[Dict, Dict]:
     with open(plugin_test_data_path("legend", f_name)) as f:
         legend = json.load(f)
     return symbols, legend
+
+
+def get_legend(name: str) -> List[Legend]:
+    _, legend = get_symbols_and_legend(name)
+    return [Legend.from_dict(lgnd) for lgnd in legend]
 
 
 def get_test_json(*args: str) -> Dict:

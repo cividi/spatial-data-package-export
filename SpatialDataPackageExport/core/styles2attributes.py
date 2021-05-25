@@ -18,9 +18,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 from PyQt5.QtCore import QVariant
+from qgis._core import QgsExpression, QgsRuleBasedRenderer
 from qgis.core import (
     QgsFeature,
     QgsFeatureRequest,
@@ -46,6 +47,7 @@ from ..definitions.types import StyleType
 from ..model.snapshot import Legend
 from ..qgis_plugin_tools.tools.exceptions import QgsPluginNotImplementedException
 from ..qgis_plugin_tools.tools.i18n import tr
+from ..qgis_plugin_tools.tools.layers import evaluate_expressions
 
 
 class StylesToAttributes:
@@ -216,6 +218,18 @@ class StylesToAttributes:
                 "label": self.layer_name,
                 "style": style,
             }
+        elif self.symbol_type == SymbolType.RuleRenderer:
+            root_rule: QgsRuleBasedRenderer.Rule = cast(
+                QgsRuleBasedRenderer, self.renderer
+            ).rootRule()
+            for rule in root_rule.children():
+                style = self._get_style(rule.symbol())
+                self.symbols[i] = {
+                    "value": QgsExpression(rule.filterExpression()),
+                    "label": rule.label(),
+                    "style": style,
+                }
+                i = i + 1
 
     def _copy_fields(
         self, sink: QgsFeatureSink, extent: Optional[QgsRectangle] = None
@@ -285,9 +299,9 @@ class StylesToAttributes:
                         matched = index
                         break
                 if matched is not None:
+                    style: Style = self.symbols[matched]["style"]
+                    style.evaluate_data_defined_expressions(feature)
                     for field_name in self.field_template.keys():
-                        style: Style = self.symbols[matched]["style"]
-                        style.evaluate_data_defined_expressions(feature)
                         attributes[
                             self.fields.names().index(field_name)
                         ] = style.to_dict()[field_name]
@@ -299,10 +313,11 @@ class StylesToAttributes:
                 for index, s in self.symbols.items():
                     if str(feature_value) == str(s["value"]):
                         matched = index
+                        break
                 if matched is not None:
+                    style = self.symbols[matched]["style"]
+                    style.evaluate_data_defined_expressions(feature)
                     for field_name in self.field_template.keys():
-                        style = self.symbols[matched]["style"]
-                        style.evaluate_data_defined_expressions(feature)
                         attributes[
                             self.fields.names().index(field_name)
                         ] = style.to_dict()[field_name]
@@ -314,6 +329,20 @@ class StylesToAttributes:
                 attributes[self.fields.names().index(field_name)] = style.to_dict()[
                     field_name
                 ]
+
+        elif self.symbol_type == SymbolType.RuleRenderer:
+            matched = None
+            for index, s in self.symbols.items():
+                if evaluate_expressions(s["value"], feature, layer=self.layer):
+                    matched = index
+                    break
+            if matched is not None:
+                style = self.symbols[matched]["style"]
+                style.evaluate_data_defined_expressions(feature)
+                for field_name in self.field_template.keys():
+                    attributes[self.fields.names().index(field_name)] = style.to_dict()[
+                        field_name
+                    ]
 
         # TODO: Add more
 
@@ -331,7 +360,6 @@ class StylesToAttributes:
             legend_style["label"] = item["label"]
             if self.legend_shape:
                 legend_style["shape"] = self.legend_shape
-
             legend[item["label"]] = Legend.from_dict(legend_style)
             i += 1
 

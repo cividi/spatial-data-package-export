@@ -46,16 +46,12 @@ def test_gpkg():
 
 @pytest.fixture
 def layer_simple_poly(test_gpkg):
-    name = "simple_poly"
-    layer = get_layer(name, test_gpkg)
-    return layer
+    return get_layer("simple_poly", test_gpkg)
 
 
 @pytest.fixture
 def layer_points(test_gpkg):
-    name = "points_with_radius"
-    layer = get_layer(name, test_gpkg)
-    return layer
+    return get_layer("points_with_radius", test_gpkg)
 
 
 @pytest.fixture
@@ -101,13 +97,14 @@ def points_with_no_fill_and_no_stroke(layer_points):
 
 
 @pytest.fixture
-def tmp_dir():
-    with tempfile.TemporaryDirectory(dir=plugin_test_data_path()) as tmpdirname:
-        yield tmpdirname
+def points_with_no_fill_and_no_stroke_rule_based(layer_points):
+    add_layer(layer_points)
+    set_styles(layer_points, "points_with_no_fill_and_no_stroke_rule_based.qml")
+    return layer_points
 
 
 @pytest.fixture
-def layer_empty_poly(tmp_dir, layer_simple_poly):
+def layer_empty_poly(layer_simple_poly):
     dp: QgsVectorDataProvider = layer_simple_poly.dataProvider()
     layer = QgsVectorLayer("Polygon", "test_poly", "memory")
     layer.setCrs(dp.crs())
@@ -116,7 +113,7 @@ def layer_empty_poly(tmp_dir, layer_simple_poly):
 
 
 @pytest.fixture
-def layer_empty_points(tmp_dir, layer_points):
+def layer_empty_points(layer_points):
     dp: QgsVectorDataProvider = layer_points.dataProvider()
     layer = QgsVectorLayer("Point", "test_point", "memory")
     layer.setCrs(dp.crs())
@@ -125,7 +122,7 @@ def layer_empty_points(tmp_dir, layer_points):
 
 
 @pytest.fixture
-def layer_empty_lines(tmp_dir, layer_lines):
+def layer_empty_lines(layer_lines):
     dp: QgsVectorDataProvider = layer_lines.dataProvider()
     layer = QgsVectorLayer("LineString", "test_lines", "memory")
     layer.setCrs(dp.crs())
@@ -143,8 +140,6 @@ def odc_1_0_license():
 
 
 # Helper functions
-
-
 def verify_layer_copy(layer, orig_layer):
     assert layer.wkbType() == orig_layer.wkbType()
     assert layer.isValid()

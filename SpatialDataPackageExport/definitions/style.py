@@ -20,9 +20,11 @@
 import logging
 from typing import Any, Dict, Union
 
-from qgis._core import QgsExpression, QgsExpressionContext, QgsFeature
+from qgis.core import QgsExpression, QgsFeature
 
+from ..qgis_plugin_tools.tools.exceptions import QgsPluginExpressionException
 from ..qgis_plugin_tools.tools.i18n import tr
+from ..qgis_plugin_tools.tools.layers import evaluate_expressions
 from ..qgis_plugin_tools.tools.resources import plugin_name
 
 LOGGER = logging.getLogger(plugin_name())
@@ -80,19 +82,17 @@ class Style:
             )
 
     def evaluate_data_defined_expressions(self, feature: QgsFeature) -> None:
-        context = QgsExpressionContext()
-        context.setFeature(feature)
         for fld_name, exp in self.data_defined_expressions.items():
-            evaluate = exp.evaluate(context)
-            if not exp.hasEvalError():
-                self.__dict__[fld_name] = evaluate
-            else:
+            try:
+                value = evaluate_expressions(exp, feature)
+                self.__dict__[fld_name] = value
+            except QgsPluginExpressionException as e:
                 LOGGER.warning(
                     tr(
                         "Skipping data defined field {} for "
                         "having evaluation error: {}",
                         fld_name,
-                        exp.evalErrorString(),
+                        e.bar_msg["details"],
                     )
                 )
 

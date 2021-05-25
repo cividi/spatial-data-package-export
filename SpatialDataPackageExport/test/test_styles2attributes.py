@@ -19,6 +19,7 @@
 
 import pytest
 from qgis.core import (
+    QgsExpression,
     QgsFields,
     QgsProcessingFeedback,
     QgsVectorDataProvider,
@@ -120,6 +121,24 @@ def test_points_with_no_fill_and_no_stroke(
     expected_symbols, expected_legend = get_symbols_and_legend(
         "points_with_no_fill_and_no_stroke"
     )
+    common_asserts(converter, expected_legend, expected_symbols, layer_empty_points)
+
+
+def test_rule_based_points_with_no_fill_and_no_stroke(
+    new_project, points_with_no_fill_and_no_stroke_rule_based, layer_empty_points
+):
+    converter = simple_asserts(
+        points_with_no_fill_and_no_stroke_rule_based,
+        layer_empty_points,
+        SymbolType.RuleRenderer,
+    )
+
+    expected_symbols, expected_legend = get_symbols_and_legend(
+        "points_with_no_fill_and_no_stroke"
+    )
+    expected_symbols[0]["value"] = QgsExpression("\"category\" = 'one'")
+    expected_symbols[1]["value"] = QgsExpression("\"category\" = 'two'")
+
     common_asserts(converter, expected_legend, expected_symbols, layer_empty_points)
 
 
