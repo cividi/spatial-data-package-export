@@ -21,8 +21,10 @@
 
 # type: ignore
 # noqa
+import json
 
 import pytest
+import xmltodict
 from qgis.core import QgsVectorLayer
 
 from ..core.attributes2styles import AttributesToStyles
@@ -38,7 +40,7 @@ from .utils import get_legend
             "points_with_no_fill_and_no_stroke_with_style_attrs",
             "points_with_no_fill_and_no_stroke",
             "categorizedSymbol",
-            "points_with_no_fill_and_no_stroke.qml",
+            "points_with_radius_reverse_engineered.qml",
         ),
     ),
 )
@@ -58,6 +60,18 @@ def test_set_style_based_on_attributes(
     styler.set_style_based_on_attributes()
 
     style_path = tmp_path / "style.qml"
+
     msg, succeeded = src_layer.saveNamedStyle(str(style_path))
     assert succeeded, msg
     assert style_path.exists()
+
+    with open(plugin_test_data_path("style", expected_style_file)) as f:
+        expected_content = json.loads(
+            json.dumps(xmltodict.parse(f.read())["qgis"]["renderer-v2"])
+        )
+    with open(style_path) as f:
+        style_content = json.loads(
+            json.dumps(xmltodict.parse(f.read())["qgis"]["renderer-v2"])
+        )
+
+    assert style_content == expected_content

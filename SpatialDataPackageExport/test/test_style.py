@@ -61,10 +61,10 @@ def test_fill_based_on_feature(points_with_no_fill_and_no_stroke_with_style_attr
         points_with_no_fill_and_no_stroke_with_style_attrs.getFeature(1)
     )
     assert style.to_dict() == {
-        "color": "#101010",
+        "color": "#ffffff",
         "fill": False,
         "fillColor": "#76a8c8",
-        "fillOpacity": 0.0,
+        "fillOpacity": 0.8,
         "opacity": 0.8,
         "radius": 50.0,
         "stroke": True,
@@ -78,7 +78,7 @@ def test_fill_based_on_feature(points_with_no_fill_and_no_stroke_with_style_attr
         "fill": True,
         "fillColor": "#a6cd6a",
         "fillOpacity": 0.8,
-        "opacity": 0.0,
+        "opacity": 0.8,
         "radius": 25.982587430391774,
         "stroke": False,
         "weight": 3.0,
