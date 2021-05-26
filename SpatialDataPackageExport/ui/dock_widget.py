@@ -56,11 +56,14 @@ from ..model.snapshot import Legend, License, Source
 from ..model.styled_layer import StyledLayer
 from ..qgis_plugin_tools.tools.custom_logging import bar_msg
 from ..qgis_plugin_tools.tools.decorations import log_if_fails
+from ..qgis_plugin_tools.tools.exceptions import QgsPluginException
 from ..qgis_plugin_tools.tools.i18n import tr
 from ..qgis_plugin_tools.tools.logger_processing import LoggerProcessingFeedBack
+from ..qgis_plugin_tools.tools.messages import MsgBar
 from ..qgis_plugin_tools.tools.resources import load_ui, plugin_name, resources_path
 from ..qgis_plugin_tools.tools.settings import set_setting
 from .extent_dialog import ExtentChooserDialog
+from .import_snapshot_dialog import ImportSnapshotDialog
 from .load_snapshot_conf_dialog import LoadSnapshotConfDialog
 from .settings_dialog import SettingsDialog
 
@@ -78,6 +81,9 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
         self.btn_open_conf.setIcon(QgsApplication.getThemeIcon("/mActionFileOpen.svg"))
         self.btn_save_conf.setIcon(QgsApplication.getThemeIcon("/mActionFileSave.svg"))
+        self.btn_import_snapshot.setIcon(
+            QgsApplication.getThemeIcon("/mActionSharingImport.svg")
+        )
         self.btn_settings.setIcon(
             QgsApplication.getThemeIcon("/propertyicons/settings.svg")
         )
@@ -97,6 +103,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             self.btn_calculate_extent,
             self.btn_open_conf,
             self.btn_save_conf,
+            self.btn_import_snapshot,
             self.btn_settings,
         )
 
@@ -520,6 +527,33 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     def on_btn_settings_clicked(self) -> None:
         settings_dialog = SettingsDialog()
         settings_dialog.exec()
+
+    @pyqtSlot()
+    def on_btn_import_snapshot_clicked(self) -> None:
+        import_snapshot_dialog = ImportSnapshotDialog()
+        result = import_snapshot_dialog.exec()
+        if (
+            result
+            and import_snapshot_dialog.snapshot_file_path is not None
+            and import_snapshot_dialog.snapshot_file_path.exists()
+        ):
+            LOGGER.info(
+                f"Importing snapshot "
+                f"{import_snapshot_dialog.snapshot_file_path.name}"
+            )
+            try:
+                config = self.data_pkg_handler.load_snapshot_from_file(
+                    import_snapshot_dialog.snapshot_file_path
+                )
+
+                self.__set_ui_based_on_snapshot_configuration(
+                    str(config.project_name), config
+                )
+            except QgsPluginException as e:
+                MsgBar.exception(str(e), **e.bar_msg)
+            except Exception as e:
+                MsgBar.error(tr("Uncaught error occurred"), e)
+                return
 
     @pyqtSlot()
     def on_btn_save_conf_clicked(self) -> None:
