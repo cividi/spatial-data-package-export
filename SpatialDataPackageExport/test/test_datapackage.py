@@ -18,14 +18,17 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 import json
+import shutil
 from pathlib import Path
 
+import pytest
 from qgis.core import QgsProcessingFeedback, QgsVectorDataProvider, QgsVectorLayer
 
 from ..core.datapackage import DataPackageHandler
 from ..core.styles2attributes import StylesToAttributes
 from ..definitions.types import StyleType
 from ..model.config import Config
+from ..model.snapshot import Snapshot
 from ..model.styled_layer import StyledLayer
 from ..qgis_plugin_tools.tools.resources import plugin_test_data_path
 from .conftest import add_layer
@@ -174,6 +177,36 @@ def test_config_saving_and_loading(new_project):
     assert "test" in available_configs
     loaded_conf = available_configs["test"]
     assert loaded_conf.to_dict() == config.to_dict()
+
+
+@pytest.mark.parametrize(
+    "snapshot_name",
+    (
+        ("categorized_poly.json"),
+        ("categorized_poly_custom_config.json"),
+        ("gratuated_poly.json"),
+        ("points_with_radius.json"),
+        ("snapshot_categorized_poly.json"),
+    ),
+)
+def test_load_snapshot_from_file(new_project, tmp_path, snapshot_name):
+    p = tmp_path / "snapshot.json"
+    shutil.copy(Path(plugin_test_data_path("snapshots", snapshot_name)), p)
+    with open(p) as f:
+        snapshot = Snapshot.from_dict(json.load(f))
+
+    config = DataPackageHandler.load_snapshot_from_file(p)
+
+    assert config.project_name == snapshot.name
+    assert len(config.snapshots[0][snapshot.name].resources) == len(
+        snapshot.layer_resources
+    )
+    assert all(
+        [
+            (tmp_path / f"{resource.name}.geojson").exists()
+            for resource in snapshot.layer_resources
+        ]
+    )
 
 
 def update_fields(converter: StylesToAttributes, layer: QgsVectorLayer):

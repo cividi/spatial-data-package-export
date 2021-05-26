@@ -19,7 +19,7 @@
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 
 import logging
-from typing import Optional
+from typing import Optional, Type
 
 from PyQt5.QtWidgets import QDialog, QRadioButton, QWidget
 
@@ -83,7 +83,7 @@ class SettingsDialog(QDialog, FORM_CLASS):
             lambda path: Settings.export_config_template.set(path)
         )
 
-    def __get_widget(self, widget_name: str) -> Optional:
+    def __get_widget(self, widget_name: str) -> Optional[Type[QWidget]]:
         try:
             LOGGER.debug(widget_name)
             return getattr(self, widget_name)

@@ -23,3 +23,7 @@ from ..qgis_plugin_tools.tools.exceptions import QgsPluginException
 
 class StyleException(QgsPluginException):
     pass
+
+
+class DataPackageException(QgsPluginException):
+    pass

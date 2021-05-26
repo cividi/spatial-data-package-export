@@ -23,6 +23,7 @@ Generated using https://app.quicktype.io/ from json file
 
 from typing import Any, Dict, List, Optional, Union
 
+from ..definitions.types import StyleType
 from .model_utils import (
     from_bool,
     from_dict,
@@ -318,6 +319,18 @@ class Snapshot:
         self.sources = sources
         self.resources = resources
         self.contributors = contributors
+
+    @property
+    def layer_resources(self) -> List[Resource]:
+        return [
+            resource
+            for resource in self.resources
+            if resource.mediatype
+            in (
+                StyleType.SimpleStyle.media_type,
+                StyleType.PointStyle.media_type,
+            )
+        ]
 
     @staticmethod
     def from_dict(obj: Any) -> "Snapshot":

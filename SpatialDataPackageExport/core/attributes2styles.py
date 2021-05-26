@@ -37,7 +37,6 @@
 
 
 import logging
-from typing import List, Optional
 
 from qgis.core import (
     QgsCategorizedSymbolRenderer,
@@ -50,7 +49,6 @@ from qgis.core import (
 
 from SpatialDataPackageExport.definitions.symbols import SymbolType
 from SpatialDataPackageExport.definitions.types import StyleType
-from SpatialDataPackageExport.model.snapshot import Legend
 from SpatialDataPackageExport.qgis_plugin_tools.tools.layers import LayerType
 from SpatialDataPackageExport.qgis_plugin_tools.tools.resources import plugin_name
 
@@ -58,11 +56,8 @@ LOGGER = logging.getLogger(plugin_name())
 
 
 class AttributesToStyles:
-    def __init__(
-        self, layer: QgsVectorLayer, legend: Optional[List[Legend]] = None
-    ) -> None:
+    def __init__(self, layer: QgsVectorLayer) -> None:
         self.layer = layer
-        self.legend = legend if legend is not None else []
         self.layer_type = LayerType.from_layer(self.layer)
         self.style_type: StyleType = StyleType.from_layer(layer)
         self.symbol_type = SymbolType.categorizedSymbol

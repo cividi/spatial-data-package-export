@@ -18,6 +18,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 import json
+from pathlib import Path
 from typing import Dict, List
 
 from qgis.core import QgsRectangle
@@ -27,6 +28,11 @@ def load_json(template_path: str) -> Dict:
     with open(template_path) as f:
         template = json.load(f)
     return template
+
+
+def write_json(path: Path, content: Dict) -> None:
+    with open(path, "w") as f:
+        json.dump(content, f)
 
 
 def extent_to_datapackage_bounds(extent: QgsRectangle, precision: int) -> List[str]:

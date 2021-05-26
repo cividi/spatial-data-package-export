@@ -18,15 +18,22 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 import logging
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+
+from qgis.core import QgsProject, QgsVectorLayer
 
 from ..definitions.configurable_settings import ProjectSettings, Settings
 from ..model.config import Config, SnapshotConfig
 from ..model.snapshot import Legend, License, Resource, Snapshot
 from ..model.styled_layer import StyledLayer
+from ..qgis_plugin_tools.tools.custom_logging import bar_msg
+from ..qgis_plugin_tools.tools.i18n import tr
 from ..qgis_plugin_tools.tools.resources import plugin_name
 from ..qgis_plugin_tools.tools.settings import get_project_setting, get_setting
-from .utils import load_json
+from .attributes2styles import AttributesToStyles
+from .exceptions import DataPackageException
+from .utils import load_json, write_json
 
 LOGGER = logging.getLogger(plugin_name())
 
@@ -127,6 +134,28 @@ class DataPackageHandler:
         return ProjectSettings.snapshot_configs.set(
             {name: conf.to_dict() for name, conf in confs.items()}
         )
+
+    @staticmethod
+    def load_snapshot_from_file(snapshot_path: Path) -> Config:
+        """ Loads snapshot configuration and layers from the file """
+        snapshot = Snapshot.from_dict(load_json(str(snapshot_path)))
+        for resource in snapshot.layer_resources:
+            if resource.data is not None:
+                geojson = resource.data
+                path = Path(snapshot_path.parent, f"{resource.name}.geojson")
+                write_json(path, geojson)
+                layer = QgsVectorLayer(str(path), resource.name)
+                if layer.isValid() and layer.featureCount():
+                    styler = AttributesToStyles(layer)
+                    styler.set_style_based_on_attributes()
+                    QgsProject.instance().addMapLayer(layer)
+                else:
+                    raise DataPackageException(
+                        tr("The layer {} is not valid", resource.name),
+                        bar_msg(tr("Please check the configuration")),
+                    )
+
+        return Config.from_snapshot(snapshot)
 
     @staticmethod
     def get_project_author() -> str:

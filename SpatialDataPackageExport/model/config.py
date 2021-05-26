@@ -33,7 +33,7 @@ from .model_utils import (
     from_union,
     to_class,
 )
-from .snapshot import GemeindescanMeta, License, Source
+from .snapshot import GemeindescanMeta, License, Snapshot, Source
 
 
 class SnapshotResource:
@@ -124,6 +124,41 @@ class SnapshotConfig:
             crop_layers,
         )
 
+    @staticmethod
+    def from_snapshot(snapshot: Snapshot) -> "SnapshotConfig":
+        legend = snapshot.views[0].spec.legend
+        snapshot_resources: List[SnapshotResource] = []
+        for i, res in enumerate(snapshot.layer_resources):
+            # This logic works only if there are 1 or 2 resources
+            # since it is hard to conclude which legend belongs to which resource
+            if i == 0:
+                snapshot_resources.append(
+                    SnapshotResource(res.name, legend[0].primary, legend[0].shape)
+                )
+            else:
+                snapshot_resources.append(
+                    SnapshotResource(res.name, legend[-1].primary, legend[-1].shape)
+                )
+
+        bounds = snapshot.views[0].spec.bounds
+        bounds_precision: Optional[int] = None
+        try:
+            bounds_precision = len(bounds[0].split(",")[0].split(":")[1].split(".")[1])
+        except IndexError:
+            bounds_precision = None
+        return SnapshotConfig(
+            title=snapshot.title,
+            description=snapshot.description,
+            keywords=snapshot.keywords,
+            gemeindescan_meta=snapshot.gemeindescan_meta,
+            sources=snapshot.sources,
+            bounds=bounds,
+            resources=snapshot_resources,
+            licenses=snapshot.licenses,
+            bounds_precision=bounds_precision,
+            crop_layers=False,
+        )
+
     def to_dict(self) -> dict:
         result: dict = {}
         result["title"] = from_union([from_str, from_none], self.title)
@@ -189,6 +224,13 @@ class Config:
         )
         return Config(
             project_name, data_dir, snapshots_dir, dp_template_file, snapshots
+        )
+
+    @staticmethod
+    def from_snapshot(snapshot: Snapshot) -> "Config":
+        return Config(
+            project_name=snapshot.name,
+            snapshots=[{snapshot.name: SnapshotConfig.from_snapshot(snapshot)}],
         )
 
     def to_dict(self) -> dict:
