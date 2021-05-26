@@ -55,11 +55,6 @@ def test_convert_to_pixels_pixel_invalid_format():
         Style.convert_to_pixels(2, "invalid")
 
 
-def test_eq():
-    style = Style()
-    assert style is not " "
-
-
 def test_fill_based_on_feature(points_with_no_fill_and_no_stroke_with_style_attrs):
     style = PointStyle()
     style.fill_based_on_feature(
