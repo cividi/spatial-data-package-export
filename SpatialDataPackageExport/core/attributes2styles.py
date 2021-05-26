@@ -34,42 +34,36 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
-#
-#
-#
-#  This file is part of SpatialDataPackageExport.
-#
-#  SpatialDataPackageExport is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 3 of the License, or
-#  (at your option) any later version.
-#
-#  SpatialDataPackageExport is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
+
 
 import logging
-from typing import List
+from typing import List, Optional
 
-from qgis._core import QgsFeatureRenderer
-from qgis.core import QgsCategorizedSymbolRenderer, QgsRendererCategory, QgsVectorLayer
+from qgis.core import (
+    QgsCategorizedSymbolRenderer,
+    QgsFeatureRenderer,
+    QgsFeatureRequest,
+    QgsRendererCategory,
+    QgsSingleSymbolRenderer,
+    QgsVectorLayer,
+)
 
 from SpatialDataPackageExport.definitions.symbols import SymbolType
 from SpatialDataPackageExport.definitions.types import StyleType
 from SpatialDataPackageExport.model.snapshot import Legend
+from SpatialDataPackageExport.qgis_plugin_tools.tools.layers import LayerType
 from SpatialDataPackageExport.qgis_plugin_tools.tools.resources import plugin_name
 
 LOGGER = logging.getLogger(plugin_name())
 
 
 class AttributesToStyles:
-    def __init__(self, layer: QgsVectorLayer, legend: List[Legend]) -> None:
+    def __init__(
+        self, layer: QgsVectorLayer, legend: Optional[List[Legend]] = None
+    ) -> None:
         self.layer = layer
-        self.legend = legend
+        self.legend = legend if legend is not None else []
+        self.layer_type = LayerType.from_layer(self.layer)
         self.style_type: StyleType = StyleType.from_layer(layer)
         self.symbol_type = SymbolType.categorizedSymbol
 
@@ -82,16 +76,35 @@ class AttributesToStyles:
 
     def _create_renderer(self) -> QgsFeatureRenderer:
         """ Creates a simple categorized renderer based on feature id """
-        symbols = {}
+        styles = {}
+        style_field_names = self.style_type.get_style().FIELD_MAPPER.keys()
+        style_field_ids = [
+            self.layer.fields().indexFromName(f_name) for f_name in style_field_names
+        ]
 
-        for feat in self.layer.getFeatures():
+        request = (
+            QgsFeatureRequest()
+            .setSubsetOfAttributes(style_field_ids)
+            .setFlags(QgsFeatureRequest.NoGeometry)
+        )
+        for feat in self.layer.getFeatures(request):
             style = self.style_type.get_style()
             style.fill_based_on_feature(feat)
-            symbols[feat.id()] = style.create_qgis_symbol()
+            styles[feat.id()] = style
 
-        categories = [
-            QgsRendererCategory(f_id, symbol, str(f_id))
-            for f_id, symbol in symbols.items()
-        ]
-        renderer = QgsCategorizedSymbolRenderer("$id", categories)
+        if len(set(styles.values())) == 1:
+            # Single symbol
+            self.symbol_type = SymbolType.singleSymbol
+            renderer = QgsSingleSymbolRenderer(
+                list(styles.values())[0].create_qgis_symbol(self.layer_type)
+            )
+        else:
+            # Categorized, graduated, rule based...
+            categories = [
+                QgsRendererCategory(
+                    f_id, style.create_qgis_symbol(self.layer_type), str(f_id)
+                )
+                for f_id, style in styles.items()
+            ]
+            renderer = QgsCategorizedSymbolRenderer("$id", categories)
         return renderer

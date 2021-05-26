@@ -23,6 +23,8 @@ from typing import Any, Dict, List, Tuple, Union
 from qgis.core import (
     QgsExpression,
     QgsFeature,
+    QgsFillSymbol,
+    QgsLineSymbol,
     QgsMarkerSymbol,
     QgsSymbol,
     QgsUnitTypes,
@@ -32,7 +34,7 @@ from ..core.exceptions import StyleException
 from ..qgis_plugin_tools.tools.custom_logging import bar_msg
 from ..qgis_plugin_tools.tools.exceptions import QgsPluginExpressionException
 from ..qgis_plugin_tools.tools.i18n import tr
-from ..qgis_plugin_tools.tools.layers import evaluate_expressions
+from ..qgis_plugin_tools.tools.layers import LayerType, evaluate_expressions
 from ..qgis_plugin_tools.tools.resources import plugin_name
 
 LOGGER = logging.getLogger(plugin_name())
@@ -165,8 +167,38 @@ class Style:
             values["type"] = self.type
         return values
 
-    def create_qgis_symbol(self) -> QgsSymbol:
-        pass
+    def create_qgis_symbol(self, layer_type: LayerType) -> QgsSymbol:
+        if layer_type == LayerType.Polygon:
+            symbol = QgsFillSymbol.createSimple(
+                {
+                    "color": self._hex_to_rgb(self.fill, self.fill_opacity),
+                    "outline_color": self._hex_to_rgb(self.stroke, self.stroke_opacity),
+                    "outline_width": str(self.stroke_width),
+                    "outline_width_unit": self.PIXEL_SIZE_UNIT,
+                }
+            )
+        elif layer_type == LayerType.Line:
+            symbol = QgsLineSymbol.createSimple(
+                {
+                    "line_color": self._hex_to_rgb(self.stroke, self.stroke_opacity),
+                    "line_width": str(self.stroke_width),
+                    "line_width_unit": self.PIXEL_SIZE_UNIT,
+                }
+            )
+        else:
+            raise StyleException()
+        return symbol
+
+    def __str__(self) -> str:
+        return str(self.__dict__)
+
+    def __hash__(self) -> int:
+        return hash(str(self))
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Style):
+            return NotImplemented
+        return str(self) == str(other)
 
 
 class SimpleStyle(Style):
@@ -203,7 +235,7 @@ class PointStyle(Style):
         self.title = ""
 
     # noinspection PyArgumentList
-    def create_qgis_symbol(self) -> QgsMarkerSymbol:
+    def create_qgis_symbol(self, layer_type: LayerType) -> QgsMarkerSymbol:
         marker_symbol = QgsMarkerSymbol.createSimple(
             {
                 "color": self._hex_to_rgb(self.fill, self.fill_opacity),

@@ -30,18 +30,22 @@ from qgis.core import QgsVectorLayer
 from ..core.attributes2styles import AttributesToStyles
 from ..definitions.symbols import SymbolType
 from ..qgis_plugin_tools.tools.resources import plugin_test_data_path
-from .utils import get_legend
 
 
 @pytest.mark.parametrize(
-    "src_layer,legend_name,expected_symbol_type,expected_style_file",
+    "src_layer,expected_symbol_type,expected_style_file",
     (
         (
             "points_with_no_fill_and_no_stroke_with_style_attrs",
-            "points_with_no_fill_and_no_stroke",
             "categorizedSymbol",
             "points_with_radius_reverse_engineered.qml",
         ),
+        (
+            "graduated_poly_attrs",
+            "categorizedSymbol",
+            "graduated_poly_reverse_engineered.qml",
+        ),
+        ("simple_lines_attrs", "singleSymbol", "simple_lines.qml"),
     ),
 )
 def test_set_style_based_on_attributes(
@@ -49,15 +53,14 @@ def test_set_style_based_on_attributes(
     tmp_path,
     request,
     src_layer,
-    legend_name,
     expected_symbol_type,
     expected_style_file,
 ):
     src_layer: QgsVectorLayer = request.getfixturevalue(src_layer)
-    styler = AttributesToStyles(src_layer, get_legend(legend_name))
+    styler = AttributesToStyles(src_layer)
 
-    assert styler.symbol_type == SymbolType[expected_symbol_type]
     styler.set_style_based_on_attributes()
+    assert styler.symbol_type == SymbolType[expected_symbol_type]
 
     style_path = tmp_path / "style.qml"
 

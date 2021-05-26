@@ -66,6 +66,16 @@ def points_with_no_fill_and_no_stroke_with_style_attrs(test_gpkg):
 
 
 @pytest.fixture
+def graduated_poly_attrs(test_gpkg):
+    return get_layer("graduated_poly", test_gpkg)
+
+
+@pytest.fixture
+def simple_lines_attrs(test_gpkg):
+    return get_layer("simple_lines_w_styles", test_gpkg)
+
+
+@pytest.fixture
 def categorized_poly(layer_simple_poly):
     add_layer(layer_simple_poly)
     set_styles(layer_simple_poly, "categorized_poly.qml")
