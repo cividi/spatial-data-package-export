@@ -77,6 +77,14 @@ def test_set_style_based_on_attributes(
         style_content = json.loads(
             json.dumps(xmltodict.parse(f.read())["qgis"]["renderer-v2"])
         )
+
+    # For debugging
+    print("----------------")
+    print(style_content)
+    print("----------------")
+    print(expected_content)
+    print("----------------")
+
     if SymbolType[expected_symbol_type] == SymbolType.categorizedSymbol:
         assert style_content["categories"] == expected_content["categories"]
 
@@ -84,14 +92,25 @@ def test_set_style_based_on_attributes(
             expected_content["symbols"]["symbol"]
         )
         for i in range(len(style_content["symbols"]["symbol"])):
-            print(style_content["symbols"]["symbol"])
-            assert (
-                style_content["symbols"]["symbol"][i]["layer"]["prop"]
-                == expected_content["symbols"]["symbol"][i]["layer"]["prop"]
-            )
+            expected_props = {
+                p["@k"]: p["@v"]
+                for p in expected_content["symbols"]["symbol"][i]["layer"]["prop"]
+            }
+            style_props = {
+                p["@k"]: p["@v"]
+                for p in style_content["symbols"]["symbol"][i]["layer"]["prop"]
+                if p["@k"] in expected_props.keys()
+            }
+            assert style_props == expected_props
 
     elif SymbolType[expected_symbol_type] == SymbolType.singleSymbol:
-        assert (
-            expected_content["symbols"]["symbol"]["layer"]["prop"]
-            == expected_content["symbols"]["symbol"]["layer"]["prop"]
-        )
+        expected_props = {
+            p["@k"]: p["@v"]
+            for p in expected_content["symbols"]["symbol"]["layer"]["prop"]
+        }
+        style_props = {
+            p["@k"]: p["@v"]
+            for p in style_content["symbols"]["symbol"]["layer"]["prop"]
+            if p["@k"] in expected_props.keys()
+        }
+        assert style_props == expected_props
