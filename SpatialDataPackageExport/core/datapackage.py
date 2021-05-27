@@ -152,7 +152,12 @@ class DataPackageHandler:
                 else:
                     raise DataPackageException(
                         tr("The layer {} is not valid", resource.name),
-                        bar_msg(tr("Please check the configuration")),
+                        bar_msg(
+                            tr(
+                                "Please check the snapshot and "
+                                "make sure it contains valid GeoJSON"
+                            )
+                        ),
                     )
 
         return Config.from_snapshot(snapshot)

@@ -101,6 +101,9 @@ def test_set_style_based_on_attributes(
                 for p in style_content["symbols"]["symbol"][i]["layer"]["prop"]
                 if p["@k"] in expected_props.keys()
             }
+            expected_props = {
+                k: v for k, v in expected_props.items() if k in style_props.keys()
+            }
             assert style_props == expected_props
 
     elif SymbolType[expected_symbol_type] == SymbolType.singleSymbol:
@@ -112,5 +115,8 @@ def test_set_style_based_on_attributes(
             p["@k"]: p["@v"]
             for p in style_content["symbols"]["symbol"]["layer"]["prop"]
             if p["@k"] in expected_props.keys()
+        }
+        expected_props = {
+            k: v for k, v in expected_props.items() if k in style_props.keys()
         }
         assert style_props == expected_props
