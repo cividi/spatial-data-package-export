@@ -242,7 +242,7 @@ class PointStyle(Style):
                 "outline_color": self._hex_to_rgb(self.stroke, self.stroke_opacity),
                 "outline_width": str(self.stroke_width),
                 "outline_width_unit": self.PIXEL_SIZE_UNIT,
-                "size": self.radius,
+                "size": str(self.radius),
                 "size_unit": self.PIXEL_SIZE_UNIT,
             }
         )

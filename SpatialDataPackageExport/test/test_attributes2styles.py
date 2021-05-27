@@ -72,9 +72,26 @@ def test_set_style_based_on_attributes(
         expected_content = json.loads(
             json.dumps(xmltodict.parse(f.read())["qgis"]["renderer-v2"])
         )
+
     with open(style_path) as f:
         style_content = json.loads(
             json.dumps(xmltodict.parse(f.read())["qgis"]["renderer-v2"])
         )
+    if SymbolType[expected_symbol_type] == SymbolType.categorizedSymbol:
+        assert style_content["categories"] == expected_content["categories"]
 
-    assert style_content == expected_content
+        assert len(style_content["symbols"]["symbol"]) == len(
+            expected_content["symbols"]["symbol"]
+        )
+        for i in range(len(style_content["symbols"]["symbol"])):
+            print(style_content["symbols"]["symbol"])
+            assert (
+                style_content["symbols"]["symbol"][i]["layer"]["prop"]
+                == expected_content["symbols"]["symbol"][i]["layer"]["prop"]
+            )
+
+    elif SymbolType[expected_symbol_type] == SymbolType.singleSymbol:
+        assert (
+            expected_content["symbols"]["symbol"]["layer"]["prop"]
+            == expected_content["symbols"]["symbol"]["layer"]["prop"]
+        )
