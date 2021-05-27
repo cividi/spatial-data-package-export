@@ -24,7 +24,6 @@ from typing import Optional
 
 from PyQt5.QtWidgets import QDialog, QWidget
 
-from ..definitions.configurable_settings import Settings
 from ..qgis_plugin_tools.tools.resources import load_ui, plugin_name
 
 FORM_CLASS: QWidget = load_ui("import_snapshot_dialog.ui")
@@ -35,7 +34,6 @@ class ImportSnapshotDialog(QDialog, FORM_CLASS):
     def __init__(self, parent: Optional[QWidget] = None) -> None:
         QDialog.__init__(self, parent)
         self.setupUi(self)
-        self.file_widget.setFilePath(Settings.export_config_template.get())
         self.file_widget.fileChanged.connect(self._on_file_widget_file_changed)
         self.snapshot_file_path: Optional[Path] = None
 
