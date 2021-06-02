@@ -334,8 +334,8 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
         output_file = Path(output_path, f"{snapshot_name}.json")
 
-        with open(output_file, "w") as f:
-            json.dump(snapshot.to_dict(), f)
+        with open(output_file, "w", encoding='utf-8') as f:
+            json.dump(snapshot.to_dict(), f, ensure_ascii=False)
 
         if Settings.layer_format.get() == LayerFormatOptions.none.value:
             LOGGER.debug("Removing memory layers")

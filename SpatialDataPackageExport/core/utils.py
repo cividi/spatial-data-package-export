@@ -24,15 +24,15 @@ from typing import Dict, List
 from qgis.core import QgsRectangle
 
 
-def load_json(template_path: str) -> Dict:
-    with open(template_path) as f:
-        template = json.load(f)
-    return template
+def load_json(json_path: str) -> Dict:
+    with open(json_path, encoding='utf-8') as f:
+        data = json.load(f)
+    return data
 
 
 def write_json(path: Path, content: Dict) -> None:
-    with open(path, "w") as f:
-        json.dump(content, f)
+    with open(path, "w", encoding='utf-8') as f:
+        json.dump(content, f, ensure_ascii=False)
 
 
 def extent_to_datapackage_bounds(extent: QgsRectangle, precision: int) -> List[str]:

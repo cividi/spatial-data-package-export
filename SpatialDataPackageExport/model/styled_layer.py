@@ -73,12 +73,12 @@ class StyledLayer:
     def get_geojson_data(self) -> Dict:
         source = self.layer.source()
         if source.lower().endswith(".geojson") or source.lower().endswith(".json"):
-            with open(source) as f:
+            with open(source, encoding='utf-8') as f:
                 data = json.load(f)
         else:
             with tempfile.TemporaryDirectory(dir=resources_path()) as tmpdirname:
                 output_file = self.save_as_geojson(Path(tmpdirname))
-                with open(output_file) as f:
+                with open(output_file, encoding='utf-8') as f:
                     data = json.load(f)
         return data
 
