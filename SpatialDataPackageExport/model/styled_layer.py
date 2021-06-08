@@ -24,6 +24,7 @@ from typing import Dict, List, Union
 
 from qgis.core import (
     QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
     QgsProject,
     QgsVectorFileWriter,
     QgsVectorLayer,
@@ -83,11 +84,20 @@ class StyledLayer:
 
     def save_as_geojson(self, output_path: Path) -> Path:
         output_file = Path(output_path, f"{self.resource_name}.geojson")
-        _writer = QgsVectorFileWriter.writeAsVectorFormat(  # noqa: F841
+
+        options = QgsVectorFileWriter.SaveVectorOptions()
+        options.driverName = "GeoJSON"
+        options.fileEncoding = "utf-8"
+
+        src_crs = self.layer.crs()
+        dst_crs = QgsCoordinateReferenceSystem("EPSG:4326")
+        options.ct = QgsCoordinateTransform(src_crs, dst_crs, QgsProject.instance())
+
+        writer_, msg = QgsVectorFileWriter.writeAsVectorFormatV2(
             self.layer,
             str(output_file),
-            "utf-8",
-            QgsCoordinateReferenceSystem("EPSG:4326"),
-            driverName="GeoJSON",
+            QgsProject.instance().transformContext(),
+            options,
         )
+
         return output_file
