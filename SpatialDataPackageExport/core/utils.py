@@ -17,21 +17,22 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
+
 import json
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from qgis.core import QgsRectangle
 
 
-def load_json(json_path: str) -> Dict:
-    with open(json_path, encoding='utf-8') as f:
+def load_json(json_path: Union[str, Path]) -> Dict:
+    with open(json_path, encoding="utf-8") as f:
         data = json.load(f)
     return data
 
 
-def write_json(path: Path, content: Dict) -> None:
-    with open(path, "w", encoding='utf-8') as f:
+def write_json(path: Union[str, Path], content: Dict) -> None:
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(content, f, ensure_ascii=False)
 
 

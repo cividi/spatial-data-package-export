@@ -17,7 +17,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
-import json
+
 import tempfile
 from pathlib import Path
 from typing import Dict, List, Union
@@ -29,6 +29,7 @@ from qgis.core import (
     QgsVectorLayer,
 )
 
+from ..core.utils import load_json
 from ..definitions.configurable_settings import Settings
 from ..definitions.types import StyleType
 from ..qgis_plugin_tools.tools.resources import resources_path
@@ -73,13 +74,11 @@ class StyledLayer:
     def get_geojson_data(self) -> Dict:
         source = self.layer.source()
         if source.lower().endswith(".geojson") or source.lower().endswith(".json"):
-            with open(source, encoding='utf-8') as f:
-                data = json.load(f)
+            data = load_json(source)
         else:
             with tempfile.TemporaryDirectory(dir=resources_path()) as tmpdirname:
-                output_file = self.save_as_geojson(Path(tmpdirname))
-                with open(output_file, encoding='utf-8') as f:
-                    data = json.load(f)
+                json_path = self.save_as_geojson(Path(tmpdirname))
+                data = load_json(json_path)
         return data
 
     def save_as_geojson(self, output_path: Path) -> Path:
