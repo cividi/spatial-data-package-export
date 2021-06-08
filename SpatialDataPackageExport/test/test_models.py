@@ -20,6 +20,7 @@
 # type: ignore
 import json
 
+from ..core.utils import load_json
 from ..model.config import Config
 from ..model.snapshot import Snapshot
 from ..qgis_plugin_tools.tools.resources import resources_path
@@ -33,8 +34,7 @@ def test_snapshot_from_categorized_polygons():
 
 
 def test_config_from_template():
-    with open(resources_path("templates", "export-config.json")) as f:
-        config_data = json.load(f)
+    config_data = load_json(resources_path("templates", "export-config.json"))
     config = Config.from_dict(config_data)
     assert config.project_name == ""
     assert len(config.snapshots) == 1

@@ -19,6 +19,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
+
 import tempfile
 from pathlib import Path
 
@@ -76,6 +77,11 @@ def simple_lines_attrs(test_gpkg):
 
 
 @pytest.fixture
+def layer_with_non_ascii_chars(test_gpkg):
+    return get_layer("layer_with_non_ascii_chars", test_gpkg)
+
+
+@pytest.fixture
 def categorized_poly(layer_simple_poly):
     add_layer(layer_simple_poly)
     set_styles(layer_simple_poly, "categorized_poly.qml")
@@ -101,6 +107,13 @@ def points_with_radius(layer_points):
     add_layer(layer_points)
     set_styles(layer_points, "points_with_radius.qml")
     return layer_points
+
+
+@pytest.fixture
+def layer_with_non_ascii_simple_style(layer_with_non_ascii_chars):
+    add_layer(layer_with_non_ascii_chars)
+    set_styles(layer_with_non_ascii_chars, "simple_points.qml")
+    return layer_with_non_ascii_chars
 
 
 @pytest.fixture

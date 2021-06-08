@@ -1,0 +1,134 @@
+{
+    "name": "point-sample-snapshot",
+    "title": "Point Sample",
+    "description": "Points with non ascii chars",
+    "version": "1.0.0",
+    "datapackage_version": "1.0.0",
+    "gemeindescan_version": "0.3.1",
+    "gemeindescan_meta": {
+        "topic": "Sample"
+    },
+    "format": "geojson",
+    "licenses": [],
+    "keywords": [
+        "europe",
+        "switzerland",
+        "gemeindescan",
+        "geodata"
+    ],
+    "views": [
+        {
+            "name": "mapview",
+            "specType": "gemeindescanSnapshot",
+            "spec": {
+                "title": "Point Sample",
+                "description": "Points with non ascii chars",
+                "attribution": "",
+                "bounds": [
+                    "geo:47.35694079,8.50916232",
+                    "geo:47.38801477,8.56700647"
+                ],
+                "legend": [
+                    {
+                        "label": "layer_with_non_ascii_chars",
+                        "size": 1,
+                        "shape": "circle",
+                        "primary": true,
+                        "fillColor": "#e5b636",
+                        "fillOpacity": 1.0,
+                        "strokeColor": "#232323",
+                        "strokeWidth": 0.0,
+                        "strokeOpacity": 1.0
+                    }
+                ]
+            },
+            "resources": [
+                "point-sample-snapshot",
+                "mapbox-background"
+            ]
+        }
+    ],
+    "sources": [
+        {
+            "url": "https://www.openstreetmap.org/copyright",
+            "title": "Karte: Mapbox, © OpenStreetMap"
+        }
+    ],
+    "resources": [
+        {
+            "name": "point-sample-snapshot",
+            "mediatype": "application/vnd.simplestyle-extended",
+            "licenses": [],
+            "data": {
+                "type": "FeatureCollection",
+                "name": "point-sample-snapshot",
+                "crs": {
+                    "type": "name",
+                    "properties": {
+                        "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+                    }
+                },
+                "features": [
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "fid": 1,
+                            "desc": "Straßburger Straße",
+                            "fill": true,
+                            "fillColor": "#e5b636",
+                            "fillOpacity": 1.0,
+                            "stroke": true,
+                            "color": "#232323",
+                            "opacity": 1.0,
+                            "weight": 0.0,
+                            "radius": 7.1429
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                8.572633810147014,
+                                47.369150346625496
+                            ]
+                        }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "fid": 2,
+                            "desc": "Karditsa Καρδίτσα",
+                            "fill": true,
+                            "fillColor": "#e5b636",
+                            "fillOpacity": 1.0,
+                            "stroke": true,
+                            "color": "#232323",
+                            "opacity": 1.0,
+                            "weight": 0.0,
+                            "radius": 7.1429
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [
+                                8.585576066328167,
+                                47.39115218213345
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "mapbox-background",
+            "mediatype": "application/vnd.mapbox-vector-tile",
+            "licenses": [],
+            "path": "mapbox://styles/gemeindescan/ck6rp249516tg1iqkmt48o4pz"
+        }
+    ],
+    "contributors": [
+        {
+            "path": "",
+            "role": "author",
+            "email": "",
+            "title": "test_author"
+        }
+    ]
+}
