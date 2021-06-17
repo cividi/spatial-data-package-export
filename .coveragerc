@@ -1,0 +1,2 @@
+[run] # pytest-cov
+omit = SpatialDataPackageExport/qgis_plugin_tools/*

@@ -1,4 +1,5 @@
-#  Gispo Ltd., hereby disclaims all copyright interest in the program SpatialDataPackageExport
+#  Gispo Ltd., hereby disclaims all copyright interest in the program
+#  SpatialDataPackageExport
 #  Copyright (C) 2020 Gispo Ltd (https://www.gispo.fi/).
 #
 #
@@ -18,10 +19,16 @@
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 import uuid
 from functools import partial
-from typing import List, Dict, Callable, Optional
+from typing import Any, Callable, Dict, List, Optional
 
-from qgis.core import (QgsApplication, QgsProcessingAlgRunnerTask, QgsRectangle, QgsVectorLayer, QgsProcessingFeedback,
-                       QgsProcessingContext)
+from qgis.core import (
+    QgsApplication,
+    QgsProcessingAlgRunnerTask,
+    QgsProcessingContext,
+    QgsProcessingFeedback,
+    QgsRectangle,
+    QgsVectorLayer,
+)
 
 from .algorithms import StyleToAttributesAlg
 from .provider import SpatialDataPackageProcessingProvider
@@ -29,12 +36,23 @@ from .provider import SpatialDataPackageProcessingProvider
 
 class TaskWrapper:
     """
-    Helper class for task parameters. Could be replaced with TypedDict, but support for Python 3.8 is not that wide yet
+    Helper class for task parameters. Could be replaced with TypedDict,
+    but support for Python 3.8 is not that wide yet
     """
 
-    def __init__(self, id: uuid.UUID, layer: QgsVectorLayer, name: str, extent: Optional[QgsRectangle], primary: bool,
-                 legend_shape: str, output: str, feedback: QgsProcessingFeedback, context: QgsProcessingContext,
-                 executed: Callable) -> None:
+    def __init__(
+        self,
+        id: uuid.UUID,
+        layer: QgsVectorLayer,
+        name: str,
+        extent: Optional[QgsRectangle],
+        primary: bool,
+        legend_shape: str,
+        output: str,
+        feedback: QgsProcessingFeedback,
+        context: QgsProcessingContext,
+        executed: Callable,
+    ) -> None:
         self.id = id
         self.layer = layer
         self.name = name
@@ -47,32 +65,44 @@ class TaskWrapper:
         self.executed = executed
 
     @property
-    def params(self) -> Dict[str, any]:
+    def params(self) -> Dict[str, Any]:
         return {
-            'EXTENT': self.extent,
-            'INPUT': self.layer,
-            'NAME': self.name,
-            'PRIMARY': self.primary,
-            'LEGEND_SHAPE': self.legend_shape,
-            'OUTPUT': self.output
+            "EXTENT": self.extent,
+            "INPUT": self.layer,
+            "NAME": self.name,
+            "PRIMARY": self.primary,
+            "LEGEND_SHAPE": self.legend_shape,
+            "OUTPUT": self.output,
         }
 
     def __str__(self) -> str:
         return str(self.params)
 
 
-def create_styles_to_attributes_tasks(task_wrappers: List[TaskWrapper], completed: Callable):
+def create_styles_to_attributes_tasks(
+    task_wrappers: List[TaskWrapper], completed: Callable
+) -> None:
     tasks = []
     if len(task_wrappers) == 0:
         # TODO: custom execption
         raise ValueError()
     for task_wrapper in task_wrappers:
         alg = QgsApplication.processingRegistry().algorithmById(
-            f'{SpatialDataPackageProcessingProvider.ID}:{StyleToAttributesAlg.ID}')
-        task = QgsProcessingAlgRunnerTask(alg, task_wrapper.params, task_wrapper.context, task_wrapper.feedback)
+            f"{SpatialDataPackageProcessingProvider.ID}:{StyleToAttributesAlg.ID}"
+        )
+        task = QgsProcessingAlgRunnerTask(
+            alg, task_wrapper.params, task_wrapper.context, task_wrapper.feedback
+        )
         task.setDependentLayers([task_wrapper.layer])
         # noinspection PyUnresolvedReferences
-        task.executed.connect(partial(task_wrapper.executed, task_wrapper.layer, task_wrapper.context, task_wrapper.id))
+        task.executed.connect(
+            partial(
+                task_wrapper.executed,
+                task_wrapper.layer,
+                task_wrapper.context,
+                task_wrapper.id,
+            )
+        )
         # noinspection PyUnresolvedReferences
         task.taskCompleted.connect(completed)
         tasks.append(task)

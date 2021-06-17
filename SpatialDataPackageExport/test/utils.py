@@ -1,4 +1,6 @@
-#  Gispo Ltd., hereby disclaims all copyright interest in the program SpatialDataPackageExport
+# type: ignore
+#  Gispo Ltd., hereby disclaims all copyright interest in the program
+#  SpatialDataPackageExport
 #  Copyright (C) 2020 Gispo Ltd (https://www.gispo.fi/).
 #
 #
@@ -16,32 +18,40 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
-import json
-from typing import Dict, Tuple
 
-from .conftest import IFACE, CANVAS
+from typing import Dict, List, Set, Tuple
+
+from ..core.utils import load_json
+from ..model.snapshot import Legend
 from ..qgis_plugin_tools.tools.resources import plugin_test_data_path
+from .conftest import CANVAS, IFACE
 
 
 def get_symbols_and_legend(name: str) -> Tuple[Dict, Dict]:
-    f_name = f'{name}.json'
-    with open(plugin_test_data_path('symbols', f_name)) as f:
-        symbols = json.load(f)
+    f_name = f"{name}.json"
+
+    symbols = load_json(plugin_test_data_path("symbols", f_name))
     symbols = {int(key): val for key, val in symbols.items()}
 
-    with open(plugin_test_data_path('legend', f_name)) as f:
-        legend = json.load(f)
+    legend = load_json(plugin_test_data_path("legend", f_name))
+
     return symbols, legend
+
+
+def get_legend(name: str) -> List[Legend]:
+    _, legend = get_symbols_and_legend(name)
+    return [Legend.from_dict(lgnd) for lgnd in legend]
 
 
 def get_test_json(*args: str) -> Dict:
     f_path = plugin_test_data_path(*args)
-    if not (f_path.endswith('.json') or f_path.endswith('.geojson')):
-        raise ValueError('Invalid path')
-    with open(f_path) as f:
-        data = json.load(f)
+    if not (f_path.endswith(".json") or f_path.endswith(".geojson")):
+        raise ValueError("Invalid path")
+
+    data = load_json(f_path)
+
     return data
 
 
-def get_existing_layer_names():
+def get_existing_layer_names() -> Set[str]:
     return {layer.name() for layer in IFACE.getMockLayers() + CANVAS.layers()}

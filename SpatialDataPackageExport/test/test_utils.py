@@ -17,9 +17,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 import pytest
-from qgis.core import QgsRectangle, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
+from qgis.core import (
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsProject,
+    QgsRectangle,
+)
 
-from ..core.utils import extent_to_datapackage_bounds, datapackage_bounds_to_extent
+from ..core.utils import datapackage_bounds_to_extent, extent_to_datapackage_bounds
 
 
 @pytest.fixture
@@ -34,7 +39,12 @@ def extent():
 
 @pytest.fixture
 def extent2():
-    return QgsRectangle(21.55787082699999857, 59.40132140899999769, 27.46496583600000108, 62.1826135000000022)
+    return QgsRectangle(
+        21.55787082699999857,
+        59.40132140899999769,
+        27.46496583600000108,
+        62.1826135000000022,
+    )
 
 
 @pytest.fixture
@@ -47,15 +57,15 @@ def test_extent_to_datapackage_bounds(extent, bounds):
     assert got_bounds == bounds
 
 
-@pytest.mark.skip('Rounding issues...')
+@pytest.mark.skip("Rounding issues...")
 def test_datapackage_bounds_to_extent(bounds, rounded_extent):
     extent = datapackage_bounds_to_extent(bounds)
     assert extent == rounded_extent
 
 
 def test_transformations(extent):
-    extent_crs = QgsCoordinateReferenceSystem('EPSG:4326')
-    source_crs = QgsCoordinateReferenceSystem('EPSG:3067')
+    extent_crs = QgsCoordinateReferenceSystem("EPSG:4326")
+    source_crs = QgsCoordinateReferenceSystem("EPSG:3067")
     transform = QgsCoordinateTransform(extent_crs, source_crs, QgsProject.instance())
     extent_transformed = transform.transformBoundingBox(extent)
     assert not extent_transformed == extent

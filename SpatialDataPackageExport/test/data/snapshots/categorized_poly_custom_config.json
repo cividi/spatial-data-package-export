@@ -44,7 +44,7 @@
             "fillColor": "#ec1182",
             "fillOpacity": 1.0,
             "strokeColor": "#232323",
-            "strokeWidth": 0.26,
+            "strokeWidth": 0.9286,
             "strokeOpacity": 1.0
           },
           {
@@ -55,7 +55,7 @@
             "fillColor": "#3df091",
             "fillOpacity": 1.0,
             "strokeColor": "#232323",
-            "strokeWidth": 0.26,
+            "strokeWidth": 0.9286,
             "strokeOpacity": 1.0
           },
           {
@@ -66,7 +66,7 @@
             "fillColor": "#4b50e2",
             "fillOpacity": 1.0,
             "strokeColor": "#232323",
-            "strokeWidth": 0.26,
+            "strokeWidth": 0.9286,
             "strokeOpacity": 1.0
           },
           {
@@ -77,7 +77,7 @@
             "fillColor": "#cecd73",
             "fillOpacity": 1.0,
             "strokeColor": "#232323",
-            "strokeWidth": 0.26,
+            "strokeWidth": 0.9286,
             "strokeOpacity": 1.0
           }
         ]
@@ -129,7 +129,7 @@
               "fill-opacity": 1.0,
               "stroke": "#232323",
               "stroke-opacity": 1.0,
-              "stroke-width": 0.26
+              "stroke-width": 0.9286
             },
             "geometry": {
               "type": "Polygon",
@@ -168,7 +168,7 @@
               "fill-opacity": 1.0,
               "stroke": "#232323",
               "stroke-opacity": 1.0,
-              "stroke-width": 0.26
+              "stroke-width": 0.9286
             },
             "geometry": {
               "type": "Polygon",
@@ -203,7 +203,7 @@
               "fill-opacity": 1.0,
               "stroke": "#232323",
               "stroke-opacity": 1.0,
-              "stroke-width": 0.26
+              "stroke-width": 0.9286
             },
             "geometry": {
               "type": "Polygon",

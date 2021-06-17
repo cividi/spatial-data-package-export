@@ -1,4 +1,5 @@
-#  Gispo Ltd., hereby disclaims all copyright interest in the program SpatialDataPackageExport
+#  Gispo Ltd., hereby disclaims all copyright interest in the program
+#  SpatialDataPackageExport
 #  Copyright (C) 2020 Gispo Ltd (https://www.gispo.fi/).
 #
 #
@@ -21,17 +22,20 @@ import enum
 
 from qgis.core import QgsVectorLayer
 
-from .style import PointStyle, SimpleStyle, Style
 from ..qgis_plugin_tools.tools.layers import LayerType
+from .style import PointStyle, SimpleStyle, Style
 
 
 @enum.unique
 class StyleType(enum.Enum):
-    SimpleStyle = {'mediatype': 'application/geo+json', 'style_cls': SimpleStyle}
-    PointStyle = {'mediatype': 'application/vnd.simplestyle-extended', 'style_cls': PointStyle}
+    SimpleStyle = {"mediatype": "application/geo+json", "style_cls": SimpleStyle}
+    PointStyle = {
+        "mediatype": "application/vnd.simplestyle-extended",
+        "style_cls": PointStyle,
+    }
 
     @staticmethod
-    def from_layer(layer: QgsVectorLayer):
+    def from_layer(layer: QgsVectorLayer) -> "StyleType":
         if LayerType.from_layer(layer) == LayerType.Point:
             return StyleType.PointStyle
         else:
@@ -39,7 +43,7 @@ class StyleType(enum.Enum):
 
     @property
     def media_type(self) -> str:
-        return self.value['mediatype']
+        return self.value["mediatype"]  # type: ignore
 
     def get_style(self) -> Style:
-        return self.value['style_cls']()
+        return self.value["style_cls"]()  # type: ignore

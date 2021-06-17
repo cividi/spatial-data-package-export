@@ -1,4 +1,5 @@
-#  Gispo Ltd., hereby disclaims all copyright interest in the program SpatialDataPackageExport
+#  Gispo Ltd., hereby disclaims all copyright interest in the program
+#  SpatialDataPackageExport
 #  Copyright (C) 2020 Gispo Ltd (https://www.gispo.fi/).
 #
 #
@@ -22,20 +23,20 @@ from .algorithms import StyleToAttributesAlg
 
 
 class SpatialDataPackageProcessingProvider(QgsProcessingProvider):
-    ID = 'spatial_data_package'
+    ID = "spatial_data_package"
 
-    def __init__(self):
+    def __init__(self) -> None:
         QgsProcessingProvider.__init__(self)
 
-    def loadAlgorithms(self):
+    def loadAlgorithms(self) -> None:  # noqa: N802
         for alg in [StyleToAttributesAlg()]:
             self.addAlgorithm(alg)
 
     def id(self) -> str:
         return SpatialDataPackageProcessingProvider.ID
 
-    def name(self):
-        return self.tr('Spatial Data Package')
+    def name(self) -> str:
+        return self.tr("Spatial Data Package")
 
-    def longName(self):
+    def longName(self) -> str:  # noqa: N802
         return self.name()

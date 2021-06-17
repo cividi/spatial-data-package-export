@@ -1,4 +1,5 @@
-#  Gispo Ltd., hereby disclaims all copyright interest in the program SpatialDataPackageExport
+#  Gispo Ltd., hereby disclaims all copyright interest in the program
+#  SpatialDataPackageExport
 #  Copyright (C) 2020 Gispo Ltd (https://www.gispo.fi/).
 #
 #
@@ -18,46 +19,63 @@
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 import enum
 import json
-from typing import Union, List, Dict
+from typing import Any, Dict, List, Union, cast
 
 from ..qgis_plugin_tools.tools.exceptions import QgsPluginException
 from ..qgis_plugin_tools.tools.i18n import tr
 from ..qgis_plugin_tools.tools.resources import resources_path
-from ..qgis_plugin_tools.tools.settings import get_setting, set_setting, get_project_setting, set_project_setting
+from ..qgis_plugin_tools.tools.settings import (
+    get_project_setting,
+    get_setting,
+    set_project_setting,
+    set_setting,
+)
 
 
 @enum.unique
 class LayerFormatOptions(enum.Enum):
-    memory = 'memory'
-    geojson = 'geojson'
-    none = 'none'
+    memory = "memory"
+    geojson = "geojson"
+    none = "none"
 
 
 @enum.unique
 class Settings(enum.Enum):
     extent_precision = 8
-    export_config_template = resources_path('templates', 'export-config.json')
-    snapshot_template = resources_path('templates', 'snapshot-template.json')
-    layer_format = 'memory'
+    export_config_template = resources_path("templates", "export-config.json")
+    snapshot_template = resources_path("templates", "snapshot-template.json")
+    layer_format = "memory"
     crop_layers = True
     licences = {
-        'Creative Commons CC Zero': {'type': 'CC0-1.0',
-                                     'url': 'https://creativecommons.org/publicdomain/zero/1.0/'},
-        'Open Data Commons Public Domain Dedication and Licence': {'type': 'PDDL-1.0',
-                                                                   'url': 'https://opendatacommons.org/licenses/pddl/'},
-        'Creative Commons Attribution 4.0': {'type': 'CC-BY-4.0',
-                                             'url': 'https://creativecommons.org/licenses/by/4.0/'},
-        'Open Data Commons Attribution License': {'type': 'ODC-BY-1.0',
-                                                  'url': 'https://opendefinition.org/licenses/odc-by'},
-        'Creative Commons Attribution Share-Alike 4.0': {'type': 'CC-BY-SA-4.0',
-                                                         'url': 'https://creativecommons.org/licenses/by-sa/4.0/'},
-        'Open Data Commons Open Database License': {'type': 'ODbL-1.0',
-                                                    'url': 'https://opendatacommons.org/licenses/odbl/'},
+        "Creative Commons CC Zero": {
+            "type": "CC0-1.0",
+            "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        },
+        "Open Data Commons Public Domain Dedication and Licence": {
+            "type": "PDDL-1.0",
+            "url": "https://opendatacommons.org/licenses/pddl/",
+        },
+        "Creative Commons Attribution 4.0": {
+            "type": "CC-BY-4.0",
+            "url": "https://creativecommons.org/licenses/by/4.0/",
+        },
+        "Open Data Commons Attribution License": {
+            "type": "ODC-BY-1.0",
+            "url": "https://opendefinition.org/licenses/odc-by",
+        },
+        "Creative Commons Attribution Share-Alike 4.0": {
+            "type": "CC-BY-SA-4.0",
+            "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+        },
+        "Open Data Commons Open Database License": {
+            "type": "ODbL-1.0",
+            "url": "https://opendatacommons.org/licenses/odbl/",
+        },
     }
 
-    _options = {'layer_format': [option.value for option in LayerFormatOptions]}
+    _options = {"layer_format": [option.value for option in LayerFormatOptions]}
 
-    def get(self) -> any:
+    def get(self) -> Any:
         """Gets the value of the setting"""
         typehint: type = str
         if self == Settings.crop_layers:
@@ -72,23 +90,25 @@ class Settings(enum.Enum):
         """Sets the value of the setting"""
         options = self.get_options()
         if options and value not in options:
-            raise QgsPluginException(tr('Invalid option. Choose something from values {}', options))
+            raise QgsPluginException(
+                tr("Invalid option. Choose something from values {}", options)
+            )
         if self == Settings.licences:
             value = json.dumps(value)
         return set_setting(self.name, value)
 
-    def get_options(self) -> List[any]:
+    def get_options(self) -> List[Any]:
         """Get options for the setting"""
         return Settings._options.value.get(self.name, [])
 
 
 @enum.unique
 class ProjectSettings(enum.Enum):
-    snapshot_configs = '{}'
+    snapshot_configs = "{}"
 
-    def get(self) -> any:
+    def get(self) -> Any:
         """Gets the value of the setting"""
-        value = get_project_setting(self.name, self.value, str)
+        value = cast(str, get_project_setting(self.name, self.value, str))
         if self == ProjectSettings.snapshot_configs:
             value = json.loads(value)
         return value
@@ -97,7 +117,7 @@ class ProjectSettings(enum.Enum):
         """Sets the value of the setting"""
         if self == ProjectSettings.snapshot_configs:
             value = json.dumps(value)
-        return set_project_setting(self.name, value)
+        return set_project_setting(self.name, value)  # type: ignore
 
     def reset(self) -> bool:
         """Resets the setting back to its default value"""

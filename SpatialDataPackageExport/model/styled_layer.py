@@ -1,4 +1,5 @@
-#  Gispo Ltd., hereby disclaims all copyright interest in the program SpatialDataPackageExport
+#  Gispo Ltd., hereby disclaims all copyright interest in the program
+#  SpatialDataPackageExport
 #  Copyright (C) 2020 Gispo Ltd (https://www.gispo.fi/).
 #
 #
@@ -16,26 +17,40 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
-import json
+
 import tempfile
 from pathlib import Path
-from typing import List, Dict, Union
+from typing import Dict, List, Union
 
-from qgis.core import QgsVectorFileWriter, QgsCoordinateReferenceSystem, QgsProject, QgsVectorLayer
+from qgis.core import (
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsProject,
+    QgsVectorFileWriter,
+    QgsVectorLayer,
+)
 
-from .snapshot import Legend, License
+from ..core.utils import load_json
 from ..definitions.configurable_settings import Settings
 from ..definitions.types import StyleType
 from ..qgis_plugin_tools.tools.resources import resources_path
+from .snapshot import Legend, License
 
 
 class StyledLayer:
-
-    def __init__(self, resource_name: str, layer_id: str, legend: List[Legend], style_type: Union[str, StyleType]):
+    def __init__(
+        self,
+        resource_name: str,
+        layer_id: str,
+        legend: List[Legend],
+        style_type: Union[str, StyleType],
+    ) -> None:
         self.resource_name = resource_name
         self.layer_id = layer_id
         self.legend = legend
-        self.style_type: StyleType = StyleType[style_type] if isinstance(style_type, str) else style_type
+        self.style_type: StyleType = (
+            StyleType[style_type] if isinstance(style_type, str) else style_type
+        )
 
     @property
     def layer(self) -> QgsVectorLayer:
@@ -48,25 +63,41 @@ class StyledLayer:
     def get_licenses(self) -> List[License]:
         licenses = self.layer.metadata().licenses()
         available_licenses = Settings.licences.get()
-        return [License(available_licenses.get(license_, {}).get('url', ''),
-                        available_licenses.get(license_, {}).get('type', ''), license_)
-                for license_ in licenses]
+        return [
+            License(
+                available_licenses.get(license_, {}).get("url", ""),
+                available_licenses.get(license_, {}).get("type", ""),
+                license_,
+            )
+            for license_ in licenses
+        ]
 
     def get_geojson_data(self) -> Dict:
         source = self.layer.source()
-        if source.lower().endswith('.geojson') or source.lower().endswith('.json'):
-            with open(source) as f:
-                data = json.load(f)
+        if source.lower().endswith(".geojson") or source.lower().endswith(".json"):
+            data = load_json(source)
         else:
             with tempfile.TemporaryDirectory(dir=resources_path()) as tmpdirname:
-                output_file = self.save_as_geojson(Path(tmpdirname))
-                with open(output_file) as f:
-                    data = json.load(f)
+                json_path = self.save_as_geojson(Path(tmpdirname))
+                data = load_json(json_path)
         return data
 
     def save_as_geojson(self, output_path: Path) -> Path:
-        output_file = Path(output_path, f'{self.resource_name}.geojson')
-        _writer = QgsVectorFileWriter.writeAsVectorFormat(self.layer, str(output_file), "utf-8",
-                                                          QgsCoordinateReferenceSystem("EPSG:4326"),
-                                                          driverName="GeoJSON")
+        output_file = Path(output_path, f"{self.resource_name}.geojson")
+
+        options = QgsVectorFileWriter.SaveVectorOptions()
+        options.driverName = "GeoJSON"
+        options.fileEncoding = "utf-8"
+
+        src_crs = self.layer.crs()
+        dst_crs = QgsCoordinateReferenceSystem("EPSG:4326")
+        options.ct = QgsCoordinateTransform(src_crs, dst_crs, QgsProject.instance())
+
+        writer_, msg = QgsVectorFileWriter.writeAsVectorFormatV2(
+            self.layer,
+            str(output_file),
+            QgsProject.instance().transformContext(),
+            options,
+        )
+
         return output_file

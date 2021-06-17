@@ -18,28 +18,43 @@
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 
 import pytest
-from qgis.core import QgsVectorDataProvider, QgsProcessingFeedback, QgsVectorLayer, QgsFields
+from qgis.core import (
+    QgsExpression,
+    QgsFields,
+    QgsProcessingFeedback,
+    QgsVectorDataProvider,
+    QgsVectorLayer,
+)
 
-from .utils import get_symbols_and_legend
 from ..core.styles2attributes import StylesToAttributes
-from ..definitions.style import SimpleStyle, PointStyle, Style
+from ..definitions.style import PointStyle, SimpleStyle, Style
 from ..definitions.symbols import SymbolType
 from ..qgis_plugin_tools.tools.logger_processing import LoggerProcessingFeedBack
+from .utils import get_symbols_and_legend  # type: ignore
 
 
 def test_simple_style_fields(new_project, layer_simple_poly):
-    converter = StylesToAttributes(layer_simple_poly, layer_simple_poly.name(), QgsProcessingFeedback())
+    converter = StylesToAttributes(
+        layer_simple_poly, layer_simple_poly.name(), QgsProcessingFeedback()
+    )
     fields = [f.name() for f in converter.fields.toList()]
 
-    assert len(fields) == len(layer_simple_poly.fields().toList()) + len(SimpleStyle.FIELD_MAPPER)
+    assert len(fields) == len(layer_simple_poly.fields().toList()) + len(
+        SimpleStyle.FIELD_MAPPER
+    )
     assert set(SimpleStyle.FIELD_MAPPER.keys()).difference(fields) == set()
 
 
 def test_point_style_fields(new_project, layer_points):
-    converter = StylesToAttributes(layer_points, layer_points.name(), QgsProcessingFeedback())
+    converter = StylesToAttributes(
+        layer_points, layer_points.name(), QgsProcessingFeedback()
+    )
     fields = [f.name() for f in converter.fields.toList()]
     # There is radius field already defined
-    assert len(fields) == len(layer_points.fields().toList()) + len(PointStyle.FIELD_MAPPER) - 1
+    assert (
+        len(fields)
+        == len(layer_points.fields().toList()) + len(PointStyle.FIELD_MAPPER) - 1
+    )
     assert set(PointStyle.FIELD_MAPPER.keys()).difference(fields) == set()
 
 
@@ -47,14 +62,18 @@ def test_simple_poly(new_project, layer_simple_poly, layer_empty_poly):
     converter = simple_asserts(layer_simple_poly, layer_empty_poly)
     legend = [val.to_dict() for val in converter.legend.values()]
     assert len(legend) == 1
-    assert legend[0]['shape'] == 'square'
+    assert legend[0]["shape"] == "square"
 
 
-def test_poly_with_circle_shaped_legend(new_project, layer_simple_poly, layer_empty_poly):
-    converter = simple_asserts(layer_simple_poly, layer_empty_poly, legend_shape='circle')
+def test_poly_with_circle_shaped_legend(
+    new_project, layer_simple_poly, layer_empty_poly
+):
+    converter = simple_asserts(
+        layer_simple_poly, layer_empty_poly, legend_shape="circle"
+    )
     legend = [val.to_dict() for val in converter.legend.values()]
     assert len(legend) == 1
-    assert legend[0]['shape'] == 'circle'
+    assert legend[0]["shape"] == "circle"
 
 
 def test_simple_lines(new_project, layer_lines, layer_empty_lines):
@@ -65,60 +84,98 @@ def test_simple_points(new_project, layer_points, layer_empty_points):
     simple_asserts(layer_points, layer_empty_points)
 
 
-@pytest.mark.skip('TODO: fix styles2attributes for centroid layers')
+@pytest.mark.skip("TODO: fix styles2attributes for centroid layers")
 def test_centroid_poly(new_project, centroid_poly, layer_empty_points):
     simple_asserts(centroid_poly, layer_empty_points)
 
 
 def test_categorized_poly(new_project, categorized_poly, layer_empty_poly):
-    converter = simple_asserts(categorized_poly, layer_empty_poly, SymbolType.categorizedSymbol)
+    converter = simple_asserts(
+        categorized_poly, layer_empty_poly, SymbolType.categorizedSymbol
+    )
 
-    expected_symbols, expected_legend = get_symbols_and_legend('categorized_poly')
+    expected_symbols, expected_legend = get_symbols_and_legend("categorized_poly")
     common_asserts(converter, expected_legend, expected_symbols, layer_empty_poly)
 
 
 def test_points_with_radius(new_project, points_with_radius, layer_empty_points):
-    converter = simple_asserts(points_with_radius, layer_empty_points, SymbolType.categorizedSymbol)
+    converter = simple_asserts(
+        points_with_radius, layer_empty_points, SymbolType.categorizedSymbol
+    )
 
-    assert converter.symbols[0]['style'].data_defined_expressions.keys() == {'radius'}
+    assert converter.symbols[0]["style"].data_defined_expressions.keys() == {"radius"}
 
-    expected_symbols, expected_legend = get_symbols_and_legend('points_with_radius')
+    expected_symbols, expected_legend = get_symbols_and_legend("points_with_radius")
     common_asserts(converter, expected_legend, expected_symbols, layer_empty_points)
 
 
-def test_points_with_no_fill_and_no_stroke(new_project, points_with_no_fill_and_no_stroke, layer_empty_points):
-    converter = simple_asserts(points_with_no_fill_and_no_stroke, layer_empty_points, SymbolType.categorizedSymbol)
+def test_points_with_no_fill_and_no_stroke(
+    new_project, points_with_no_fill_and_no_stroke, layer_empty_points
+):
+    converter = simple_asserts(
+        points_with_no_fill_and_no_stroke,
+        layer_empty_points,
+        SymbolType.categorizedSymbol,
+    )
 
-    expected_symbols, expected_legend = get_symbols_and_legend('points_with_no_fill_and_no_stroke')
+    expected_symbols, expected_legend = get_symbols_and_legend(
+        "points_with_no_fill_and_no_stroke"
+    )
     common_asserts(converter, expected_legend, expected_symbols, layer_empty_points)
 
 
-def simple_asserts(src_layer, dst_layer, symbol=SymbolType.singleSymbol, legend_shape=None):
+def test_rule_based_points_with_no_fill_and_no_stroke(
+    new_project, points_with_no_fill_and_no_stroke_rule_based, layer_empty_points
+):
+    converter = simple_asserts(
+        points_with_no_fill_and_no_stroke_rule_based,
+        layer_empty_points,
+        SymbolType.RuleRenderer,
+    )
+
+    expected_symbols, expected_legend = get_symbols_and_legend(
+        "points_with_no_fill_and_no_stroke"
+    )
+    expected_symbols[0]["value"] = QgsExpression("\"category\" = 'one'")
+    expected_symbols[1]["value"] = QgsExpression("\"category\" = 'two'")
+
+    common_asserts(converter, expected_legend, expected_symbols, layer_empty_points)
+
+
+def simple_asserts(
+    src_layer, dst_layer, symbol=SymbolType.singleSymbol, legend_shape=None
+):
     feedback = LoggerProcessingFeedBack()
-    converter = StylesToAttributes(src_layer, src_layer.name(), feedback, legend_shape=legend_shape)
+    converter = StylesToAttributes(
+        src_layer, src_layer.name(), feedback, legend_shape=legend_shape
+    )
     assert converter.symbol_type == symbol
     update_fields(converter, dst_layer)
     dst_layer.startEditing()
     converter.extract_styles_to_layer(dst_layer)
     succeeded = dst_layer.commitChanges()
-    assert succeeded, f'Copying fields failed: {dst_layer.commitErrors()}'
+    assert succeeded, f"Copying fields failed: {dst_layer.commitErrors()}"
     assert not feedback.isCanceled(), feedback.last_report_error
-    assert dst_layer.featureCount() == src_layer.featureCount(), 'feature count is not the same'
+    assert (
+        dst_layer.featureCount() == src_layer.featureCount()
+    ), "feature count is not the same"
     return converter
 
 
 def common_asserts(converter, expected_legend, expected_symbols, converted_layer):
-    assert [val.to_dict() for val in converter.legend.values()] == expected_legend, 'Legends differ'
-    assert converter.get_symbols() == expected_symbols, 'Symbols differ'
+    assert [
+        val.to_dict() for val in converter.legend.values()
+    ] == expected_legend, "Legends differ"
+    assert converter.get_symbols() == expected_symbols, "Symbols differ"
 
-    if len(converter.symbols[0]['style'].data_defined_expressions) == 0:
+    if len(converter.symbols[0]["style"].data_defined_expressions) == 0:
         for i in range(converted_layer.featureCount()):
             # Memory layer indexing starts with 1 instead of 0 (possibly a BUG)
             f = converted_layer.getFeature(i + 1)
             symbol = expected_symbols[i]
-            style: Style = converter.symbols[i]['style']
+            style: Style = converter.symbols[i]["style"]
             for key, c_key in style.FIELD_MAPPER.items():
-                assert f[key] == symbol['style'][key]
+                assert f[key] == symbol["style"][key]
 
 
 def update_fields(converter: StylesToAttributes, layer: QgsVectorLayer):
