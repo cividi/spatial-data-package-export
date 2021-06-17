@@ -32,7 +32,7 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>Import Spatial Data Package From a File...</string>
+         <string>Import metadata from a Spatial Data Package file...</string>
         </property>
         <property name="text">
          <string/>
@@ -122,8 +122,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>482</width>
-         <height>603</height>
+         <width>471</width>
+         <height>682</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_10">

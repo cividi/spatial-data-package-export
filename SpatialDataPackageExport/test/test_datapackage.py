@@ -248,6 +248,9 @@ def test_load_snapshot_from_file(new_project, tmp_path, snapshot_name):
     config = DataPackageHandler.load_snapshot_from_file(p)
 
     assert config.project_name == snapshot.name
+
+    # TODO: Take in use again when implementing #49
+    """
     assert len(config.snapshots[0][snapshot.name].resources) == len(
         snapshot.layer_resources
     )
@@ -257,6 +260,7 @@ def test_load_snapshot_from_file(new_project, tmp_path, snapshot_name):
             for resource in snapshot.layer_resources
         ]
     )
+    """
 
 
 def update_fields(converter: StylesToAttributes, layer: QgsVectorLayer):

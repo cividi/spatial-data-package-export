@@ -21,19 +21,13 @@ import logging
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-from qgis.core import QgsProject, QgsVectorLayer
-
 from ..definitions.configurable_settings import ProjectSettings, Settings
 from ..model.config import Config, SnapshotConfig
 from ..model.snapshot import Legend, License, Resource, Snapshot
 from ..model.styled_layer import StyledLayer
-from ..qgis_plugin_tools.tools.custom_logging import bar_msg
-from ..qgis_plugin_tools.tools.i18n import tr
 from ..qgis_plugin_tools.tools.resources import plugin_name
 from ..qgis_plugin_tools.tools.settings import get_project_setting, get_setting
-from .attributes2styles import AttributesToStyles
-from .exceptions import DataPackageException
-from .utils import load_json, write_json
+from .utils import load_json
 
 LOGGER = logging.getLogger(plugin_name())
 
@@ -137,8 +131,11 @@ class DataPackageHandler:
 
     @staticmethod
     def load_snapshot_from_file(snapshot_path: Path) -> Config:
-        """ Loads snapshot configuration and layers from the file """
+        """Loads snapshot configuration and layers from the file"""
         snapshot = Snapshot.from_dict(load_json(str(snapshot_path)))
+
+        # TODO: Take in use again when implementing #49
+        """
         for resource in snapshot.layer_resources:
             if resource.data is not None:
                 geojson = resource.data
@@ -159,6 +156,7 @@ class DataPackageHandler:
                             )
                         ),
                     )
+        """
 
         return Config.from_snapshot(snapshot)
 

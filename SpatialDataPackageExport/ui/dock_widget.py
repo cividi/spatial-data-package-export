@@ -236,6 +236,9 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
         for row_uuid in list(self.layer_rows.keys()):
             self.__remove_row(row_uuid, self.layer_rows, self.layer_grid)
+
+        # TODO: Take in use again when implementing #49
+        """
         for i, layer_resource in enumerate(
             snapshot_conf.resources if snapshot_conf.resources else [], start=1
         ):
@@ -252,6 +255,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                         )
                     ),
                 )
+        """
 
         # Add one row initially
         if not snapshot_conf.resources:
