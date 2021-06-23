@@ -46,6 +46,7 @@ class Settings(enum.Enum):
     snapshot_template = resources_path("templates", "snapshot-template.json")
     layer_format = "memory"
     crop_layers = True
+    role = "contributor"
     licences = {
         "Creative Commons CC Zero": {
             "type": "CC0-1.0",
@@ -73,7 +74,10 @@ class Settings(enum.Enum):
         },
     }
 
-    _options = {"layer_format": [option.value for option in LayerFormatOptions]}
+    _options = {
+        "layer_format": [option.value for option in LayerFormatOptions],
+        "role": ["author", "publisher", "maintainer", "wrangler", "contributor"],
+    }
 
     def get(self) -> Any:
         """Gets the value of the setting"""

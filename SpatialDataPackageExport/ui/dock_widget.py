@@ -52,7 +52,7 @@ from ..core.processing.task_runner import TaskWrapper, create_styles_to_attribut
 from ..core.utils import datapackage_bounds_to_extent, extent_to_datapackage_bounds
 from ..definitions.configurable_settings import LayerFormatOptions, Settings
 from ..model.config import Config, SnapshotConfig, SnapshotResource
-from ..model.snapshot import Legend, License, Source
+from ..model.snapshot import Contributor, Legend, License, Source
 from ..model.styled_layer import StyledLayer
 from ..qgis_plugin_tools.tools.custom_logging import bar_msg
 from ..qgis_plugin_tools.tools.decorations import log_if_fails
@@ -96,6 +96,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.source_grid: QGridLayout = self.source_grid
         self.layer_rows: Dict = {}
         self.source_rows: Dict = {}
+        self.contributor_rows: Dict = {}
         # TODO: add items here
         self.responsive_items = (
             self.btn_export,
@@ -121,6 +122,16 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.btn_add_source_row.setIcon(QgsApplication.getThemeIcon("/mActionAdd.svg"))
         self.btn_add_source_row.clicked.connect(
             lambda _: self.__add_source_row(len(self.source_rows) + 1)
+        )
+
+        self.btn_add_contributor_row.setIcon(
+            QgsApplication.getThemeIcon("/mActionAdd.svg")
+        )
+        self.btn_add_contributor_row.clicked.connect(
+            lambda _: self.__add_contributor_row(
+                len(self.contributor_rows) + 1,
+                Contributor("", "", "", DataPackageHandler.get_project_author()),
+            )
         )
 
         self.btn_export.clicked.connect(self.run)
@@ -172,6 +183,10 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             Source(row["url"].text(), row["title"].text())
             for row in self.source_rows.values()
         ]
+        snapshot_config.contributors = [
+            Source(row["url"].text(), row["title"].text())
+            for row in self.source_rows.values()
+        ]
         snapshot_config.resources = [
             SnapshotResource(
                 row["layer"].currentText(),
@@ -180,6 +195,16 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             )
             for row in self.layer_rows.values()
         ]
+        snapshot_config.contributors = [
+            Contributor(
+                row["path"].text(),
+                row["role"].currentText(),
+                row["email"].text(),
+                row["title"].text(),
+            )
+            for row in self.contributor_rows.values()
+        ]
+
         snapshot_config.bounds_precision = self.sb_extent_precision.value()
         snapshot_config.crop_layers = self.cb_crop_layers.isChecked()
         snapshot_config.licenses = [
@@ -229,13 +254,23 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
         for row_uuid in list(self.source_rows.keys()):
             self.__remove_row(row_uuid, self.source_rows, self.source_grid)
+        for row_uuid in list(self.layer_rows.keys()):
+            self.__remove_row(row_uuid, self.layer_rows, self.layer_grid)
+        for row_uuid in list(self.contributor_rows.keys()):
+            self.__remove_row(row_uuid, self.contributor_rows, self.contributors_grid)
+
         for i, source in enumerate(
-            snapshot_conf.sources if snapshot_conf.sources else [], start=1
+            snapshot_conf.sources if snapshot_conf.sources is not None else [], start=1
         ):
             self.__add_source_row(i, source.url, source.title)
 
-        for row_uuid in list(self.layer_rows.keys()):
-            self.__remove_row(row_uuid, self.layer_rows, self.layer_grid)
+        for i, contributor in enumerate(
+            snapshot_conf.contributors
+            if snapshot_conf.contributors is not None
+            else [],
+            start=1,
+        ):
+            self.__add_contributor_row(i, contributor)
 
         # TODO: Take in use again when implementing #49
         """
@@ -279,6 +314,12 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         for id, row in self.layer_rows.items():
             cb: QgsMapLayerComboBox = row["layer"]
             layer_name = cb.currentText()
+            if layer_name == "":
+                LOGGER.warning(
+                    tr("No Layer selected"),
+                    extra=bar_msg(tr("Add at least one layer to the project")),
+                )
+                return
             row["layer_name"] = layer_name
             new_layer_name = f"{layer_name}-snapshot"
             row["new_layer_name"] = new_layer_name
@@ -487,6 +528,47 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.source_grid.addWidget(b_rm, row_index, 0)
         self.source_grid.addWidget(le_url, row_index, 1)
         self.source_grid.addWidget(le_title, row_index, 2)
+
+    # noinspection PyUnresolvedReferences
+    @log_if_fails
+    def __add_contributor_row(self, row_index: int, contributor: Contributor) -> None:
+        row_uuid = str(uuid.uuid4())
+        b_rm = QPushButton(
+            text="", icon=QgsApplication.getThemeIcon("/mActionRemove.svg")
+        )
+        b_rm.setToolTip(tr("Remove row"))
+        b_rm.clicked.connect(
+            lambda _: self.__remove_row(
+                row_uuid, self.contributor_rows, self.contributors_grid
+            )
+        )
+
+        LOGGER.info(f"Titteli: {contributor.title}")
+        bx_role = QComboBox()
+        bx_role.addItems(Settings.role.get_options())
+        bx_role.setCurrentText(
+            contributor.role if contributor.role else Settings.role.get()
+        )
+        le_title = QLineEdit(contributor.title)
+        le_title.setToolTip(tr("e.g. first- and lastname"))
+        le_email = QLineEdit(contributor.email)
+        le_path = QLineEdit(contributor.path)
+        le_path.setToolTip(tr("url"))
+        # TODO: Add organisation
+        row = {
+            "rm": b_rm,
+            "role": bx_role,
+            "title": le_title,
+            "email": le_email,
+            "path": le_path,
+        }
+
+        self.contributor_rows[row_uuid] = row
+        self.contributors_grid.addWidget(b_rm, row_index, 0)
+        self.contributors_grid.addWidget(bx_role, row_index, 1)
+        self.contributors_grid.addWidget(le_title, row_index, 2)
+        self.contributors_grid.addWidget(le_email, row_index, 3)
+        self.contributors_grid.addWidget(le_path, row_index, 4)
 
     @log_if_fails
     def __remove_row(self, row_uuid: str, row_dict: Dict, grid: QGridLayout) -> None:

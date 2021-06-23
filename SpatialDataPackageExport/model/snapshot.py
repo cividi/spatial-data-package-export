@@ -43,6 +43,7 @@ class Contributor:
         self.role = role
         self.email = email
         self.title = title
+        # TODO: Add organisation
 
     @staticmethod
     def from_dict(obj: Any) -> "Contributor":

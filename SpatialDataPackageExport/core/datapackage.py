@@ -205,7 +205,11 @@ class DataPackageHandler:
         snapshot.gemeindescan_meta = snapshot_config.gemeindescan_meta
         if snapshot_license:
             snapshot.licenses = [snapshot_license]
-        snapshot.contributors[0].title = self.get_project_author()
+        snapshot.contributors = (
+            snapshot_config.contributors
+            if snapshot_config.contributors is not None
+            else []
+        )
 
         LOGGER.debug("Updating resources")
         initial_resources = snapshot.resources
