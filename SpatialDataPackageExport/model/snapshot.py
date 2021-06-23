@@ -38,28 +38,40 @@ from .model_utils import (
 
 
 class Contributor:
-    def __init__(self, path: str, role: str, email: str, title: str) -> None:
-        self.path = path
+    def __init__(
+        self,
+        role: str,
+        title: str,
+        email: Optional[str] = None,
+        path: Optional[str] = None,
+        organisation: Optional[str] = None,
+    ) -> None:
+        self.title = title
         self.role = role
         self.email = email
-        self.title = title
-        # TODO: Add organisation
+        self.path = path
+        self.organisation = organisation
 
     @staticmethod
     def from_dict(obj: Any) -> "Contributor":
         assert isinstance(obj, dict)
-        path = from_str(obj.get("path"))
         role = from_str(obj.get("role"))
-        email = from_str(obj.get("email"))
         title = from_str(obj.get("title"))
-        return Contributor(path, role, email, title)
+        email = from_union([from_str, from_none], obj.get("email"))
+        path = from_union([from_str, from_none], obj.get("path"))
+        organisation = from_union([from_str, from_none], obj.get("organisation"))
+        return Contributor(role, title, email, path, organisation)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["path"] = from_str(self.path)
         result["role"] = from_str(self.role)
-        result["email"] = from_str(self.email)
         result["title"] = from_str(self.title)
+        if self.email:
+            result["email"] = from_str(self.email)
+        if self.path:
+            result["path"] = from_str(self.path)
+        if self.organisation:
+            result["organisation"] = from_str(self.organisation)
         return result
 
 

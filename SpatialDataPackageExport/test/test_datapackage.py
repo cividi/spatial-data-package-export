@@ -113,7 +113,7 @@ def test_gratuated_poly(new_project, gratuated_poly, layer_empty_poly, monkeypat
     config_data = load_json(plugin_test_data_path("config", "config_simple_poly.json"))
     config = Config.from_dict(config_data)
     config.get_snapshot_config().contributors = [
-        Contributor("", "author", "", DataPackageHandler.get_project_author())
+        Contributor("author", DataPackageHandler.get_project_author())
     ]
 
     handler = DataPackageHandler.create(config)

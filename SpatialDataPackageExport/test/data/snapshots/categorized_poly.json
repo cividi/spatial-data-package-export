@@ -236,10 +236,8 @@
   ],
   "contributors": [
     {
-      "path": "",
       "role": "author",
-      "email": "",
-      "title": ""
+      "title": "test_author"
     }
   ]
 }

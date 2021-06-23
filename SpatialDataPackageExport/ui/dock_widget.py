@@ -130,7 +130,9 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.btn_add_contributor_row.clicked.connect(
             lambda _: self.__add_contributor_row(
                 len(self.contributor_rows) + 1,
-                Contributor("", "", "", DataPackageHandler.get_project_author()),
+                Contributor(
+                    Settings.role.get(), DataPackageHandler.get_project_author()
+                ),
             )
         )
 
@@ -197,10 +199,11 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         ]
         snapshot_config.contributors = [
             Contributor(
-                row["path"].text(),
                 row["role"].currentText(),
-                row["email"].text(),
                 row["title"].text(),
+                row["email"].text(),
+                row["path"].text(),
+                row["organisation"].text(),
             )
             for row in self.contributor_rows.values()
         ]
@@ -546,14 +549,13 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         LOGGER.info(f"Titteli: {contributor.title}")
         bx_role = QComboBox()
         bx_role.addItems(Settings.role.get_options())
-        bx_role.setCurrentText(
-            contributor.role if contributor.role else Settings.role.get()
-        )
+        bx_role.setCurrentText(contributor.role)
         le_title = QLineEdit(contributor.title)
         le_title.setToolTip(tr("e.g. first- and lastname"))
         le_email = QLineEdit(contributor.email)
         le_path = QLineEdit(contributor.path)
         le_path.setToolTip(tr("url"))
+        le_organisation = QLineEdit(contributor.organisation)
         # TODO: Add organisation
         row = {
             "rm": b_rm,
@@ -561,6 +563,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             "title": le_title,
             "email": le_email,
             "path": le_path,
+            "organisation": le_organisation,
         }
 
         self.contributor_rows[row_uuid] = row
@@ -569,6 +572,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.contributors_grid.addWidget(le_title, row_index, 2)
         self.contributors_grid.addWidget(le_email, row_index, 3)
         self.contributors_grid.addWidget(le_path, row_index, 4)
+        self.contributors_grid.addWidget(le_organisation, row_index, 5)
 
     @log_if_fails
     def __remove_row(self, row_uuid: str, row_dict: Dict, grid: QGridLayout) -> None:
