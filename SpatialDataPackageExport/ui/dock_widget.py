@@ -27,15 +27,6 @@ import uuid
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
-from PyQt5.QtWidgets import (
-    QCheckBox,
-    QComboBox,
-    QGridLayout,
-    QLineEdit,
-    QPushButton,
-    QWidget,
-)
 from qgis.core import (
     QgsApplication,
     QgsMapLayerProxyModel,
@@ -44,8 +35,18 @@ from qgis.core import (
     QgsRectangle,
     QgsVectorLayer,
 )
-from qgis.gui import QgisInterface, QgsFileWidget, QgsMapLayerComboBox
+from qgis.gui import QgsFileWidget, QgsMapLayerComboBox
 from qgis.PyQt import QtWidgets
+from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
+from qgis.PyQt.QtWidgets import (
+    QCheckBox,
+    QComboBox,
+    QGridLayout,
+    QLineEdit,
+    QPushButton,
+    QWidget,
+)
+from qgis.utils import iface
 
 from ..core.datapackage import DataPackageHandler
 from ..core.processing.task_runner import TaskWrapper, create_styles_to_attributes_tasks
@@ -75,7 +76,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     closingPlugin = pyqtSignal()  # noqa: N815
 
     # noinspection PyCallByClass
-    def __init__(self, iface: QgisInterface, parent: Optional[QWidget] = None) -> None:
+    def __init__(self, parent: Optional[QWidget] = None) -> None:
         super(ExporterDockWidget, self).__init__(parent)
         self.setupUi(self)
 
@@ -88,7 +89,6 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             QgsApplication.getThemeIcon("/propertyicons/settings.svg")
         )
 
-        self.iface = iface
         # Template can be configured via settings
         self.data_pkg_handler = DataPackageHandler.create()
         self.extent: Optional[QgsRectangle] = None
@@ -603,7 +603,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
     @pyqtSlot()
     def on_btn_calculate_extent_clicked(self) -> None:
-        canvas = self.iface.mapCanvas()
+        canvas = iface.mapCanvas()
         crs = canvas.mapSettings().destinationCrs()
 
         extent_chooser = ExtentChooserDialog(canvas, crs)

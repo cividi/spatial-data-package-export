@@ -19,13 +19,12 @@
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
 from typing import Callable, List, Optional
 
-from PyQt5.QtCore import QCoreApplication, Qt
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QWidget
 from qgis.core import QgsApplication
 from qgis.gui import QgisInterface
 from qgis.PyQt import QtWidgets
-from qgis.PyQt.QtCore import QTranslator
+from qgis.PyQt.QtCore import QCoreApplication, Qt, QTranslator
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction, QWidget
 
 from .core.processing.provider import SpatialDataPackageProcessingProvider
 from .qgis_plugin_tools.tools.custom_logging import setup_logger, teardown_logger
@@ -37,7 +36,7 @@ from .ui.dock_widget import ExporterDockWidget
 class Plugin:
     """QGIS Plugin Implementation."""
 
-    def __init__(self, iface: QgisInterface) -> None:
+    def __init__(self, iface: QgisInterface) -> None:  # noqa QGS105
 
         self.iface = iface
 
@@ -160,7 +159,7 @@ class Plugin:
     def run(self) -> None:
         """Run method that performs all the real work"""
         if self.dock_widget is None:
-            self.dock_widget = ExporterDockWidget(self.iface)
+            self.dock_widget = ExporterDockWidget()
 
         self.dock_widget.closingPlugin.connect(self.onClosePlugin)
 

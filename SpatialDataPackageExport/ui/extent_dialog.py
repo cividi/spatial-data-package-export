@@ -21,9 +21,9 @@
 import logging
 from typing import Optional
 
-from PyQt5.QtWidgets import QDialog, QWidget
 from qgis.core import QgsCoordinateReferenceSystem, QgsRectangle
 from qgis.gui import QgsExtentGroupBox, QgsMapCanvas
+from qgis.PyQt.QtWidgets import QDialog, QWidget
 
 from ..qgis_plugin_tools.tools.resources import load_ui, plugin_name
 

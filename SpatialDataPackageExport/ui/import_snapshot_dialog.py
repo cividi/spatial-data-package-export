@@ -22,7 +22,7 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from PyQt5.QtWidgets import QDialog, QWidget
+from qgis.PyQt.QtWidgets import QDialog, QWidget
 
 from ..qgis_plugin_tools.tools.resources import load_ui, plugin_name
 

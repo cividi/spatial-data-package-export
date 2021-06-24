@@ -20,7 +20,6 @@
 
 from typing import Any, Dict, List, Optional, cast
 
-from PyQt5.QtCore import QVariant
 from qgis.core import (
     QgsExpression,
     QgsFeature,
@@ -41,6 +40,7 @@ from qgis.core import (
     QgsSymbolLayer,
     QgsVectorLayer,
 )
+from qgis.PyQt.QtCore import QVariant
 
 from ..definitions.style import PointStyle, Style
 from ..definitions.symbols import SymbolLayerType, SymbolType
