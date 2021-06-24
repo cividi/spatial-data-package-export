@@ -397,6 +397,7 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             ),
         )
 
+    @log_if_fails
     def __styles_to_attributes_finished(
         self,
         input_layer: QgsVectorLayer,
