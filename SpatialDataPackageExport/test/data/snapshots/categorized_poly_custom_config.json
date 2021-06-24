@@ -243,12 +243,5 @@
       "path": "mapbox://styles/gemeindescan/ck6rp249516tg1iqkmt48o4pz"
     }
   ],
-  "contributors": [
-    {
-      "path": "",
-      "role": "author",
-      "email": "",
-      "title": "test_author"
-    }
-  ]
+  "contributors": []
 }

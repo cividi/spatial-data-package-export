@@ -21,7 +21,7 @@
 import logging
 from typing import Optional, Type
 
-from PyQt5.QtWidgets import QDialog, QRadioButton, QWidget
+from qgis.PyQt.QtWidgets import QDialog, QRadioButton, QWidget
 
 from ..definitions.configurable_settings import Settings
 from ..qgis_plugin_tools.tools.custom_logging import bar_msg

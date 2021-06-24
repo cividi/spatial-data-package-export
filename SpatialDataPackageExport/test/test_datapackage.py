@@ -30,7 +30,7 @@ from ..core.styles2attributes import StylesToAttributes
 from ..core.utils import load_json
 from ..definitions.types import StyleType
 from ..model.config import Config
-from ..model.snapshot import Snapshot
+from ..model.snapshot import Contributor, Snapshot
 from ..model.styled_layer import StyledLayer
 from ..qgis_plugin_tools.tools.resources import plugin_test_data_path
 from .conftest import add_layer
@@ -112,6 +112,9 @@ def test_gratuated_poly(new_project, gratuated_poly, layer_empty_poly, monkeypat
 
     config_data = load_json(plugin_test_data_path("config", "config_simple_poly.json"))
     config = Config.from_dict(config_data)
+    config.get_snapshot_config().contributors = [
+        Contributor("author", DataPackageHandler.get_project_author())
+    ]
 
     handler = DataPackageHandler.create(config)
     snapshot_config = config.snapshots[0]
@@ -127,12 +130,7 @@ def test_gratuated_poly(new_project, gratuated_poly, layer_empty_poly, monkeypat
     assert snapshot.to_dict() == expected_snapshot_dict
 
 
-def test_points_with_radius(
-    new_project, points_with_radius, layer_empty_points, monkeypatch
-):
-    # Mock get_project_author
-    monkeypatch.setattr(DataPackageHandler, "get_project_author", mock_auth)
-
+def test_points_with_radius(new_project, points_with_radius, layer_empty_points):
     converter = StylesToAttributes(
         points_with_radius,
         points_with_radius.name(),
@@ -167,11 +165,8 @@ def test_points_with_radius(
 
 
 def test_export_of_non_ascii_layer(
-    new_project, layer_with_non_ascii_simple_style, layer_empty_points, monkeypatch
+    new_project, layer_with_non_ascii_simple_style, layer_empty_points
 ):
-    # Mock get_project_author
-    monkeypatch.setattr(DataPackageHandler, "get_project_author", mock_auth)
-
     converter = StylesToAttributes(
         layer_with_non_ascii_simple_style,
         layer_with_non_ascii_simple_style.name(),

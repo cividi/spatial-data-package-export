@@ -159,12 +159,5 @@
       "mediatype": "application/vnd.mapbox-vector-tile"
     }
   ],
-  "contributors": [
-    {
-      "path": "",
-      "role": "author",
-      "email": "",
-      "title": "test_author"
-    }
-  ]
+  "contributors": []
 }

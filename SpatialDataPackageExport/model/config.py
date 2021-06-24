@@ -33,7 +33,7 @@ from .model_utils import (
     from_union,
     to_class,
 )
-from .snapshot import GemeindescanMeta, License, Snapshot, Source
+from .snapshot import Contributor, GemeindescanMeta, License, Snapshot, Source
 
 
 class SnapshotResource:
@@ -71,6 +71,7 @@ class SnapshotConfig:
         licenses: Optional[List[License]] = None,
         bounds_precision: Optional[int] = None,
         crop_layers: Optional[bool] = None,
+        contributors: Optional[List[Contributor]] = None,
     ) -> None:
         self.title = title
         self.description = description
@@ -82,6 +83,7 @@ class SnapshotConfig:
         self.licenses = licenses
         self.bounds_precision = bounds_precision
         self.crop_layers = crop_layers
+        self.contributors = contributors
 
     @staticmethod
     def from_dict(obj: Any) -> "SnapshotConfig":
@@ -111,6 +113,10 @@ class SnapshotConfig:
             [from_int, from_none], obj.get("bounds_precision")
         )
         crop_layers = from_union([from_bool, from_none], obj.get("crop_layers"))
+        contributors = from_union(
+            [lambda x: from_list(Contributor.from_dict, x), from_none],
+            obj.get("contributors"),
+        )
         return SnapshotConfig(
             title,
             description,
@@ -122,6 +128,7 @@ class SnapshotConfig:
             licenses,
             bounds_precision,
             crop_layers,
+            contributors,
         )
 
     @staticmethod
@@ -157,6 +164,7 @@ class SnapshotConfig:
             licenses=snapshot.licenses,
             bounds_precision=bounds_precision,
             crop_layers=False,
+            contributors=snapshot.contributors,
         )
 
     def to_dict(self) -> dict:
@@ -191,6 +199,14 @@ class SnapshotConfig:
             [from_int, from_none], self.bounds_precision
         )
         result["crop_layers"] = from_union([from_bool, from_none], self.crop_layers)
+        if self.contributors is not None:
+            result["contributors"] = from_union(
+                [
+                    lambda x: from_list(lambda x: to_class(Contributor, x), x),
+                    from_none,
+                ],
+                self.contributors,
+            )
         return result
 
 

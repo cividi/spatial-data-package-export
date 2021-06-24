@@ -17,7 +17,7 @@
 #
 #  You should have received a copy of the GNU General Public License
 #  along with SpatialDataPackageExport.  If not, see <https://www.gnu.org/licenses/>.
-
+import logging
 import tempfile
 from pathlib import Path
 from typing import Dict, List, Union
@@ -30,11 +30,16 @@ from qgis.core import (
     QgsVectorLayer,
 )
 
+from ..core.exceptions import DataPackageException
 from ..core.utils import load_json
 from ..definitions.configurable_settings import Settings
 from ..definitions.types import StyleType
-from ..qgis_plugin_tools.tools.resources import resources_path
+from ..qgis_plugin_tools.tools.custom_logging import bar_msg
+from ..qgis_plugin_tools.tools.i18n import tr
+from ..qgis_plugin_tools.tools.resources import plugin_name, resources_path
 from .snapshot import Legend, License
+
+LOGGER = logging.getLogger(plugin_name())
 
 
 class StyledLayer:
@@ -93,11 +98,24 @@ class StyledLayer:
         dst_crs = QgsCoordinateReferenceSystem("EPSG:4326")
         options.ct = QgsCoordinateTransform(src_crs, dst_crs, QgsProject.instance())
 
-        writer_, msg = QgsVectorFileWriter.writeAsVectorFormatV2(
-            self.layer,
-            str(output_file),
-            QgsProject.instance().transformContext(),
-            options,
-        )
+        if hasattr(QgsVectorFileWriter, "writeAsVectorFormatV3"):
+            writer_, msg, _, _ = QgsVectorFileWriter.writeAsVectorFormatV3(
+                self.layer,
+                str(output_file),
+                QgsProject.instance().transformContext(),
+                options,
+            )
+        else:
+            writer_, msg = QgsVectorFileWriter.writeAsVectorFormatV2(
+                self.layer,
+                str(output_file),
+                QgsProject.instance().transformContext(),
+                options,
+            )
+        if msg != "":
+            raise DataPackageException(
+                tr("Could not write layer {} to disk", output_file),
+                bar_msg(tr("Check the log for more details")),
+            )
 
         return output_file
