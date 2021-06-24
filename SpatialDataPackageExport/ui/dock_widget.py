@@ -275,8 +275,6 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         ):
             self.__add_contributor_row(i, contributor)
 
-        # TODO: Take in use again when implementing #49
-        """
         for i, layer_resource in enumerate(
             snapshot_conf.resources if snapshot_conf.resources else [], start=1
         ):
@@ -293,7 +291,6 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                         )
                     ),
                 )
-        """
 
         # Add one row initially
         if not snapshot_conf.resources:
