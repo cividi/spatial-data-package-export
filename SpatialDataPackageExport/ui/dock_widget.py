@@ -35,7 +35,7 @@ from qgis.core import (
     QgsRectangle,
     QgsVectorLayer,
 )
-from qgis.gui import QgsFileWidget, QgsMapLayerComboBox
+from qgis.gui import QgsMapLayerComboBox
 from qgis.PyQt import QtWidgets
 from qgis.PyQt.QtCore import pyqtSignal, pyqtSlot
 from qgis.PyQt.QtWidgets import (
@@ -238,10 +238,6 @@ class ExporterDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         if snapshot_conf.bounds:
             self.extent = datapackage_bounds_to_extent(snapshot_conf.bounds)
         self.sb_extent_precision.setValue(snapshot_conf.bounds_precision)
-
-        self.f_output: QgsFileWidget
-        if config.project_name:
-            self.f_output.setFilePath(config.project_name)
 
         self.cb_crop_layers: QCheckBox
         self.cb_crop_layers.setChecked(snapshot_conf.crop_layers)
