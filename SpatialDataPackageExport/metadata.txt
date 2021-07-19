@@ -2,7 +2,7 @@
 name=SpatialDataPackageExport
 description=Spatial Data Package Export plugin
 about=Plugin to export layers to spatial data packages according to <a href="https://frictionlessdata.io/">Frictionless Data Standard</a> compatible with the <a href="https://github.com/cividi/spatial-data-package-platform">Spatial Data Package Platform</a> developed by <a href="https://cividi.ch">Cividi GmbH</a>.
-version=0.0.1
+version=0.2.1
 qgisMinimumVersion=3.10
 author=Gispo Ltd.
 email=joona@gispo.fi
